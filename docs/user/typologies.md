@@ -42,7 +42,7 @@ A bar with a full-depth stair at the west end (`ST`), a double-loaded corridor a
 ![Plan of the Linear Plan Generator example](../assets/screenshots/linear-plan-plan.png){ width="49%" }
 ![Building of the Linear Plan Generator example](../assets/screenshots/linear-plan-building.png){ width="49%" }
 
-Example: `examples/linear-plan.gh` ([canvas](../assets/screenshots/canvas/linear-plan.png)); reference: [Linear Plan Generator](components/generate.md#linear-plan-generator).
+Example: `linear-plan.gh` ([canvas](../assets/screenshots/canvas/linear-plan.png)); reference: [Linear Plan Generator](components/generate.md#linear-plan-generator).
 
 ### Stair Bay Bar
 
@@ -51,7 +51,7 @@ Repeated bays of dwelling, stair, dwelling through the full depth, each stair se
 ![Plan of the Stair Bay Bar example](../assets/screenshots/stair-bay-bar-plan.png){ width="49%" }
 ![Building of the Stair Bay Bar example](../assets/screenshots/stair-bay-bar-building.png){ width="49%" }
 
-Example: `examples/stair-bay-bar.gh` ([canvas](../assets/screenshots/canvas/stair-bay-bar.png)); reference: [Stair Bay Bar](components/generate.md#stair-bay-bar).
+Example: `stair-bay-bar.gh` ([canvas](../assets/screenshots/canvas/stair-bay-bar.png)); reference: [Stair Bay Bar](components/generate.md#stair-bay-bar).
 
 ### Stair Pair
 
@@ -60,7 +60,7 @@ One stair bay of the *Stair Bay Bar* as its own building: two dwellings on eithe
 ![Plan of the Stair Pair example](../assets/screenshots/stair-pair-plan.png){ width="49%" }
 ![Building of the Stair Pair example](../assets/screenshots/stair-pair-building.png){ width="49%" }
 
-Example: `examples/stair-pair.gh` ([canvas](../assets/screenshots/canvas/stair-pair.png)); reference: [Stair Pair](components/generate.md#stair-pair).
+Example: `stair-pair.gh` ([canvas](../assets/screenshots/canvas/stair-pair.png)); reference: [Stair Pair](components/generate.md#stair-pair).
 
 ### Gallery Bar
 
@@ -69,7 +69,7 @@ A row of dwellings through the bar depth between a stair at each end (`ST1` west
 ![Plan of the Gallery Bar example](../assets/screenshots/gallery-bar-plan.png){ width="49%" }
 ![Building of the Gallery Bar example](../assets/screenshots/gallery-bar-building.png){ width="49%" }
 
-Example: `examples/gallery-bar.gh` ([canvas](../assets/screenshots/canvas/gallery-bar.png)); reference: [Gallery Bar](components/generate.md#gallery-bar).
+Example: `gallery-bar.gh` ([canvas](../assets/screenshots/canvas/gallery-bar.png)); reference: [Gallery Bar](components/generate.md#gallery-bar).
 
 ### Terrace Row
 
@@ -78,7 +78,7 @@ Attached house plots sharing dividing walls, one dwelling zone per plot and stor
 ![Plan of the Terrace Row example](../assets/screenshots/terrace-row-plan.png){ width="49%" }
 ![Building of the Terrace Row example](../assets/screenshots/terrace-row-building.png){ width="49%" }
 
-Example: `examples/terrace-row.gh` ([canvas](../assets/screenshots/canvas/terrace-row.png)); reference: [Terrace Row](components/generate.md#terrace-row).
+Example: `terrace-row.gh` ([canvas](../assets/screenshots/canvas/terrace-row.png)); reference: [Terrace Row](components/generate.md#terrace-row).
 
 ### Point Plate
 
@@ -87,7 +87,7 @@ A square plate of side *Core Width* + 2 × *Dwelling Depth* (22 m by default) wi
 ![Plan of the Point Plate example](../assets/screenshots/point-plate-plan.png){ width="49%" }
 ![Building of the Point Plate example](../assets/screenshots/point-plate-building.png){ width="49%" }
 
-Example: `examples/point-plate.gh` ([canvas](../assets/screenshots/canvas/point-plate.png)); reference: [Point Plate](components/generate.md#point-plate).
+Example: `point-plate.gh` ([canvas](../assets/screenshots/canvas/point-plate.png)); reference: [Point Plate](components/generate.md#point-plate).
 
 ### Winged Band
 
@@ -96,7 +96,7 @@ A band of stair bays with wings of stair bays projecting to plan north, each joi
 ![Plan of the Winged Band example](../assets/screenshots/winged-band-plan.png){ width="49%" }
 ![Building of the Winged Band example](../assets/screenshots/winged-band-building.png){ width="49%" }
 
-Example: `examples/winged-band.gh` ([canvas](../assets/screenshots/canvas/winged-band.png)); reference: [Winged Band](components/generate.md#winged-band).
+Example: `winged-band.gh` ([canvas](../assets/screenshots/canvas/winged-band.png)); reference: [Winged Band](components/generate.md#winged-band).
 
 ### Open Court
 
@@ -105,7 +105,7 @@ West, east, and north wings of stair bays around a court open to plan south; eve
 ![Plan of the Open Court example](../assets/screenshots/open-court-plan.png){ width="49%" }
 ![Building of the Open Court example](../assets/screenshots/open-court-building.png){ width="49%" }
 
-Example: `examples/open-court.gh` ([canvas](../assets/screenshots/canvas/open-court.png)); reference: [Open Court](components/generate.md#open-court).
+Example: `open-court.gh` ([canvas](../assets/screenshots/canvas/open-court.png)); reference: [Open Court](components/generate.md#open-court).
 
 ### Enclosed Court
 
@@ -114,7 +114,7 @@ Four wings of stair bays around a court closed on all four sides. The footprint 
 ![Plan of the Enclosed Court example](../assets/screenshots/enclosed-court-plan.png){ width="49%" }
 ![Building of the Enclosed Court example](../assets/screenshots/enclosed-court-building.png){ width="49%" }
 
-Example: `examples/enclosed-court.gh` ([canvas](../assets/screenshots/canvas/enclosed-court.png)); reference: [Enclosed Court](components/generate.md#enclosed-court).
+Example: `enclosed-court.gh` ([canvas](../assets/screenshots/canvas/enclosed-court.png)); reference: [Enclosed Court](components/generate.md#enclosed-court).
 
 ### Court Cluster
 
@@ -123,7 +123,7 @@ A row of courts closed by wings of stair bays: south and north wings across the 
 ![Plan of the Court Cluster example](../assets/screenshots/court-cluster-plan.png){ width="49%" }
 ![Building of the Court Cluster example](../assets/screenshots/court-cluster-building.png){ width="49%" }
 
-Example: `examples/court-cluster.gh` ([canvas](../assets/screenshots/canvas/court-cluster.png)); reference: [Court Cluster](components/generate.md#court-cluster).
+Example: `court-cluster.gh` ([canvas](../assets/screenshots/canvas/court-cluster.png)); reference: [Court Cluster](components/generate.md#court-cluster).
 
 ### Radial Lobes
 
@@ -132,7 +132,7 @@ Three or four lobes on the sides of a square core `ST`, east, north, west, then 
 ![Plan of the Radial Lobes example](../assets/screenshots/radial-lobes-plan.png){ width="49%" }
 ![Building of the Radial Lobes example](../assets/screenshots/radial-lobes-building.png){ width="49%" }
 
-Example: `examples/radial-lobes.gh` ([canvas](../assets/screenshots/canvas/radial-lobes.png)); reference: [Radial Lobes](components/generate.md#radial-lobes).
+Example: `radial-lobes.gh` ([canvas](../assets/screenshots/canvas/radial-lobes.png)); reference: [Radial Lobes](components/generate.md#radial-lobes).
 
 ### Stepped Band
 
@@ -141,7 +141,7 @@ A band of dwellings between a west stair `ST` and a rear corridor `CO` that step
 ![Plan of the Stepped Band example](../assets/screenshots/stepped-band-plan.png){ width="49%" }
 ![Building of the Stepped Band example](../assets/screenshots/stepped-band-building.png){ width="49%" }
 
-Example: `examples/stepped-band.gh` ([canvas](../assets/screenshots/canvas/stepped-band.png)); reference: [Stepped Band](components/generate.md#stepped-band).
+Example: `stepped-band.gh` ([canvas](../assets/screenshots/canvas/stepped-band.png)); reference: [Stepped Band](components/generate.md#stepped-band).
 
 ## Non-residential
 
@@ -152,7 +152,7 @@ A rectangular plate whose office work area `OF` is one zone, a ring around a cen
 ![Plan of the Office Plate example](../assets/screenshots/office-plate-plan.png){ width="49%" }
 ![Building of the Office Plate example](../assets/screenshots/office-plate-building.png){ width="49%" }
 
-Example: `examples/office-plate.gh` ([canvas](../assets/screenshots/canvas/office-plate.png)); reference: [Office Plate](components/generate.md#office-plate).
+Example: `office-plate.gh` ([canvas](../assets/screenshots/canvas/office-plate.png)); reference: [Office Plate](components/generate.md#office-plate).
 
 ### Cafeteria
 
@@ -161,7 +161,7 @@ The kitchen and servery `KS`, one zone, along the whole north edge of a larger d
 ![Plan of the Cafeteria example](../assets/screenshots/cafeteria-plan.png){ width="49%" }
 ![Building of the Cafeteria example](../assets/screenshots/cafeteria-building.png){ width="49%" }
 
-Example: `examples/cafeteria.gh` ([canvas](../assets/screenshots/canvas/cafeteria.png)); reference: [Cafeteria](components/generate.md#cafeteria).
+Example: `cafeteria.gh` ([canvas](../assets/screenshots/canvas/cafeteria.png)); reference: [Cafeteria](components/generate.md#cafeteria).
 
 ### Branching Mall
 
@@ -170,7 +170,7 @@ One mall zone `MALL` through a central court and three or four branches (east, n
 ![Plan of the Branching Mall example](../assets/screenshots/branching-mall-plan.png){ width="49%" }
 ![Building of the Branching Mall example](../assets/screenshots/branching-mall-building.png){ width="49%" }
 
-Example: `examples/branching-mall.gh` ([canvas](../assets/screenshots/canvas/branching-mall.png)); reference: [Branching Mall](components/generate.md#branching-mall).
+Example: `branching-mall.gh` ([canvas](../assets/screenshots/canvas/branching-mall.png)); reference: [Branching Mall](components/generate.md#branching-mall).
 
 ### Care Hub
 
@@ -179,7 +179,7 @@ Two to four bedroom wings around a communal hub `HUB`, each wing a corridor `W{i
 ![Plan of the Care Hub example](../assets/screenshots/care-hub-plan.png){ width="49%" }
 ![Building of the Care Hub example](../assets/screenshots/care-hub-building.png){ width="49%" }
 
-Example: `examples/care-hub.gh` ([canvas](../assets/screenshots/canvas/care-hub.png)); reference: [Care Hub](components/generate.md#care-hub).
+Example: `care-hub.gh` ([canvas](../assets/screenshots/canvas/care-hub.png)); reference: [Care Hub](components/generate.md#care-hub).
 
 ### Foyer Halls
 
@@ -188,7 +188,7 @@ Two or three activity halls and a support wing around a square public foyer `FO`
 ![Plan of the Foyer Halls example](../assets/screenshots/foyer-halls-plan.png){ width="49%" }
 ![Building of the Foyer Halls example](../assets/screenshots/foyer-halls-building.png){ width="49%" }
 
-Example: `examples/foyer-halls.gh` ([canvas](../assets/screenshots/canvas/foyer-halls.png)); reference: [Foyer Halls](components/generate.md#foyer-halls).
+Example: `foyer-halls.gh` ([canvas](../assets/screenshots/canvas/foyer-halls.png)); reference: [Foyer Halls](components/generate.md#foyer-halls).
 
 ### Operating Suite
 
@@ -197,11 +197,11 @@ Support rooms `SUP` across the west end, then bands from south to north: a dirty
 ![Plan of the Operating Suite example](../assets/screenshots/operating-suite-plan.png){ width="49%" }
 ![Building of the Operating Suite example](../assets/screenshots/operating-suite-building.png){ width="49%" }
 
-Example: `examples/operating-suite.gh` ([canvas](../assets/screenshots/canvas/operating-suite.png)); reference: [Operating Suite](components/generate.md#operating-suite).
+Example: `operating-suite.gh` ([canvas](../assets/screenshots/canvas/operating-suite.png)); reference: [Operating Suite](components/generate.md#operating-suite).
 
 ## Example definitions
 
-The repository's `examples/` folder (next to `docs/` and `src/`, not part of this site) holds one Grasshopper definition per typology and `end-to-end.gh`. Each reads left to right: the default preset components, the generator with its default inputs, a plan simplifier, a floor aggregator with a panel of storey multipliers, *Validate*, and *Convert2BEM* and *Convert2IDF* with *Write* off, in coloured groups with short notes. The simplifiers and aggregators vary across the examples so that each appears several times; any simplifier works with any aggregator. Open one in Grasshopper with the plugin installed; each solves without warnings or errors and validates.
+The examples zip of each [release](https://github.com/energy-atlas/BEMGen-docs/releases), `bemgen-<version>-examples.zip`, holds one Grasshopper definition per typology and `end-to-end.gh`. Each reads left to right: the default preset components, the generator with its default inputs, a plan simplifier, a floor aggregator with a panel of storey multipliers, *Validate*, and *Convert2BEM* and *Convert2IDF* with *Write* off, in coloured groups with short notes. The simplifiers and aggregators vary across the examples so that each appears several times; any simplifier works with any aggregator. Open one in Grasshopper with the plugin installed; each solves without warnings or errors and validates.
 
 | Definition | Simplifier | Aggregator | Multipliers |
 | --- | --- | --- | --- |
@@ -225,4 +225,4 @@ The repository's `examples/` folder (next to `docs/` and `src/`, not part of thi
 | `stepped-band.gh` | Perimeter Core | Stack Floors | none: one plan per storey, one floor each |
 | `end-to-end.gh` | Perimeter Core (Depth 4.57) | Stack Floors | 1, 3, 1 ([end-to-end example](example-end-to-end.md)) |
 
-All values are the components' defaults. The `examples/README.md` file describes the definitions and how they are rebuilt.
+All values are the components' defaults. The zip's `README.md` describes the definitions.

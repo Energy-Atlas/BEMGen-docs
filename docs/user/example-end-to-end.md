@@ -1,6 +1,6 @@
 # End-to-end example
 
-This example builds a five-storey residential bar from the default linear plan, simplifies every storey to perimeter and core zones, stacks the storeys, validates the building, and converts it with *Convert2BEM* and *Convert2IDF*. Every input value is given, and every expected result below was computed by BEMGen's own code with these inputs, so your definition should show exactly these numbers. The saved definition is `end-to-end.gh` in the repository's `examples/` folder.
+This example builds a five-storey residential bar from the default linear plan, simplifies every storey to perimeter and core zones, stacks the storeys, validates the building, and converts it with *Convert2BEM* and *Convert2IDF*. Every input value is given, and every expected result below was computed by BEMGen's own code with these inputs, so your definition should show exactly these numbers. The saved definition is `end-to-end.gh` in the examples zip of the [release](https://github.com/energy-atlas/BEMGen-docs/releases).
 
 ## The definition
 

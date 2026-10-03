@@ -3,7 +3,9 @@
 !!! abstract "You are in the developer documentation"
     This part of the site is for people who change BEMGen: its code, its research rules, or its documents. If you want to build energy models with BEMGen, go to the [user guide](../user/index.md).
 
-Every page of this section except this one is taken from the repository's `docs/` folder (and `GLOBAL.md` and `AGENTS.md` at its root) each time the site is built. They are never copied into `docs-site/`: edit them in `docs/`, and links to source files outside `docs/` lead to the repository on GitHub.
+Every page of this section except this one comes from BEMGen's `docs/` folder and the `GLOBAL.md` and `AGENTS.md` at its root, through the docs export made with each BEMGen version. BEMGen's code is private for now, so links to source files outside `docs/` appear as plain paths, such as `src/Lod.Core`.
+
+To propose a fix to a page, open an [issue](https://github.com/energy-atlas/BEMGen-docs/issues) in this site's repository. The fix is made in BEMGen and reaches this site with its next export.
 
 ## Where to start
 
@@ -24,8 +26,7 @@ Every page of this section except this one is taken from the repository's `docs/
 | `src/Lod.Grasshopper` | Components, parameters, previews, *Convert2BEM*, icons |
 | `tests/` | Unit, invariant, snapshot, and integration tests, run with `dotnet test` without Rhino |
 | `docs/` | Architecture, decisions, plans, research, development guides (the source of this section) |
-| `docs-site/` | The hand-written pages of this site and the generated component reference |
-| `scripts/` | `verify.ps1` (the merge gate), `rhino-smoke/` (headless Rhino check), `idd-check/`, `docs-site/` (this site), `package-yak.ps1`, `make_icons.py` |
+| `scripts/` | `verify.ps1` (the merge gate), `rhino-smoke/` (headless Rhino check), `idd-check/`, `docs-export/` (the export of this site's generated parts), `package-yak.ps1` and `package-release.ps1` (the release files), `make_icons.py` |
 | `examples/` | Example Grasshopper definitions |
 
 ## Build, test, and document
@@ -34,7 +35,7 @@ Every page of this section except this one is taken from the repository's `docs/
 dotnet build BEMGen.sln -c Release
 dotnet test BEMGen.sln -c Release
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/docs-site/build.ps1 -Python <venv>\Scripts\python.exe
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/docs-export/export.ps1 -OutDir <folder outside the repository>
 ```
 
-`scripts/verify.ps1` must print `VERIFY PASSED` before every merge; `scripts/docs-site/build.ps1` builds this site with `mkdocs build --strict`. How the site is assembled and served: [`scripts/docs-site/README.md`](https://github.com/EnvironmentalSystemsLab/BEMGen/blob/main/scripts/docs-site/README.md). Whether the documentation still matches the code is checked with the project skill `sync-docs` (`.claude/skills/sync-docs/SKILL.md`), run at every stage close-out.
+`scripts/verify.ps1` must print `VERIFY PASSED` before every merge. `scripts/docs-export/export.ps1` runs on a machine with Rhino 8 and writes the docs export: the pages of this section, the component reference, the icons, and the screenshots. This site's repository imports it and builds the site with `mkdocs build --strict`. Whether the documentation still matches the code is checked with the project skill `sync-docs` (`.claude/skills/sync-docs/SKILL.md`), run at every stage close-out.

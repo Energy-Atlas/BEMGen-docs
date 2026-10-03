@@ -187,13 +187,13 @@ Surface types follow the building: ceilings facing outdoors are written as `Roof
 
 ### Checking the file against the EnergyPlus IDD
 
-The repository has a checker that compares IDF files with the EnergyPlus data dictionary (`Energy+.idd`, shipped with EnergyPlus; it is not in the repository). With Python 3:
+BEMGen's repository, private for now, has a checker that compares IDF files with the EnergyPlus data dictionary (`Energy+.idd`, shipped with EnergyPlus). With Python 3, in a clone of that repository:
 
 ```bash
 python scripts/idd-check/idd_check.py "C:\EnergyPlusV25-2-0\Energy+.idd" C:\models\linear.idf
 ```
 
-It also takes a folder of IDF files. Details: [IDD check](https://github.com/EnvironmentalSystemsLab/BEMGen/blob/main/scripts/idd-check/README.md).
+It also takes a folder of IDF files. What it checks and its last run: [IDD check](../developer/architecture/convert2idf.md#idd-check).
 
 ## Runtime messages
 

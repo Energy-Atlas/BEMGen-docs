@@ -23,11 +23,11 @@ This site has two parts.
 
     ---
 
-    For people who change BEMGen itself: the architecture, the domain model, validation, the converters, the architecture decision records, the decision log, and the stage plans, taken from the repository's `docs/` folder each time the site is built.
+    For people who change BEMGen itself: the architecture, the domain model, validation, the converters, the architecture decision records, the decision log, and the stage plans, taken from BEMGen's own documents with each version.
 
 </div>
 
 !!! note "Illustrative example values"
     The program presets and the envelope preset that ship with BEMGen hold illustrative round numbers for development and testing. They are not taken from ASHRAE 90.1, the DOE prototype buildings, or any other standard, and no result based on them should be presented as if they were.
 
-BEMGen is released under the MIT License, copyright 2026 Environmental Systems Lab. Source code: [github.com/EnvironmentalSystemsLab/BEMGen](https://github.com/EnvironmentalSystemsLab/BEMGen).
+BEMGen is released under the MIT License, copyright 2026 Environmental Systems Lab. Its source code is in the BEMGen repository, which is private for now; access is given on request. The plugin and the example definitions are on the [Releases page](https://github.com/energy-atlas/BEMGen-docs/releases) of this site's repository.

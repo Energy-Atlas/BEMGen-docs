@@ -1,0 +1,13 @@
+/* BEMGen site styling (D-115): keep tables readable and make wide tables scroll instead of overflowing. */
+.md-typeset table:not([class]) {
+  font-size: 0.72rem;
+}
+
+.md-typeset table:not([class]) code {
+  white-space: nowrap;
+}
+
+/* The landing-page abstract boxes mark which part of the site a page belongs to. */
+.md-typeset .admonition.abstract {
+  border-left-width: 0.3rem;
+}

@@ -1,0 +1,108 @@
+# BEMGen documentation site (D-115). Build and serve it with scripts/docs-site/build.ps1 and serve.ps1, never with a
+# bare `mkdocs build`: the scripts assemble the developer part from docs/ and the generated component reference into
+# a git-ignored staging folder (.docs-build/) and run MkDocs there, so this file's docs_dir is only the hand-written part.
+site_name: BEMGen
+site_description: Building energy models at several levels of detail in Grasshopper for Rhino 8
+site_author: Environmental Systems Lab
+copyright: Copyright &copy; 2026 Environmental Systems Lab. MIT License.
+repo_url: https://github.com/EnvironmentalSystemsLab/BEMGen
+repo_name: EnvironmentalSystemsLab/BEMGen
+edit_uri: ""
+
+docs_dir: docs-site
+site_dir: site
+strict: true
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: deep orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+extra_css:
+  - assets/stylesheets/bemgen.css
+
+plugins:
+  - search
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      # GitHub-style anchors, so that the links between documents in docs/ work on the site as they do on GitHub.
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+# Every broken link, missing nav target, and unlisted page is a warning, so `--strict` fails on it.
+validation:
+  nav:
+    omitted_files: warn
+    not_found: warn
+    absolute_links: warn
+  links:
+    not_found: warn
+    absolute_links: warn
+    unrecognized_links: warn
+    anchors: warn
+
+# The "Component reference" pages are listed in toolbar order; scripts/docs-site/assemble.py appends any other page the
+# generator writes into that folder. The "Developer" section lists developer/index.md here, and assemble.py adds the
+# pages assembled from docs/ in the staged configuration.
+nav:
+  - Home: index.md
+  - User guide:
+      - user/index.md
+      - Getting started: user/getting-started.md
+      - Concepts: user/concepts.md
+      - Workflow: user/workflow.md
+      - End-to-end example: user/example-end-to-end.md
+      - Typologies: user/typologies.md
+      - Component reference:
+          - user/components/index.md
+          - user/components/info.md
+          - user/components/program.md
+          - user/components/program-presets.md
+          - user/components/generate.md
+          - user/components/simplify.md
+          - user/components/aggregate.md
+          - user/components/convert.md
+          - user/components/inspect.md
+  - Developer:
+      - developer/index.md

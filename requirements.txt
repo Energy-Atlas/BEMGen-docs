@@ -1,6 +1,6 @@
-# Pinned packages of the BEMGen documentation site (D-115). Install into a virtual environment outside the repository:
+# Pinned packages of the BEMGen documentation site. Install into a virtual environment outside the repository:
 #   python -m venv <folder>
-#   <folder>\Scripts\python -m pip install -r scripts/docs-site/requirements.txt
+#   <folder>\Scripts\python -m pip install -r requirements.txt
 # Checked with Python 3.14 on Windows.
 mkdocs==1.6.1
 mkdocs-material==9.7.7

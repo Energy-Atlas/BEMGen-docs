@@ -1,14 +1,13 @@
-# Serves the BEMGen documentation site on this machine only (D-115): assembles it as build.ps1 does, then runs
-# `mkdocs serve` bound to 127.0.0.1. Stop it with Ctrl+C.
-#   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/docs-site/serve.ps1 [-Python <python.exe>] [-Port 8000]
-# The server watches the staged copy, not docs-site/ or docs/: re-run this script after editing a page.
+# Serves the BEMGen documentation site on this machine only with `mkdocs serve`, bound to 127.0.0.1; it rebuilds when a
+# page changes. Stop it with Ctrl+C.
+#   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/serve.ps1 [-Python <python.exe of a venv>] [-Port 8000]
+# The Python must have the packages of requirements.txt; keep its virtual environment outside the repository.
 param(
-    [switch]$AllowMissingReference,
     [string]$Python = $(if ($env:BEMGEN_DOCS_PYTHON) { $env:BEMGEN_DOCS_PYTHON } else { 'python' }),
     [int]$Port = 8000
 )
 $ErrorActionPreference = 'Stop'
-$repo = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$repo = Split-Path -Parent $PSScriptRoot
 Set-Location $repo
 
 $ErrorActionPreference = 'Continue'
@@ -16,16 +15,13 @@ $ErrorActionPreference = 'Continue'
 $installed = $LASTEXITCODE -eq 0
 $ErrorActionPreference = 'Stop'
 if (-not $installed) {
-    Write-Host "MkDocs Material is not installed for '$Python'; see scripts/docs-site/README.md." -ForegroundColor Red
+    Write-Host "MkDocs Material is not installed for '$Python'. Create a virtual environment outside the repository:" -ForegroundColor Red
+    Write-Host '  python -m venv <folder outside the repository>'
+    Write-Host '  <folder>\Scripts\python -m pip install -r requirements.txt'
+    Write-Host '  then pass -Python <folder>\Scripts\python.exe or set BEMGEN_DOCS_PYTHON.'
     exit 1
 }
 
-Write-Host '== Assemble =='
-$assembleArgs = @()
-if ($AllowMissingReference) { $assembleArgs += '--allow-missing-reference' }
-& $Python scripts/docs-site/assemble.py @assembleArgs
-if ($LASTEXITCODE -ne 0) { Write-Host 'ASSEMBLY FAILED' -ForegroundColor Red; exit $LASTEXITCODE }
-
 Write-Host "== mkdocs serve on http://127.0.0.1:$Port/ (local only) =="
-& $Python -m mkdocs serve --strict -f .docs-build/mkdocs.yml -a "127.0.0.1:$Port"
+& $Python -m mkdocs serve --strict -a "127.0.0.1:$Port"
 exit $LASTEXITCODE

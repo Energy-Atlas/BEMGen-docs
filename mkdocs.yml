@@ -108,4 +108,65 @@ nav:
   # BEGIN generated developer nav
   - Developer:
       - developer/index.md
+      - Project rules:
+          - developer/GLOBAL.md
+          - developer/AGENTS.md
+      - Architecture:
+          - developer/architecture/convert2bem.md
+          - developer/architecture/convert2idf.md
+          - developer/architecture/domain-model.md
+          - developer/architecture/pipeline.md
+          - developer/architecture/validation.md
+      - Decisions:
+          - developer/decisions/decision-log.md
+          - developer/decisions/ADR-001-toolchain.md
+          - developer/decisions/ADR-002-geometry.md
+          - developer/decisions/ADR-003-schedules.md
+          - developer/decisions/ADR-004-tolerances.md
+          - developer/decisions/ADR-005-conditioning-and-setpoints.md
+          - developer/decisions/ADR-006-plan-generation-mechanism.md
+          - developer/decisions/ADR-007-load-basis-aggregation.md
+          - developer/decisions/ADR-008-perimeter-core-corners.md
+          - developer/decisions/ADR-009-vertical-aggregation.md
+          - developer/decisions/ADR-010-convert2idf.md
+          - developer/decisions/ADR-011-minimum-wall-and-window-geometry.md
+          - developer/decisions/ADR-012-centred-windows.md
+          - developer/decisions/ADR-013-vertical-aggregation-methods.md
+          - developer/decisions/ADR-014-program-types-and-department-zoning.md
+          - developer/decisions/ADR-015-plans-per-storey.md
+      - Plans:
+          - developer/plans/2026-09-30-implementation-roadmap.md
+          - developer/plans/2026-10-01-s0-foundation.md
+          - developer/plans/2026-10-01-s1-presets-equivalence.md
+          - developer/plans/2026-10-01-s2-pipeline-skeleton.md
+          - developer/plans/2026-10-01-s3-plan-simplifiers.md
+          - developer/plans/2026-10-01-s4-floor-aggregators.md
+          - developer/plans/2026-10-01-s4.1-presets-preview-icons.md
+          - developer/plans/2026-10-01-s4.2-aggregation-transform-heat-transfer.md
+          - developer/plans/2026-10-01-s5-centred-windows.md
+          - developer/plans/2026-10-02-s6-convert2idf.md
+          - developer/plans/2026-10-02-s8.1-bar-typologies.md
+          - developer/plans/2026-10-02-s8.2-non-rectangular-typologies.md
+          - developer/plans/2026-10-02-s8.3-enclosed-courtyard.md
+          - developer/plans/2026-10-02-s8.4-non-residential-programs.md
+          - developer/plans/2026-10-02-s8.5-hub-and-arms-typologies.md
+          - developer/plans/2026-10-02-s8.6-operating-suite-court-cluster.md
+          - developer/plans/2026-10-02-s8.7-per-storey-plans-stepped-band.md
+          - developer/plans/2026-10-02-s8.8-previews-any-preset-panel.md
+          - developer/plans/2026-10-03-docs-site-move.md
+          - developer/plans/2026-10-03-docs-site-move/HANDOVER.md
+          - developer/plans/2026-10-03-docs-site-move/PROMPT.md
+          - developer/plans/2026-10-03-docs-site-move/docs-repo-sync-docs-SKILL.md
+          - developer/plans/2026-10-03-s9-release.md
+          - developer/plans/2026-10-03-zero-width-artefacts.md
+      - Research:
+          - developer/research/envelope-presets.md
+          - developer/research/precedents/hdhm-typologies.md
+          - developer/research/precedents/syn-typologies.md
+          - developer/research/program-presets.md
+      - Development:
+          - developer/development/grasshopper-smoke-test.md
+      - Specifications:
+          - developer/LOD_geometric_zoning_equivalence_research_brief.md
+          - developer/LOD_grasshopper_plugin_repository_spec.md
   # END generated developer nav

@@ -159,6 +159,7 @@ nav:
           - developer/plans/2026-10-03-docs-site-move/docs-repo-sync-docs-SKILL.md
           - developer/plans/2026-10-03-s9-release.md
           - developer/plans/2026-10-03-zero-width-artefacts.md
+          - developer/plans/2026-10-04-dropdown-enums.md
       - Research:
           - developer/research/envelope-presets.md
           - developer/research/precedents/hdhm-typologies.md

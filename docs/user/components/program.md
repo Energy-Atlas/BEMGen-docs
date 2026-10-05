@@ -23,8 +23,8 @@ A load: design value in its basis and a fraction schedule. Magnitudes are people
 
 | Name | Nickname | Type | Access | Optional | Default | Description |
 | --- | --- | --- | --- | --- | --- | --- |
-| Type | `T` | Text | item | no | – | Load type: Occupancy, Lighting, ElectricEquipment, GasEquipment, DomesticHotWater, Ventilation, Infiltration. |
-| Basis | `B` | Text | item | no | – | Basis: PerFloorArea, PerPerson, Absolute, PerExteriorWallArea, AirChangesPerHour. |
+| Type | `T` | Text | item | no | – | Load type: Occupancy, Lighting, ElectricEquipment, GasEquipment, DomesticHotWater, Ventilation, Infiltration. Right-click the input to choose one, or extract it as a dropdown. |
+| Basis | `B` | Text | item | no | – | Basis: PerFloorArea, PerPerson, Absolute, PerExteriorWallArea, AirChangesPerHour. Right-click the input to choose one, or extract it as a dropdown. |
 | Value | `V` | Number | item | no | – | Design value in the basis' unit. |
 | Schedule | `Sch` | [Schedule](info.md#schedule) | item | no | – | A fraction schedule. |
 
@@ -47,7 +47,7 @@ Loads, conditioning and setpoints, and window-to-wall ratio for one space type.
 | Name | Nickname | Type | Access | Optional | Default | Description |
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | – | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
-| Space Type | `ST` | Text | item | no | – | Space type: DwellingUnit, Corridor, Stair, Core, Lobby, Service, Mechanical, Other, Mixed, Office, Retail, Mall, Kitchen, Dining, OperatingTheatre, CleanCorridor, DirtyCorridor, ClinicalSupport, CareBedroom, CareCommunal, ActivityHall. |
+| Space Type | `ST` | Text | item | no | – | Space type: DwellingUnit, Corridor, Stair, Core, Lobby, Service, Mechanical, Other, Mixed, Office, Retail, Mall, Kitchen, Dining, OperatingTheatre, CleanCorridor, DirtyCorridor, ClinicalSupport, CareBedroom, CareCommunal, ActivityHall. Right-click the input to choose one, or extract it as a dropdown. |
 | Loads | `L` | [Load](info.md#load) | list | yes | – | Loads; at most one per type and basis. |
 | Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned. Conditioned spaces need both setpoints. |
 | Heating | `H` | [Schedule](info.md#schedule) | item | yes | – | Heating setpoint, a temperature schedule (°C); conditioned spaces only. |
@@ -73,10 +73,10 @@ An 8760-hour schedule from a 24-hour weekday and weekend profile (holidays not m
 | Name | Nickname | Type | Access | Optional | Default | Description |
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | – | Schedule name. |
-| Kind | `K` | Text | item | no | `Fraction` | Value meaning: Fraction, Temperature. |
+| Kind | `K` | Text | item | no | `Fraction` | Value meaning: Fraction, Temperature. Right-click the input to choose one, or extract it as a dropdown. |
 | Weekday | `Wd` | Number | list | no | – | 24 hourly values for Monday to Friday. |
 | Weekend | `We` | Number | list | no | – | 24 hourly values for Saturday and Sunday. |
-| First Day | `D` | Text | item | no | `Monday` | Weekday of 1 January. |
+| First Day | `D` | Text | item | no | `Monday` | Weekday of 1 January. Right-click the input to choose one, or extract it as a dropdown. |
 
 **Outputs**
 

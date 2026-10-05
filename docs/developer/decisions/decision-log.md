@@ -913,3 +913,42 @@ Chronological record of project decisions made in conversations, meetings, or re
 - **Open:**
   - Diagnostic messages from `Lod.Core`, `Lod.Generators`, and `Lod.Export` still cite decision numbers in 14 strings, and these reach Grasshopper users as runtime messages. The IDF header comment cites D-112. Both are outside D-118's literal scope and are left for the owner.
   - The example definitions still carry the 1.0.0 build stamp. They solve with 1.0.1 and were not rebuilt.
+
+### D-120 — Enum inputs: values in the right-click menu and a dropdown on Extract parameter
+
+- **Date:** 2026-10-04 · **Decided by:** Cheng Xuan Li (the two ways to choose a value, the branch `features/dropdown-enums`); controller (the realisation, Provisional) · **Status:** Accepted
+- Why: five inputs took an enum name as typed text, and only their descriptions listed the valid names: *Schedule* *Kind* and *First Day*, *Load* *Type* and *Basis*, and *Program Preset* *Space Type*. The owner asked for two things. *Extract parameter* on such an input should give a dropdown component. Its right-click menu should offer the enum's values next to Grasshopper's own items.
+- Built from the [enum inputs design note](../plans/2026-10-04-dropdown-enums.md) (now Done) as D-111 sets out, test-first against a new headless Rhino spec, and reviewed by a second agent before the merge.
+- **Realisation (controller, pending the owner's reading):**
+  - The five inputs are `EnumParameter<TEnum>` (`src/Lod.Grasshopper/Parameters/EnumParameter.cs`), an internal generic subclass of Grasshopper's `Param_String`.
+  - The data stays text. Panels, wires, saved definitions, and the components' case-insensitive parsing work as before.
+  - The class keeps the *Text* parameter's `ComponentGuid`, icon, and type name. Grasshopper never registers it, because it is internal and generic.
+  - No component GUID, input name, nickname, access, optional flag, or default changed. The descriptions add one sentence on how to choose a value.
+  - **Right-click menu.** The names follow Grasshopper's *Set Text*, *Set Multiple Texts*, and *Manage Text collection* items, in declaration order. The current value is ticked, read as the parser reads it. The names are disabled while the input has a source. A click is one undo step.
+  - **Extract parameter.** It places a *Value List* in dropdown mode left of the input, centred on it, labelled with its name, and wired into it.
+    - The list has every name in declaration order, each with its quoted name as the expression, so it outputs text. It is selected on the current value, or on the first name when the value is not one.
+    - Its description is the input's, without the note.
+    - It moves past any object it would overlap, away from that object, so the dropdowns of neighbouring inputs keep their order.
+    - The list and its wire are one undo record, built from Grasshopper's add-object and wire actions.
+- **Tests.**
+  - `scripts/rhino-smoke/specs/enum-inputs.py` makes 179 checks, among them: the menu, a click, undo and redo of a click and of the extraction, the dropdown's items, selection, placement, and result, the disabled state with a source, no registered enum parameter, adjacent dropdowns in both orders, and a save and reopen.
+  - `run.ps1` now counts a line starting with `CHECK FAILED` as a failure of its spec.
+- **Checks** (controller, on `a4ecc1a`):
+  - `scripts/verify.ps1` passed with 0 warnings: 346 core, 518 generator, 1573 integration, and 635 export tests. No test changed, because `Lod.Grasshopper` has no `dotnet test` project.
+  - All 13 `scripts/rhino-smoke` specs ran in Rhino 8.25.25314.11001 with every *Validate* True, no exceptions, and no failed checks. Runtime errors came only in the error scenarios. All 19 examples solve.
+- **Open:**
+  - A person checks the menu and the dropdown on the canvas ([smoke test](../development/grasshopper-smoke-test.md)).
+  - The public site's component reference needs a new export, since the five descriptions and the parameter class changed.
+  - The version for this change is the owner's choice.
+
+### D-121 — Version 1.0.2: the enum inputs, released with a docs export
+
+- **Date:** 2026-10-05 · **Decided by:** Cheng Xuan Li · **Status:** Accepted
+- Version 1.0.2, tag `v1.0.2`, releases the enum inputs (D-120). The owner reviewed and approved them, and they were merged into `main` and pushed.
+- The release goes on the docs repository's GitHub Releases, as D-118 sets out, with the files of `scripts/package-release.ps1` built from the tagged commit:
+  - the plugin zip, with `BEMGen.gha` and its libraries;
+  - the `.yak`;
+  - the examples zip;
+  - `SHA256SUMS.txt`.
+- A docs export of `v1.0.2` (`scripts/docs-export/export.ps1`) carries the changed input descriptions to the public site's component reference. The docs repository imports it.
+- The example definitions are not rebuilt. They still carry the 1.0.0 build stamp and solve with 1.0.2 (D-119).

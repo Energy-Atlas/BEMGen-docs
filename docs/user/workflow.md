@@ -43,7 +43,8 @@ Panel *1 Program* builds a preset for any space type from scratch:
 
 - *Schedule* (Sch): an 8760-hour schedule from a *Name*, a *Kind* (`Fraction` for loads, `Temperature` for setpoints), 24 hourly *Weekday* values (Monday to Friday), 24 hourly *Weekend* values (Saturday and Sunday), and the *First Day* of the year (default `Monday`). Holidays are not modelled.
 - *Load* (Load): a load from its *Type* (`Occupancy`, `Lighting`, `ElectricEquipment`, `GasEquipment`, `DomesticHotWater`, `Ventilation`, `Infiltration`), *Basis* (`PerFloorArea`, `PerPerson`, `Absolute`, `PerExteriorWallArea`, `AirChangesPerHour`), *Value* in the basis' unit, and a fraction *Schedule*.
-- *Program Preset* (Preset): a preset from a *Name*, a *Space Type* (one of the space type names, typed as text), a list of *Loads* (at most one per type and basis), *Conditioned* (default true), *Heating* and *Cooling* temperature schedules (required when conditioned), and a *WWR*.
+- *Program Preset* (Preset): a preset from a *Name*, a *Space Type* (one of the space type names), a list of *Loads* (at most one per type and basis), *Conditioned* (default true), *Heating* and *Cooling* temperature schedules (required when conditioned), and a *WWR*.
+- **Choosing a value.** *Kind* and *First Day* of *Schedule*, *Type* and *Basis* of *Load*, and *Space Type* of *Program Preset* take the name of a value as text, typed in any case. You can type it or wire a panel. You can also right-click the input and pick the value from the menu, where the current one is ticked. Or choose *Extract parameter* on the input: this places a dropdown (a *Value List*) with every value, wired into the input and set to its current value.
 
 Text inputs are matched case-insensitively; an unknown name gives an error that lists the valid names.
 

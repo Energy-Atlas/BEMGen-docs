@@ -242,6 +242,11 @@ html {
   color: var(--ea-bg-base);
 }
 
+/* The active tab already wears the accent outline, so keyboard focus thickens it to stay visible. */
+.md-tabs__item--active .md-tabs__link:focus-visible {
+  outline-width: 2px;
+}
+
 /* ---------------------------------------------------------------------------------------------------------------------
  * Search
  * ------------------------------------------------------------------------------------------------------------------ */

@@ -1,6 +1,6 @@
 # Convert2BEM output
 
-> **Status:** Provisional (D-023) · **Since:** S2 (`v0.2.0`); envelope S6 · **Component:** *Convert2BEM* (`2BEM`), panel *5 Convert*, GUID `d091d70c-4de3-4f29-a900-ea4c9b777ba3`
+> **Status:** Provisional (D-023) · **Since:** S2 (`v0.2.0`); envelope S6; infiltration outputs D-124 · **Component:** *Convert2BEM* (`2BEM`), panel *5 Convert*, GUID `d091d70c-4de3-4f29-a900-ea4c9b777ba3`
 
 ## Purpose
 
@@ -8,7 +8,7 @@
 
 ClimateStudio is the downstream target (D-006, D-016), but no ClimateStudio reference definition is available yet (D-023). Until one is, the component produces the neutral layout described here: one tree branch per zone, standard Grasshopper types (Brep, text, integer, Boolean, number), and every number in a stated unit. Once a reference definition exists, the output is adapted to ClimateStudio's actual inputs; that change updates this document and the decision log.
 
-The component is a thin adaptor (GLOBAL.md, architecture rule 3): it converts geometry to Rhino Breps through `Lod.Grasshopper.Convert.RhinoGeometry` and copies zone programs and boundary conditions. It computes no new quantities.
+The component is a thin adaptor (GLOBAL.md, architecture rule 3): it converts geometry to Rhino Breps through `Lod.Grasshopper.Convert.RhinoGeometry` and copies zone programs and boundary conditions. It computes one new quantity, the design infiltration flow of each zone (D-124, [Infiltration](#infiltration)); everything else is copied from the building and the envelope preset unchanged.
 
 ## Input
 
@@ -27,8 +27,8 @@ From S3 (`v0.3.0`) the component validates the building before converting it; se
 From S3 (`v0.3.0`) *Convert2BEM* validates the building before converting it (GLOBAL.md, scientific rule 6; checks and tolerances in [validation.md](validation.md)).
 
 1. `BuildingValidator` with `ToleranceSettings.Default` runs on every solve.
-2. Passed: the conversion runs, outputs 0–14, 16, and 17 are filled, and *Provenance* holds the building's provenance tree followed by the validation report, the line `OPTIONS: EnableInternalWallHeatTransfer=<True|False> EnableFloorHeatTransfer=<True|False>`, and the line `ENVELOPE: <preset name>`.
-3. Failed and *Override* `false` (the default): the component shows the error `ValidationFailed`, outputs 0–14, 16, and 17 stay empty, and only *Provenance* is set, so the failing checks can be read.
+2. Passed: the conversion runs, outputs 0–14 and 16–21 are filled, and *Provenance* holds the building's provenance tree followed by the validation report, the line `OPTIONS: EnableInternalWallHeatTransfer=<True|False> EnableFloorHeatTransfer=<True|False>`, the line `ENVELOPE: <preset name>`, and since D-124 the line `INFILTRATION: <rate> <basis> (EnergyPlus <method>), schedule <schedule name>`, worded as *Convert2IDF*'s.
+3. Failed and *Override* `false` (the default): the component shows the error `ValidationFailed`, outputs 0–14 and 16–21 stay empty, and only *Provenance* is set, so the failing checks can be read.
 4. Failed and *Override* `true`: the component shows the warning `ValidationOverridden`, the conversion runs, and *Provenance* ends with the line `OVERRIDE: converted despite failed validation`.
 
 Only enforced checks decide the outcome. The conditioned floor area is reported as a `note` line and never blocks (D-038); ground, roof, and exposed floor area (D-046) and building height (D-045) are enforced. The override is recorded only in *Provenance*, not in the building, so keep that text with any result produced from an overridden model.
@@ -36,8 +36,8 @@ Only enforced checks decide the outcome. The conditioned floor area is reported 
 ## Zone order and tree paths
 
 - Branch `{i}` belongs to zone `i` of `IGeneratedBuilding.Zones`, in the building's zone order. For *Stack Floors* that is storey by storey from the bottom (zone IDs `L0/…`, `L1/…`, …) and, within a storey, the floor's zone order; for the linear plan `ST`, `CO`, `US1` … `USn`, `UN1` … `UNn`. *Stacked Floor Zone Multiplier* lists its modelled storeys the same way; *Single Zone per Floor Type* has one zone per floor entry, `E0`, `E1`, …, bottom to top; *Single Zone Building* has the one zone `BUILDING`.
-- Paths are explicit, so `{i}` means zone `i` in every output. *Names*, *Space Types*, *Multipliers*, *Conditioned*, *Heating Setpoints*, *Cooling Setpoints*, and *Internal Mass* always have a branch for every zone; the setpoint branches of an unconditioned zone are empty. Another output can lack the branch of a zone that has no items of its kind (for example a zone without windows or without loads); match branches by path, not by position.
-- Loads: item `k` of branch `{i}` in *Load Types*, *Load Bases*, and *Load Values* describes the same load, and its schedule is branch `{i;k}` of *Load Schedules*. Loads are in program order: by `LoadType` (Occupancy, Lighting, ElectricEquipment, GasEquipment, DomesticHotWater, Ventilation, Infiltration), then by `LoadBasis` (PerFloorArea, PerPerson, Absolute, PerExteriorWallArea, AirChangesPerHour). A zone has at most one load per type and basis; components of the same type in different bases add up (D-047).
+- Paths are explicit, so `{i}` means zone `i` in every output. *Names*, *Space Types*, *Multipliers*, *Conditioned*, *Heating Setpoints*, *Cooling Setpoints*, *Internal Mass*, and *Infiltration Flows* always have a branch for every zone; the setpoint branches of an unconditioned zone are empty. Another output can lack the branch of a zone that has no items of its kind (for example a zone without windows or without loads); match branches by path, not by position.
+- Loads: item `k` of branch `{i}` in *Load Types*, *Load Bases*, and *Load Values* describes the same load, and its schedule is branch `{i;k}` of *Load Schedules*. Loads are in program order: by `LoadType` (Occupancy, Lighting, ElectricEquipment, GasEquipment, DomesticHotWater, Ventilation), then by `LoadBasis` (PerFloorArea, PerPerson, Absolute, AirChangesPerHour). Infiltration is not a load since D-124; it has its own outputs, 18 to 21. A zone has at most one load per type and basis; components of the same type in different bases add up (D-047).
 - *Surfaces*, *Boundaries*, and *Constructions* are aligned item by item within a branch.
 - *Windows* are not aligned with *Surfaces*: branch `{i}` lists every window of zone `i`'s walls, wall by wall and, within a wall, by offset; walls without windows contribute nothing. *Window Constructions* is aligned with *Windows* item by item.
 
@@ -45,7 +45,7 @@ Only enforced checks decide the outcome. The conditioned floor area is reported 
 
 | Index | Name | Nickname | Tree layout | Content | Units |
 | --- | --- | --- | --- | --- | --- |
-| 0 | Zones | Z | `{i}`: one closed Brep per zone part | Zone volume: each part's floor polygon extruded by its floor-to-floor height, with coplanar faces merged so that a merged zone shows no seam where its source zones met. Zones have one part, except in *Single Zone per Floor Type* and *Single Zone Building* buildings, which have one part per storey outline (the viewport preview merges them into one volume; this output does not). Every Brep is outward-oriented: its faces point out of the volume, so its volume is positive. | model units |
+| 0 | Zones | Z | `{i}`: one closed Brep per zone part | Zone volume: each part's floor polygon extruded by its floor-to-floor height, with coplanar faces merged so that a merged zone shows no seam where its source zones met. A zone has one part, except in two cases. In *Single Zone per Floor Type* and *Single Zone Building* buildings it has one part per storey outline (the viewport preview merges them into one volume; this output does not). A floor zone made by *Semantic Merge* or *Conditioned Merge* with *Join Pieces* true has one part per piece (D-123), so its branch holds one closed Brep per piece, for example four for the conditioned zone and three for the unconditioned zone of the Stair Bay Bar; the viewport preview shows them as separate solids too, never united. Every Brep is outward-oriented: its faces point out of the volume, so its volume is positive. | model units |
 | 1 | Names | N | `{i}`: one text | Zone ID, e.g. `L0/US1` (the floor aggregator prefixes `L{k}/` for storey `k`). | — |
 | 2 | Space Types | ST | `{i}`: one text | `SpaceType` name: `DwellingUnit`, `Corridor`, `Stair`, `Core`, `Lobby`, `Service`, `Mechanical`, `Other`, `Mixed`, or one of the non-residential types of ADR-014 (`Office`, `Retail`, `Mall`, `Kitchen`, `Dining`, `OperatingTheatre`, `CleanCorridor`, `DirtyCorridor`, `ClinicalSupport`, `CareBedroom`, `CareCommunal`, `ActivityHall`). | — |
 | 3 | Multipliers | M | `{i}`: one integer | Zone multiplier: the number of storeys a representative storey stands for in *Stacked Floor Zone Multiplier*; always 1 for the other aggregators. | — |
@@ -56,24 +56,27 @@ Only enforced checks decide the outcome. The conditioned floor area is reported 
 | 8 | Load Schedules | LS | `{i;k}`: 8760 numbers | Hourly fraction schedule of load `k` of zone `i` (non-leap year). | fraction, 0–1 |
 | 9 | Heating Setpoints | HS | `{i}`: 8760 numbers, or empty | Hourly heating setpoint of a conditioned zone; the branch is empty for an unconditioned zone. | °C |
 | 10 | Cooling Setpoints | CS | `{i}`: 8760 numbers, or empty | Hourly cooling setpoint of a conditioned zone; the branch is empty for an unconditioned zone. | °C |
-| 11 | Surfaces | S | `{i}`: Breps | The zone's surfaces in building surface order (for *Stack Floors*: its walls, then its floors and ceilings). A wall is one planar rectangle; a floor or ceiling gives the planar Breps of its polygon, one face with an inner loop per hole. Every surface faces out of its zone: a wall towards its outward side (its azimuth), a floor down, a ceiling (or roof) up, also where the surface is interzone. | model units |
+| 11 | Surfaces | S | `{i}`: Breps | The zone's surfaces in building surface order (for *Stack Floors*: its walls, then its floors and ceilings). A wall is one planar rectangle; a floor or ceiling gives the planar Breps of its polygon, one face with an inner loop per hole (a zone of several pieces has one floor and one ceiling per piece, D-123). Every surface faces out of its zone: a wall towards its outward side (its azimuth), a floor down, a ceiling (or roof) up, also where the surface is interzone. | model units |
 | 12 | Boundaries | B | `{i}`: one text per *Surfaces* item | Boundary written for the surface at the same index (format below): its boundary condition, except that interzone surfaces are `Adiabatic` unless their heat-transfer option is on (D-069). | — |
 | 13 | Windows | W | `{i}`: Breps | Every explicit window of the zone's walls, as a rectangle in the wall's plane at its offset along the wall and its sill height (D-039). That is one centred window per glazed outdoor wall: as the generator placed it (D-026) where walls are not rebuilt, and with the glazed area of the source windows the wall covers where zones are merged (D-079, [ADR-012](../decisions/ADR-012-centred-windows.md)). A window faces the way its wall faces, out of the zone. | model units |
 | 14 | Internal Mass | IM | `{i}`: one number | Exposed internal-mass area: the sum of slab area × exposed faces over the zone's internal-mass objects; 0 when it has none. | m² |
-| 15 | Provenance | P | item: one text | The building's provenance tree, then the validation report (`PASSED` or `FAILED`, then one line per check), then the line `OPTIONS: EnableInternalWallHeatTransfer=… EnableFloorHeatTransfer=…` with the values used, then the line `ENVELOPE: <preset name>` (S6), then the line `OVERRIDE: converted despite failed validation` when *Override* was used. Set on every solve that has a building, including blocked ones. | — |
+| 15 | Provenance | P | item: one text | The building's provenance tree, then the validation report (`PASSED` or `FAILED`, then one line per check), then the line `OPTIONS: EnableInternalWallHeatTransfer=… EnableFloorHeatTransfer=…` with the values used, then the line `ENVELOPE: <preset name>` (S6), then the line `INFILTRATION: <rate> <basis> (EnergyPlus <method>), schedule <schedule name>` (D-124, worded as *Convert2IDF*'s; for example `INFILTRATION: 0.3 AirChangesPerHour (EnergyPlus AirChanges/Hour), schedule Example Always On`), then the line `OVERRIDE: converted despite failed validation` when *Override* was used. Set on every solve that has a building, including blocked ones. | — |
 | 16 | Constructions | Con | `{i}`: one text per *Surfaces* item | Name of the envelope preset's construction for the surface at the same index, by its envelope role (S6, ADR-010; see [Constructions](#constructions)). | — |
 | 17 | Window Constructions | WCon | `{i}`: one text per *Windows* item | Name of the window construction for the window at the same index: the envelope preset's glazing. | — |
+| 18 | Infiltration Rate | IR | item: one number | The envelope preset's infiltration design rate (D-124), the same for every zone, in the unit of *Infiltration Basis*. | m³/h per m², or 1/h (see below) |
+| 19 | Infiltration Basis | IB | item: one text | What *Infiltration Rate* is per: `PerExteriorSurfaceArea` (outdoor walls, roofs, and exposed floors, windows included), `PerExteriorWallArea`, or `AirChangesPerHour`. | — |
+| 20 | Infiltration Schedule | IS | item: 8760 numbers | The fraction schedule that multiplies the infiltration of every zone (non-leap year). | fraction, 0–1 |
+| 21 | Infiltration Flows | IF | `{i}`: one number | Design infiltration flow of one instance of zone `i` at a schedule fraction of 1: *Infiltration Rate* times the zone's own exterior surface area, outdoor wall area, or volume, by the basis (`ZoneInfiltration`, see [Infiltration](#infiltration)). Times *Infiltration Schedule* it is the hourly flow, and times *Multipliers* that of every instance. | m³/h |
 
 ### Load value units
 
-Each load's design magnitude is its value times the basis quantity (ADR-007). Magnitudes are in people (Occupancy), W (Lighting, ElectricEquipment, GasEquipment), or m³/h (DomesticHotWater, Ventilation, Infiltration).
+Each load's design magnitude is its value times the basis quantity (ADR-007). Magnitudes are in people (Occupancy), W (Lighting, ElectricEquipment, GasEquipment), or m³/h (DomesticHotWater, Ventilation).
 
 | Load Basis | Unit of the Load Value |
 | --- | --- |
 | `PerFloorArea` | magnitude per m² of zone floor area |
 | `PerPerson` | magnitude per occupant |
 | `Absolute` | magnitude per zone |
-| `PerExteriorWallArea` | magnitude per m² of gross exterior wall area (walls with an outdoor boundary, windows included) |
 | `AirChangesPerHour` | air changes per hour (1/h); the magnitude is value × zone volume, in m³/h |
 
 Load values, conditioning, and setpoints are copied from the zone program unchanged. For Z0 buildings (*No Simplification*, *Stack Floors*) they are the program preset values; with the example presets the stair is unconditioned (illustrative, D-038).
@@ -117,11 +120,23 @@ Since S6 every surface and window gets a construction from one envelope preset (
 
 The heat-transfer options never change a role, only the boundary. A ceiling between storeys is the other side of the slab whose floor uses the interior floor construction, so it gets the reversed layer order (`Construction.Reversed`, named `"<name> Reversed"`; a symmetric construction is its own reverse). Of the two walls between two zones, the one whose zone ID sorts after the other zone's ID (ordinal) is reversed, so both sides of an asymmetric partition list its layers in opposite order. The envelope preset's internal-mass construction is not output: *Internal Mass* (output 14) is only the exposed area, and the construction (the interior floor slab in the example, D-031) is written by *Convert2IDF*. If the building has a surface without a construction role (an unresolved boundary or a wall or ceiling on the ground, only possible with *Override* on a building that failed validation), the component shows the error `NoConstructionRole` and sets only *Provenance*. The layers themselves are not output: they are in the envelope preset, which *Inspect* or a script can read. How ClimateStudio takes constructions is decided with the ClimateStudio mapping (D-023).
 
+## Infiltration
+
+Since D-124 ([ADR-017](../decisions/ADR-017-program-mix-and-building-infiltration.md)) infiltration is an input of the envelope preset, not a load of the zone programs: its magnitude follows each zone's own surfaces or volume, which a program does not know. The same preset *Convert2IDF* uses gives it, so both outputs apply one infiltration. *Convert2BEM* gives the building's infiltration once (outputs 18 to 20, the same for every zone) and each zone its design flow (output 21), so that a ClimateStudio definition can take the flow as it is, whatever the basis. `ZoneInfiltration` in `Lod.Core.Conversion` computes the flow from the building's surfaces, with the quantities EnergyPlus uses for the three methods *Convert2IDF* writes:
+
+| *Infiltration Basis* | *Infiltration Rate* | *Infiltration Flows* of a zone, m³/h |
+| --- | --- | --- |
+| `PerExteriorSurfaceArea` | m³/h per m² | rate × the gross area (windows included) of the zone's surfaces whose boundary is `Outdoors`: walls, roofs, and exposed floors; not floors on the ground, adiabatic surfaces, or surfaces between zones |
+| `PerExteriorWallArea` | m³/h per m² | rate × the gross area (windows included) of the zone's outdoor walls |
+| `AirChangesPerHour` | 1/h | rate × the zone's volume |
+
+Each flow is of one zone instance, before the zone multiplier, as EnergyPlus applies a design flow rate. The building's own boundaries decide, not the exported ones: the heat-transfer options (D-069) only turn surfaces between zones adiabatic, so they never change a flow, and the slabs between storeys that *Stacked Floor Zone Multiplier* turns adiabatic are not counted. The tests of *Convert2IDF* compare every zone's infiltration, read from the IDF as EnergyPlus reads it, with this flow, so the two converters agree zone by zone ([convert2idf.md](convert2idf.md#loads)). The infiltration is not aggregated by any zone merge; it follows each target zone's own surfaces, so the building's infiltration is conserved wherever the exterior wall, roof, and exposed floor areas and the volume are ([validation.md](validation.md#infiltration-and-program-mixes-d-124)).
+
 ## Units and coordinates
 
 - Pipeline geometry is in metres in a building-local plan frame: +Y is plan north, and elevation 0 is the bottom of the lowest storey.
 - *Convert2BEM* scales every Brep from metres to the model units of the active Rhino document (`RhinoMath.UnitScale(UnitSystem.Meters, doc.ModelUnitSystem)`), about the world origin. Without an active document the scale is 1.
-- Only geometry is converted. *Load Values*, *Load Schedules*, setpoints, and *Internal Mass* stay in the units listed above, whatever the model units are.
+- Only geometry is converted. *Load Values*, *Load Schedules*, setpoints, *Internal Mass*, and the infiltration outputs (*Infiltration Flows* in m³/h) stay in the units listed above, whatever the model units are.
 - The building orientation (`IGeneratedBuilding.OrientationDegrees`, the clockwise rotation of plan north from true north) is not applied to the geometry and is not an output; see *Not yet decided*.
 
 ## Internal mass
@@ -132,7 +147,7 @@ An `InternalMass` object (D-031) describes a slab whose faces both lie inside on
 
 ## Not yet decided
 
-- **ClimateStudio mapping.** Which ClimateStudio components and inputs each output feeds, and in what form, is unknown until a ClimateStudio reference definition exists (D-023). This includes how loads and their schedules, conditioning and setpoints, windows, boundary conditions, zone multipliers, and internal mass are represented there. The layout above will change accordingly.
+- **ClimateStudio mapping.** Which ClimateStudio components and inputs each output feeds, and in what form, is unknown until a ClimateStudio reference definition exists (D-023). This includes how loads and their schedules, infiltration, conditioning and setpoints, windows, boundary conditions, zone multipliers, and internal mass are represented there. The layout above will change accordingly.
 - **Orientation.** The geometry stays in the plan frame and the orientation is not output. Whether *Convert2BEM* rotates the geometry to true north or passes the orientation on is decided together with the ClimateStudio mapping.
 - **Constructions in ClimateStudio.** Since S6 *Convert2BEM* outputs the construction name of every surface and window from the envelope preset (ADR-010); how ClimateStudio receives constructions and their layers is decided with the ClimateStudio mapping.
 - **Simulation.** Not part of the pipeline: ClimateStudio or EnergyPlus runs only after the pipeline, outside BEMGen (D-016). *Convert2BEM* prepares inputs and nothing else.

@@ -21,9 +21,11 @@ Place *Dwelling Unit Preset* (Unit), *Corridor Preset* (Corr), and *Stair Preset
 
 | Preset | WWR | Conditioned | Heating / Cooling | Loads |
 | --- | --- | --- | --- | --- |
-| Example Dwelling Unit | 0.3 | yes | 21 °C / 24 °C | Occupancy 0.03 people/m², Lighting 5 W/m², Equipment 5 W/m², Infiltration 0.3 1/h |
-| Example Corridor | 0.2 | yes | 21 °C / 24 °C | Lighting 5 W/m², Infiltration 0.3 1/h |
-| Example Stair | 0.1 | no | — | Lighting 3 W/m², Infiltration 0.3 1/h |
+| Example Dwelling Unit | 0.3 | yes | 21 °C / 24 °C | Occupancy 0.03 people/m², Lighting 5 W/m², Equipment 5 W/m² |
+| Example Corridor | 0.2 | yes | 21 °C / 24 °C | Lighting 5 W/m² |
+| Example Stair | 0.1 | no | — | Lighting 3 W/m² |
+
+The presets have no infiltration. The building's infiltration comes from the envelope preset, here the *Example Envelope*'s 0.3 air changes per hour, always on ([step 6](#6-convert2bem)).
 
 ### 2. Linear Plan Generator
 
@@ -116,14 +118,17 @@ Place *Convert2BEM* (2BEM) from *5 Convert* and wire the *Building*. Leave *Over
 | Output | Expected |
 | --- | --- |
 | Zones, Names, Space Types, Multipliers, Conditioned | 25 branches `{0}` to `{24}`; names `L0/P-North` … `L4/CORE`; every space type `Mixed`, multiplier `1`, conditioned `True` |
-| Load Types / Load Bases | 4 per zone: `Occupancy`, `Lighting`, `ElectricEquipment` (all `PerFloorArea`), `Infiltration` (`AirChangesPerHour`) |
-| Load Values | e.g. `L0/P-North`: 0.027297, 4.81981, 4.549525, 0.3; `L0/CORE`: 0.023228, 5, 3.871332, 0.3 (rounded) |
-| Load Schedules | 100 branches `{i;k}` of 8760 values |
+| Load Types / Load Bases | 3 per zone: `Occupancy`, `Lighting`, `ElectricEquipment` (all `PerFloorArea`) |
+| Load Values | e.g. `L0/P-North`: 0.027297, 4.81981, 4.549525; `L0/CORE`: 0.023228, 5, 3.871332 (rounded) |
+| Load Schedules | 75 branches `{i;k}` of 8760 values |
 | Heating / Cooling Setpoints | 8760 values per zone, 21 °C and 24 °C |
 | Surfaces / Boundaries / Constructions | 6 per zone, 150 in all. Boundaries: 20 `Outdoors` walls, 80 `Adiabatic` walls, 5 `Ground` floors, 40 `Adiabatic` floors and ceilings, 5 `Outdoors` roofs. Constructions: `Example Exterior Wall`, `Example Interior Wall`, `Example Ground Floor`, `Example Interior Floor` (floors above a storey), `Example Interior Floor Reversed` (ceilings below one), `Example Roof` |
 | Windows / Window Constructions | 20 windows, one per perimeter zone and storey; each `Example Double Glazing`; the `CORE` zones have no branch |
 | Internal Mass | 0 for every zone |
-| Provenance | the provenance tree, the validation report, `OPTIONS: EnableInternalWallHeatTransfer=False EnableFloorHeatTransfer=False`, `ENVELOPE: Example Envelope` |
+| Provenance | the provenance tree, the validation report, `OPTIONS: EnableInternalWallHeatTransfer=False EnableFloorHeatTransfer=False`, `ENVELOPE: Example Envelope`, `INFILTRATION: 0.3 AirChangesPerHour (EnergyPlus AirChanges/Hour), schedule Example Always On` |
+| Infiltration Rate / Infiltration Basis | `0.3` / `AirChangesPerHour`, the same for every zone |
+| Infiltration Schedule | 8760 values, all `1` |
+| Infiltration Flows | 25 branches `{0}` to `{24}`, one number each, 0.3 times the zone's volume in m³: e.g. `L0/P-North` 79.9156, `L0/P-East` 55.2376, `L0/CORE` 118.4936 (rounded) |
 
 Set both heat-transfer options to `True` and the 120 adiabatic surfaces become `Interzone:<zone ID>`, for example a wall of `L0/P-North` against the core is written `Interzone:L0/CORE`.
 
@@ -135,14 +140,15 @@ Place *Convert2IDF* (2IDF) from *5 Convert* and wire the *Building*. Leave *Enve
 | --- | --- |
 | IDF | the full IDF text; the component shows no runtime message |
 | Written | `False` |
-| Provenance | ends with `ENVELOPE: Example Envelope`, `ENERGYPLUS: 25.2`, and `FILE: not written (Write is false)` |
+| Provenance | ends with `ENVELOPE: Example Envelope`, `INFILTRATION: 0.3 AirChangesPerHour (EnergyPlus AirChanges/Hour), schedule Example Always On`, `ENERGYPLUS: 25.2`, and `FILE: not written (Write is false)` |
 
-The IDF holds 25 `Zone` objects, 150 `BuildingSurface:Detailed`, 20 `FenestrationSurface:Detailed`, 25 each of `People`, `Lights`, `ElectricEquipment`, and `ZoneInfiltration:DesignFlowRate`, 25 thermostats with ideal-loads air systems, 8 materials, 1 simple glazing, 7 constructions (the six above and the window construction `Example Double Glazing`), and 4 monthly meters.
+The IDF holds 25 `Zone` objects, 150 `BuildingSurface:Detailed`, 20 `FenestrationSurface:Detailed`, 25 each of `People`, `Lights`, `ElectricEquipment`, and `ZoneInfiltration:DesignFlowRate` (the last one per zone, from the envelope preset, in EnergyPlus's air-changes-per-hour method), 25 thermostats with ideal-loads air systems, 8 materials, 1 simple glazing, 7 constructions (the six above and the window construction `Example Double Glazing`), and 4 monthly meters.
 
 To write the file, give *Path* a fully qualified path in an existing folder, for example `C:\models\end-to-end.idf`, and set *Write* to `True`; *Written* becomes `True` and *Provenance* ends with `FILE: written C:\models\end-to-end.idf`. Before simulating, add a weather file and the outputs you need; BEMGen does not run EnergyPlus.
 
 ## Variations to try
 
 - Replace *Perimeter Core* with *Single Zone per Floor*: each storey becomes one zone, and the building has 5 zones with the same 2160 m², 297 m² of glazing, and loads.
+- Replace *Perimeter Core* with *Conditioned Merge*: each storey becomes two zones, `Conditioned-1` (360 m²) and `Unconditioned-1` (the 72 m² stair), so the building has 10 zones and 60 surfaces, with the same 2160 m² and 297 m² of glazing. *Validate* passes with no note, because the conditioned floor area, 1800 m², is exactly that of the five plans.
 - Replace *Stack Floors* with *Stacked Floor Zone Multiplier*: the three middle storeys are modelled once, by storey `L2` at its true elevation with zone multiplier 3, so the building has 15 zones (provenance `Storeys=L0x1,L2x3,L4x1`); storeys `L1` and `L3` are drawn transparent grey, and the totals that *Validate* checks stay the same.
 - Change *Orientation* to 90: the geometry stays, but every façade's orientation changes, so the glazing per orientation in the validation report changes accordingly.

@@ -952,3 +952,124 @@ Chronological record of project decisions made in conversations, meetings, or re
   - `SHA256SUMS.txt`.
 - A docs export of `v1.0.2` (`scripts/docs-export/export.ps1`) carries the changed input descriptions to the public site's component reference. The docs repository imports it.
 - The example definitions are not rebuilt. They still carry the 1.0.0 build stamp and solve with 1.0.2 (D-119).
+
+### D-123 — Conditioned Merge, and joined pieces for both merge simplifiers
+
+- **Date:** 2026-10-06 · **Decided by:** Cheng Xuan Li (a new plan simplifier that merges conditioned and unconditioned zones separately; a boolean on both merge simplifiers for separate pieces, default false; the branch `feature/conditioned-merge`); controller (the realisation, Provisional) · **Status:** Provisional — pending the owner's reading, not merged
+- Numbered D-123 because the unmerged S10 branch holds D-122. Whichever branch merges second rebases its log entry.
+- **Why:**
+  - No plan simplifier removed the semantic partitions inside conditioned space while keeping its boundary with unconditioned space. *Perimeter Core* and *Single Zone per Floor* enlarge the conditioned floor area wherever they cover a stair.
+  - *Semantic Merge* gives one zone per connected piece of a space type. Stairs and stair bays cut floors into many pieces, so "one zone per class" needs zones made of several pieces.
+  - The owner asked for both modes on both merge simplifiers.
+- Built from the [design note](../plans/2026-10-06-conditioned-merge.md) (now Done) as D-111 sets out: test-first on the branch, reviewed by a second agent twice (core, then Grasshopper), with every finding fixed.
+- **Realisation (controller, pending the owner's reading):**
+  - **Joined pieces.** `SemanticMerge(tolerances, joinPieces)` and the new `ConditionedMerge(tolerances, joinPieces)` share one grouping. Zones are connected only through a shared wall.
+    - *Join Pieces* false (the default) gives one zone per connected piece, which is `SemanticMerge` unchanged.
+    - True gives one zone per class on the floor, made of all its pieces.
+    - Provenance records `JoinPieces=true` only when true, so every existing output is byte-identical.
+  - **Conditioned Merge (Z1c).** The classes are conditioned and unconditioned, decided only by whether the source's program has a thermostat.
+    - The targets are `Conditioned-n`, then `Unconditioned-n`, numbered in plan order. Each takes the space type its sources share, or `Mixed`.
+    - Aggregation is the existing rule (ADR-005, ADR-007, D-047).
+    - It keeps conditioned floor area exactly in both modes. With the example presets, joined, it gives at most two zones per floor on every family.
+  - **Floor zones of several pieces.** A floor zone may have several parts at one elevation:
+    - `TargetZone.Pieces`, and `LayoutSurfaceBuilder` builds every piece under one ID, with floors and ceilings `F1…` and `C1…` when a zone has several pieces;
+    - `OverlapMapper`, `Storeys`, `SingleZoneMerge`, and the overlap validation read every part;
+    - new error codes `TouchingPieces` and `DuplicateZoneId`; a target without pieces is `InvalidParameter`;
+    - the IDF writes one `Zone` with every piece's surfaces, and *Convert2BEM* gives one closed Brep per part;
+    - previews draw same-storey pieces as separate solids; a Boolean union had fused pieces meeting at a corner.
+  - **Components.**
+    - *Semantic Merge* gains the input *Join Pieces* (J, default false) before *Preview Location*. Its GUID is unchanged.
+    - *Conditioned Merge* (Z1c, `4bf2f852-144c-4afb-8dcc-8c016787f571`) is in *3 Simplify*, with the same inputs and its own icon.
+    - **Old files.** A *Semantic Merge* saved before *Join Pieces* is read with *Join Pieces* at its default, keeping its *Preview Location* data and wires. Without this, five shipped examples reopened with no output and no message, which D-064 does not intend. A fixture saved by the pre-change plugin keeps this tested.
+  - **Research brief §8.** It gains Z1c and the *Join Pieces* variant of Z1, and a table of what each level does to conditioned floor area (GLOBAL.md scientific rule 7).
+- **Checks** (on `0cebbc6`):
+  - `scripts/verify.ps1` passed with 0 warnings: 412 core, 518 generator, 2620 integration, and 1024 export tests.
+    - The integration and export tests run every family × aggregator × new mode, at the default placement and rotated, and validate with no warnings. Conditioned floor area is asserted exact.
+    - No existing snapshot or assertion changed; the snapshot diff against `main` is additions only.
+  - All 14 `scripts/rhino-smoke` specs ran in Rhino 8.25.25314.11001 on `0cebbc6` with every *Validate* True, no exceptions, no failed checks, and runtime errors only in the error scenarios. They include the new `merge-pieces` spec (four modes × four aggregators on the stair-bay bar, piece previews and *Convert2BEM* Breps per piece on three families, the pre-change fixture, a save and reopen, the *Join Pieces* descriptions) and the 19 examples, each with exactly one *Validate* True.
+- **Open:**
+  - **For a person in Rhino 8:** the order of *3 Simplify* (nothing in BEMGen sets it), the look of *Conditioned Merge* and its icon, the piece previews in the viewport, and a pre-change file with a wired *Preview Location* on screen.
+  - **Saved tooltips.** Definitions saved with this branch's builds before `168f583` keep the short *Join Pieces* tooltip, because Grasshopper restores descriptions from the file. No released file is affected.
+  - **Out of scope:** a building-level counterpart, and the example definitions.
+  - **The owner's choices:** the merge, the version and tag, and the docs export that follows them.
+
+### D-124 — Program mix by floor-area share; infiltration becomes a building-level input
+
+- **Date:** 2026-10-06 · **Decided by:** Cheng Xuan Li. The owner decided the operation and its rules:
+  - a component that mixes presets with weights, where a weight is a floor-area share;
+  - absolute loads added raw;
+  - setpoints mixed as zone merges mix them;
+  - the space-type default and the WWR weighted mean;
+  - infiltration moved wholly to the building level (option (a)), with an illustrative 0.3 ACH;
+  - the branch `feature/program-mix`.
+
+  The controller decided the realisation, which is Provisional ([ADR-017](ADR-017-program-mix-and-building-infiltration.md)). · **Status:** Provisional, pending the owner's reading; not merged.
+- **Numbering.** D-122 (S10 atlas) and D-123 (Conditioned Merge) are on other unmerged branches. Whichever branch merges later rebases its log entry. `ProgramPreset.Source` is the same cherry-picked commit on this branch and on S10.
+- **Why.** Mixing presets raised two problems:
+  - loads in different unit bases;
+  - weights that depend on geometry a preset does not know, which today is infiltration per exterior wall area.
+- **How it was built.** From the [design note](../plans/2026-10-06-program-mix.md) (now Done), as D-111 sets out: test-first, then reviewed by a second agent twice, first the core and then the Grasshopper side. The core review found a blocker: one input's absolute occupancy diluted another input's per-person load about 50-fold. It and every other finding were fixed.
+- **Realisation (controller, pending the owner's reading):**
+  - **Infiltration**
+    - `LoadType.Infiltration` and `LoadBasis.PerExteriorWallArea` leave programs. The aggregator loses its exterior-wall path, and the example presets lose their rates (mall 0.8, lobby 0.6, retail 0.5, operating theatre 0.1, the rest 0.3 ACH).
+    - `EnvelopePreset` carries `Infiltration`: a rate in one basis (per exterior surface area, per exterior wall area, or air changes per hour) with a fraction schedule. The example envelope uses 0.3 ACH, always on.
+    - *Convert2IDF* writes one `ZoneInfiltration:DesignFlowRate` per zone, in the native EnergyPlus method. *Convert2BEM* outputs the infiltration and each zone's design flow (outputs 18–21), from `ZoneInfiltration`.
+    - EnergyPlus 26.2 counts the exterior area as outdoor walls with their windows, roofs, and exposed floors, but not the ground or adiabatic surfaces. That matches what BEMGen writes.
+    - Zone merges no longer aggregate infiltration; it follows each zone's own surfaces.
+  - **`ProgramMix.Mix`** runs the existing zone merge on a virtual zone of unit floor area:
+    - densities and ACH are weighted;
+    - per-person loads are weighted by occupants;
+    - absolutes are summed raw;
+    - schedules are weighted by magnitude;
+    - setpoints are averaged over the conditioned inputs, and the result is conditioned if any input is.
+  - **Mix rules.**
+    - Weights must be finite and greater than 0; they are normalised.
+    - Absolute occupancy in any input beside a per-person load in any input is an error.
+    - The space type and the WWR follow the owner's defaults.
+    - Provenance holds `Input.k` pairs (name, given weight, normalised weight) and nests each input's own source.
+  - **Equivalence.** A mix with weights 0.7/0.3 equals *Single Zone per Floor* on zones of 70 and 30 m², in every load, every hour of every schedule, and every setpoint.
+  - **Components.**
+    - *Mix Programs* (`744378f8-861d-4e6d-bff4-68c7fe2b62c1`) is new.
+    - *Envelope Preset* gains three infiltration inputs, and *Convert2BEM* four outputs.
+    - The default preset components lose their infiltration inputs.
+    - *Load* explains that infiltration belongs on the envelope.
+    - No existing GUID changed. The 19 examples were rebuilt.
+  - **Research docs.** The research brief, `program-presets.md`, and `envelope-presets.md` record infiltration as an envelope input and the equivalence of a mix with a zone merge (GLOBAL.md scientific rule 7).
+- **Checks** (on `7c4a7d0` and the record commit after it):
+  - `scripts/verify.ps1` passed with 0 warnings: 417 core, 518 generator, 1624 integration, and 705 export tests.
+  - 30 snapshots changed, all because of infiltration:
+    - 25 lose only their infiltration lines;
+    - 5 IDF snapshots gain the header line;
+    - 4 of those IDF snapshots also share the envelope's single schedule instead of writing one per zone.
+  - All 14 `scripts/rhino-smoke` specs ran in Rhino 8.25.25314.11001 with every *Validate* True, no exceptions, and no failed checks. The new `program-mix` spec has 17 scenarios and 76 checks: hand values, the cross-input occupancy error, the envelope bases against the Rhino geometry, and *Convert2IDF*. All 19 rebuilt examples solved, each with one *Validate* True.
+  - The IDD check against the EnergyPlus 25.2.0 IDD: 579 files, all three infiltration methods, 0 problems.
+- **Open.**
+  - **For a person in Rhino 8:** the *Mix Programs* icon, the layouts of *Envelope Preset* and *Convert2BEM*, and the rebuilt examples in the editor.
+  - **Old definitions** open with Grasshopper's IO dialog. It drops the presets' saved infiltration values, which the release notes must state.
+  - **Integration with S10:** the atlas branch's infiltration handling becomes obsolete when both merge.
+  - **The owner's choices:** the merge order of the three branches, the version and tag, and the docs export.
+
+### D-125 — Version 1.1.0: Conditioned Merge and the program mix, released with a docs export
+
+- **Date:** 2026-10-07 · **Decided by:** Cheng Xuan Li (approved the two stages; the merge, the tag, the push, and the release, on 2026-10-07) · **Status:** Accepted
+- **Version.** 1.1.0, tag `v1.1.0`. It is a minor version, chosen over 2.0.0 because D-064 waives backward compatibility: the new inputs and outputs and the infiltration that left the presets need no major version.
+- **What it merges.** `feature/conditioned-merge` (D-123) and `feature/program-mix` (D-124, [ADR-017](ADR-017-program-mix-and-building-infiltration.md)), rebased into one linear history (D-004), Conditioned Merge first. Their entries stay as written, with their per-branch counts and "not merged"; this entry gives what holds for the merged result.
+- **The merged facts** that D-123 and D-124 give only per branch:
+  - `scripts/verify.ps1` passed with 0 warnings on the integrated candidate: 484 core, 518 generator, 2695 integration, and 1148 export tests.
+  - **Snapshots.** Beyond D-124's 30, the four Conditioned Merge snapshots were regenerated for infiltration:
+    - three floor snapshots lose their infiltration load lines;
+    - the stair-bay bar's IDF snapshot gains the header line and the envelope's schedule.
+  - **IDD check.** 1016 files against the EnergyPlus 25.2.0 IDD, 0 problems, with all three infiltration methods covered ([convert2idf.md](../architecture/convert2idf.md#idd-check)).
+  - **IDF names.** The export tests had named the IDFs of the joined merge modes after the simplifier, as in `ConditionedMerge:JoinPieces`. On Windows a colon makes the rest of the name an alternate data stream, so 288 files were never listed and never checked. `IdfOut.FileName` now replaces every character a file name cannot hold with `_`, and `IdfOutTests` tests it.
+  - **Zones of several pieces take the envelope's infiltration over every piece:** the outdoor walls with their windows, roofs, and exposed floors of all pieces, or the volume. This is tested in the export tests, in the integration matrices that run every merge mode through every infiltration basis and the program mixes, and in the `merge-pieces` smoke spec; the architecture documents and the research brief state it.
+- **Smoke result.** The 19 example definitions were rebuilt with the 1.1.0 plugin (`BEMGEN_EXAMPLES_WRITE=1`): all reopen and solve with one *Validate* True each, no warnings or errors. All 15 `scripts/rhino-smoke` specs ran in Rhino 8.25.25314.11001 on the candidate, with every *Validate* True, no exceptions, no failed checks, and runtime errors only in the error scenarios; `merge-pieces` (16 *Validate* True, with the multi-piece infiltration checks) and `program-mix` (17 scenarios) included. In the full run `hub-arms` stalled inside one scenario and wrote no result; run again on its own it passed in 45 s with its usual 54 scenarios and 324 *Validate* True.
+- **What follows:**
+  - The release goes on the docs repository's GitHub Releases, as D-118 sets out, with the files of `scripts/package-release.ps1` built from the tagged commit: the plugin zip, the `.yak`, the examples zip, and `SHA256SUMS.txt`.
+  - A docs export of `v1.1.0` (`scripts/docs-export/export.ps1`) carries the new components, inputs, outputs, and the changed descriptions to the public site. The docs repository imports it and runs its own `sync-docs`.
+  - The release notes state that definitions saved before D-124 open with Grasshopper's IO dialog, which drops the presets' saved infiltration values (D-124).
+- **Open:**
+  - **The S10 atlas branch (D-122)** is not in this release. When it merges, its infiltration handling must be removed, because infiltration is no longer a program input, and its log entry rebased.
+  - **For a person in Rhino 8:** the checks of the [smoke test](../development/grasshopper-smoke-test.md) that only a person can make:
+    - the icons of *Conditioned Merge* and *Mix Programs*, the order of *3 Simplify*, and the piece previews in the viewport;
+    - the layouts of *Envelope Preset* and *Convert2BEM*;
+    - a pre-change file with a wired *Preview Location*, the rebuilt examples in the editor, and the install from the release.

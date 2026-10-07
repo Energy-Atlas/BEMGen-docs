@@ -201,7 +201,7 @@ Example: `operating-suite.gh` ([canvas](../assets/screenshots/canvas/operating-s
 
 ## Example definitions
 
-The examples zip of each [release](https://github.com/energy-atlas/BEMGen-docs/releases), `bemgen-<version>-examples.zip`, holds one Grasshopper definition per typology and `end-to-end.gh`. Each reads left to right: the default preset components, the generator with its default inputs, a plan simplifier, a floor aggregator with a panel of storey multipliers, *Validate*, and *Convert2BEM* and *Convert2IDF* with *Write* off, in coloured groups with short notes. The simplifiers and aggregators vary across the examples so that each appears several times; any simplifier works with any aggregator. Open one in Grasshopper with the plugin installed; each solves without warnings or errors and validates.
+The examples zip of each [release](https://github.com/energy-atlas/BEMGen-docs/releases), `bemgen-<version>-examples.zip`, holds one Grasshopper definition per typology and `end-to-end.gh`. Each reads left to right: the default preset components, the generator with its default inputs, a plan simplifier, a floor aggregator with a panel of storey multipliers, *Validate*, and *Convert2BEM* and *Convert2IDF* with *Write* off, in coloured groups with short notes. The simplifiers and aggregators vary across the examples so that each appears several times (except *Conditioned Merge*, which no example uses); any simplifier works with any aggregator. Open one in Grasshopper with the plugin installed; each solves without warnings or errors and validates.
 
 | Definition | Simplifier | Aggregator | Multipliers |
 | --- | --- | --- | --- |

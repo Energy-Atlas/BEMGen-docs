@@ -49,8 +49,6 @@ Program preset of an activity hall for sport or community use; space type Activi
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Community Hours' when connected. |
 | Equipment | `Eq` | Number | item | no | `2` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Community Hours' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -83,8 +81,6 @@ Program preset of a group of care bedrooms; space type CareBedroom. Every input 
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Care Bedroom Lighting' when connected. |
 | Equipment | `Eq` | Number | item | no | `3` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Care Bedroom Equipment' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -117,8 +113,6 @@ Program preset of the communal and service hub of a care home; space type CareCo
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Care Communal Hours' when connected. |
 | Equipment | `Eq` | Number | item | no | `5` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Care Communal Hours' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -147,8 +141,6 @@ Program preset of the clean route of an operating suite; space type CleanCorrido
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Lighting | `Lt` | Number | item | no | `8` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Always On' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -181,8 +173,6 @@ Program preset of the support rooms of an operating suite; space type ClinicalSu
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Theatre Services' when connected. |
 | Equipment | `Eq` | Number | item | no | `10` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Theatre Services' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -213,8 +203,6 @@ Program preset of an office service core: lifts, stairs, toilets, risers; space 
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Office Lighting' when connected. |
 | Equipment | `Eq` | Number | item | no | `3` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Office Equipment' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -243,8 +231,6 @@ Program preset of a corridor. Every input defaults to the illustrative example v
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Lighting | `Lt` | Number | item | no | `5` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Always On' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -277,8 +263,6 @@ Program preset of a dining field; space type Dining. Every input defaults to the
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Dining Hours' when connected. |
 | Equipment | `Eq` | Number | item | no | `2` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Dining Hours' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -307,8 +291,6 @@ Program preset of the dirty (disposal) route of an operating suite; space type D
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Lighting | `Lt` | Number | item | no | `8` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Always On' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -341,8 +323,6 @@ Program preset of a dwelling unit (one zone per unit). Every input defaults to t
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Dwelling Lighting' when connected. |
 | Equipment | `Eq` | Number | item | no | `5` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Dwelling Equipment' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -358,7 +338,7 @@ Program preset of a dwelling unit (one zone per unit). Every input defaults to t
 
 Component · nickname `Env` · GUID `89ebd842-fc6e-4a06-95f5-2fcfe39f08b8` · exposure primary
 
-Envelope preset for Convert2BEM and Convert2IDF: one layered construction per envelope role (exterior wall, roof, ground floor, exposed floor, interior wall, interior floor, internal mass) and the window's simple glazing. The constructions are the illustrative example's; every input defaults to the example values.
+Envelope preset for Convert2BEM and Convert2IDF: one layered construction per envelope role (exterior wall, roof, ground floor, exposed floor, interior wall, interior floor, internal mass), the window's simple glazing, and the building's infiltration, which every zone gets at conversion from its own exterior area or volume. The constructions are the illustrative example's; every input defaults to the example values.
 
 **Inputs**
 
@@ -369,6 +349,9 @@ Envelope preset for Convert2BEM and Convert2IDF: one layered construction per en
 | U-Factor | `U` | Number | item | no | `1.8` | Window U-factor, W/(m²·K), in (0, 7]. |
 | SHGC | `SHGC` | Number | item | no | `0.4` | Window solar heat gain coefficient, in (0, 1). |
 | VT | `VT` | Number | item | no | `0.7` | Window visible transmittance, in (0, 1). |
+| Infiltration Rate | `Inf` | Number | item | no | `0.3` | Infiltration design rate of every zone, finite and not negative, in the unit of Infiltration Basis: m³/h per m² of the zone's exterior surface area (outdoor walls, roofs, and exposed floors, windows included) or of its outdoor wall area, or air changes per hour (1/h) of its volume. |
+| Infiltration Basis | `InfB` | Text | item | no | `AirChangesPerHour` | What Infiltration Rate is per: PerExteriorSurfaceArea, PerExteriorWallArea, AirChangesPerHour. Right-click the input to choose one, or extract it as a dropdown. |
+| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule multiplying Infiltration Rate; unset means always on (the example's 'Example Always On'). |
 
 **Outputs**
 
@@ -403,8 +386,6 @@ Program preset of a kitchen with its servery, one food-service department; space
 | Gas Equipment Schedule | `GasS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Gas Equipment; replaces the built-in schedule 'Example Kitchen Gas' when connected. |
 | Ventilation | `Vent` | Number | item | no | `15` | Ventilation design value, 1/h (air changes per hour). |
 | Ventilation Schedule | `VentS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Ventilation; replaces the built-in schedule 'Example Kitchen Hours' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -435,8 +416,6 @@ Program preset of a public foyer or entrance lobby; space type Lobby. Every inpu
 | Occupancy Schedule | `OccS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Occupancy; replaces the built-in schedule 'Example Community Occupancy' when connected. |
 | Lighting | `Lt` | Number | item | no | `10` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Community Hours' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.6` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -467,8 +446,6 @@ Program preset of the public mall route; space type Mall. Every input defaults t
 | Occupancy Schedule | `OccS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Occupancy; replaces the built-in schedule 'Example Retail Occupancy' when connected. |
 | Lighting | `Lt` | Number | item | no | `10` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Retail Lighting' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.8` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -501,8 +478,6 @@ Program preset of an office work area (one zone per work-area department); space
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Office Lighting' when connected. |
 | Equipment | `Eq` | Number | item | no | `10` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Office Equipment' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -537,8 +512,6 @@ Program preset of a bank of operating theatres; space type OperatingTheatre. Eve
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Theatre Services' when connected. |
 | Ventilation | `Vent` | Number | item | no | `20` | Ventilation design value, 1/h (air changes per hour). |
 | Ventilation Schedule | `VentS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Ventilation; replaces the built-in schedule 'Example Theatre Ventilation' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.1` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -571,8 +544,6 @@ Program preset of the shops of one mall wing or an anchor store; space type Reta
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Retail Lighting' when connected. |
 | Equipment | `Eq` | Number | item | no | `5` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Retail Equipment' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.5` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -601,8 +572,6 @@ Program preset of service or support rooms: changing rooms, stores, toilets; spa
 | Cooling | `C` | Number | item | no | `26` | Constant cooling setpoint, °C. |
 | Lighting | `Lt` | Number | item | no | `6` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Community Hours' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 
@@ -631,8 +600,6 @@ Program preset of a stair. Every input defaults to the illustrative example valu
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Lighting | `Lt` | Number | item | no | `3` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Always On' when connected. |
-| Infiltration | `Inf` | Number | item | no | `0.3` | Infiltration design value, 1/h (air changes per hour). |
-| Infiltration Schedule | `InfS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Infiltration; replaces the built-in schedule 'Example Always On' when connected. |
 
 **Outputs**
 

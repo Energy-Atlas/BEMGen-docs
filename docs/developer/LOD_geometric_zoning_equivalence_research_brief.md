@@ -185,7 +185,7 @@ Each source zone or space should support at least:
 - lighting power density,
 - electric equipment power density,
 - gas equipment density if used,
-- infiltration parameter,
+- infiltration (in this project a building-level envelope input applied to each zone's own surfaces or volume, not a zone parameter; see §7 and §9),
 - ventilation parameter,
 - heating setpoint schedule,
 - cooling setpoint schedule,
@@ -259,8 +259,9 @@ The same principle should be applied separately to:
 - occupancy,
 - DHW,
 - ventilation,
-- infiltration where appropriate,
 - other internally scheduled gains.
+
+Infiltration is not in this list in this project (D-124, [ADR-017](decisions/ADR-017-program-mix-and-building-infiltration.md)). Its magnitude depends on the envelope, which a program does not know, so it is an input of the envelope preset, applied by the converters to each target zone's own exterior surface area, exterior wall area, or volume, according to its basis. It is therefore not aggregated or transferred between zones: every zone gets the building's rate times its own exterior quantity. Those quantities (exterior wall area, roof and exposed floor area, volume) are conserved by the zoning (§17), so the building's infiltration is conserved by construction, and it has no separate check.
 
 For thermostat setpoints, a separate explicit aggregation rule is required because setpoints are controls rather than additive loads. Possible rules include:
 
@@ -278,6 +279,33 @@ T^\*(t) = \frac{\sum_{i \in C} w_i T_i(t)}{\sum_{i \in C} w_i}, \qquad w_i = f_i
 \]
 
 where \(w_i\) is the floor area of source zone \(i\) transferred to the target zone: its area fraction \(f_i\) times its floor area \(A_i\), which is the overlap area when a source zone is split between targets. There is no method parameter and no fallback; exposed-surface-area weighting was rejected because it would make the control assumption depend on geometry. This is a prescribed control rule, not a conservation invariant, so validation checks it against its definition rather than against a conserved total. Merging conditioned and unconditioned sources enlarges the conditioned floor area; validation reports this change without enforcing it, because it is a consequence of the zoning simplification under study. Each aggregated setpoint schedule records its source zones, the method, and the weights.
+
+### Mixing program presets (D-124)
+
+Programs are also combined without any geometry, to give the program of a space made of several programs by floor-area share (*Mix Programs*, [ADR-017](decisions/ADR-017-program-mix-and-building-infiltration.md)). Take inputs \(i = 1,\ldots,m\) with weights \(w_i > 0\), normalised to \(\hat w_i = w_i / \sum_k w_k\); for each component (a load type in a basis) its value \(v_i\) and schedule \(s_i(t)\), a missing component being \(v_i = 0\); the design occupants per m² of floor area \(o_i\), the summed occupancy components; and the heating and cooling setpoints \(\theta_i(t)\) of the set \(C\) of conditioned inputs.
+
+The mix is the merge rule above and of §9 applied to one virtual zone of floor area 1 and volume 1 whose sources are the inputs, input \(i\) a source of floor area and volume \(\hat w_i\) (one common height) transferred whole. Each input transfers
+
+\[
+T_i = \hat w_i v_i \ \text{(per floor area, air changes per hour)}, \qquad
+T_i = \hat w_i o_i v_i \ \text{(per person)}, \qquad
+T_i = v_i \ \text{(absolute)},
+\]
+
+and the mixed component is \(v^\* = \sum_i T_i / B^\*\) and \(s^\*(t) = \sum_i T_i s_i(t) / \sum_i T_i\), with \(B^\* = 1\), or for per-person loads the mixed occupants per m², \(\sum_i \hat w_i o_i\). A zero \(\sum_i T_i\) gives the value 0 and a constant-zero schedule. Absolute values are summed raw and not weighted: a fixed value is "just there" whatever the shares. Conditioning and setpoints follow the rule above with the weights as floor areas: the mix is conditioned when \(C\) is not empty, and
+
+\[
+\theta^\*(t) = \frac{\sum_{i \in C} \hat w_i \theta_i(t)}{\sum_{i \in C} \hat w_i}.
+\]
+
+By construction, for every component and hour the scheduled magnitude of the mix per m² of floor area, \(B^\* v^\* s^\*(t)\), is \(\sum_i T_i s_i(t)\), the inputs' scheduled magnitudes each scaled by its share (absolute magnitudes not scaled).
+
+**Equivalence with a zone merge.** Let one source zone stand for each input, with floor areas \(A_i = \hat w_i A\) for any \(A > 0\) and one common height, merged whole into one target zone of area \(A\). The merge rule gives exactly the mixed values \(v^\*\), schedules \(s^\*(t)\), conditioning, and setpoints \(\theta^\*(t)\), whatever \(A\) is: area-weighted densities, volume-weighted air changes, occupant-weighted per-person values, raw sums of absolute loads, and floor-area-weighted setpoints over the conditioned inputs. So a mix of weights \(w_i\) is the merge of zones whose floor areas are in the ratio of the weights; `ProgramMixEquivalenceTests` compares the two for zones of 70 m² and 30 m² against weights 0.7 and 0.3, component by component, with every schedule and setpoint at every hour. Two things bound the statement:
+
+- The merge adds an absolute value once per source zone, so a preset that stands for \(k\) zones of a plan adds it \(k\) times, and a source zone split between targets transfers only its fraction of it; a mix has one input per preset and no split.
+- Absolute occupancy beside a per-person load has no such equivalent. The merge's per-person value then depends on the area \(A\) (the absolute occupants do not scale with it, the others do), and a mix has no area, so at unit area an absolute occupancy would dilute the other inputs' per-person load by a factor that no real zone has; for example a hall of 5 people mixed half and half with an office of 0.1 people/m² at 30 m³/h per person would give 2.97 m³/h on a zone of 100 m², and merged zones of 50 m² and 50 m² give 150 m³/h. The mix rejects this combination (`PerPersonWithAbsoluteOccupancy`) in any inputs.
+
+The setpoint rule is a prescribed control rule, not a conservation invariant, and chaining mixes renormalises over the conditioned inputs step by step, so a mix of mixes can differ from the same inputs mixed once; this is accepted. The window-to-wall ratio of a mix, when not given, is the weighted mean \(\sum_i \hat w_i \mathrm{WWR}_i\), glazing per wall shared like floor area, recorded as derived.
 
 ---
 
@@ -310,6 +338,19 @@ Examples:
 - same-orientation units.
 
 The merged zones preserve equivalent schedules and installed loads.
+
+Variant, joined pieces (D-123). The zones of one class often form several pieces that share no wall: the stairs of a floor are usually several separate cores, and the stair bays of a bar cut its dwellings into blocks. By default each connected piece is its own target zone; zones are connected when they share a wall, and zones that touch only at a point are not. With joined pieces, all pieces of a class on the floor form one target zone, a zone of several disjoint pieces at one elevation. The aggregation rules (§7) apply unchanged to the larger group, every invariant of §17 holds, and joining removes no partition, because the pieces share none. What the variant adds is the modelling assumption that the separate pieces are one thermal zone, with one air volume and one set of setpoints. It is a switch of the merge, not a new level, so a study can vary it on its own.
+
+### Z1c — Conditioning merge
+
+Merge by a known semantic relationship other than space type: conditioning. A source zone is conditioned when its program has a thermostat (D-038), and by nothing else: not its space type, its name, or the values of its setpoints. The conditioned zones that share walls form one target zone, and so do the unconditioned ones; a conditioned and an unconditioned source zone are never merged. With joined pieces, a floor has at most one conditioned and one unconditioned zone, each made of all the pieces of its class, and a floor without unconditioned zones has one conditioned zone. In both modes:
+
+- Schedules, installed loads, and occupancy are conserved per target zone by the rules of §7. Infiltration is not merged: it is the envelope's and is applied to each target zone's own outdoor surfaces or volume, over all its pieces (D-124, §7, §9).
+- The conditioned floor area is conserved exactly. Every target zone covers source zones of one class only, so no unconditioned area becomes conditioned and no conditioned area is lost. Validation reports the conditioned floor area as a note (§7, D-038) and for Z1c it never differs.
+- A conditioned target zone's setpoints are the floor-area weighted schedules of §7 over its sources, all of which are conditioned. An unconditioned target zone has no thermostat and keeps its loads.
+- A target zone takes the space type its sources share, or `Mixed` when they differ.
+
+Z1c separates two effects that Z2 and Z3 confound. Those levels make a zone conditioned whenever any source in it is, so where they cover an unconditioned source, such as the stairs, they enlarge the conditioned floor area, and their difference from Z0 mixes the removal of internal partitions with the conditioning of that space. Z1c removes the partitions inside conditioned space and keeps the boundary between conditioned and unconditioned space, in either mode. Comparing it with Z0 or Z1 therefore shows the effect of the internal partitions alone, and comparing it with Z3 shows the effect of conditioning the unconditioned space and removing its boundary with the conditioned space.
 
 ### Z2 — Re-Zoning to Perimeter/Core
 
@@ -349,6 +390,18 @@ Represent multiple geometrically similar floors using a single simulated floor w
 
 The experiment must clearly distinguish zoning simplification from the multiplier approximation.
 
+### What the zoning levels do to the conditioned floor area
+
+Every zoning level Z0 to Z3, in every variant, conserves the quantities of §17. They differ in how they treat one quantity, the conditioned floor area, which §7 defines through the thermostat of the program (D-038) and validation reports without enforcing.
+
+| Level | Conditioned floor area |
+| --- | --- |
+| Z0 | the source's |
+| Z1, separate or joined pieces | the source's when the zones of each space type share their conditioning; a group of zones that differ in conditioning is conditioned as a whole, which enlarges it |
+| Z1c, separate or joined pieces | exactly the source's |
+| Z2 | enlarged, wherever a perimeter or core zone covers both conditioned and unconditioned source zones, by the unconditioned area in it |
+| Z3 | enlarged by all the unconditioned area of the floor when any source on the floor is conditioned |
+
 ---
 
 ## 9. Rezoning as Spatial Remapping
@@ -385,17 +438,17 @@ Examples:
 - installed equipment power: extensive,
 - schedules: installed-load weighted where relevant,
 - window area: façade-overlap weighted,
-- infiltration: depends on whether represented by exterior area, floor area, or ACH.
+- infiltration: not transferred (D-124); it is an envelope input applied to each target zone's own exterior area or volume.
 
 The transfer matrix should be retained as part of the output metadata so every simplified model can be traced back to its source model.
 
-Rule adopted for this project (ADR-007, D-019, D-041, D-047): loads are aggregated per component, one per load type and basis; a program may express a load type in several bases (e.g. ventilation per person plus per floor area), and its components add up. Every component is converted to its absolute design magnitude \(Q_i\) = value × basis quantity, where the basis quantity is the floor area, the design occupants (the sum of the zone's occupancy components), 1 for absolute loads, the gross exterior wall area (walls with an outdoor boundary, windows included), or the zone volume for air changes per hour. Source zone \(i\) transfers \(T_{ji} = f_{ji} Q_i\) to target zone \(j\), where \(f_{ji}\) is the exterior-wall fraction for loads per exterior wall area and the floor-area fraction otherwise; a source without the component contributes nothing to it. The target magnitude \(Q_j = \sum_i T_{ji}\) is re-expressed in the component's basis as \(v_j = Q_j / B_j\), and the target schedule is
+Rule adopted for this project (ADR-007, D-019, D-041, D-047): loads are aggregated per component, one per load type and basis; a program may express a load type in several bases (e.g. ventilation per person plus per floor area), and its components add up. Every component is converted to its absolute design magnitude \(Q_i\) = value × basis quantity, where the basis quantity is the floor area, the design occupants (the sum of the zone's occupancy components), 1 for absolute loads, or the zone volume for air changes per hour (D-124: no basis depends on the envelope). Source zone \(i\) transfers \(T_{ji} = f_{ji} Q_i\) to target zone \(j\), where \(f_{ji}\) is the floor-area fraction; a source without the component contributes nothing to it. The target magnitude \(Q_j = \sum_i T_{ji}\) is re-expressed in the component's basis as \(v_j = Q_j / B_j\), and the target schedule is
 
 \[
 s_j(t) = \frac{\sum_i T_{ji} s_i(t)}{Q_j}
 \]
 
-This yields area weighting for densities, occupancy weighting for per-person loads, summation for absolute loads, exterior-wall-area weighting for loads per exterior wall area, and volume weighting for air changes per hour, \(ACH^\* = \sum_i V_i ACH_i / \sum_i V_i\) (D-019). Transfer fractions are normalised per source, \(\sum_j f_{ji} = 1\), so every extensive quantity is conserved to floating-point precision regardless of polygon rounding; how well the target zones cover each source is checked separately. Exterior-wall fractions are used only after the target façades are shown to cover every source outdoor wall over its full length, checked before any normalisation (D-041). Loads of one type with different bases are neither rejected nor converted to one basis: each basis is aggregated as its own component and conserved exactly, so no program assumption changes (D-047). A positive magnitude cannot be expressed in a target whose basis quantity is zero; this is an error. A zero total magnitude gives the value 0 and a constant-zero schedule.
+This yields area weighting for densities, occupancy weighting for per-person loads, summation for absolute loads, and volume weighting for air changes per hour, \(ACH^\* = \sum_i V_i ACH_i / \sum_i V_i\) (D-019). Transfer fractions are normalised per source, \(\sum_j f_{ji} = 1\), so every extensive quantity is conserved to floating-point precision regardless of polygon rounding; how well the target zones cover each source is checked separately. Through S8 a second, exterior-wall fraction transferred loads per exterior wall area, and was used only after the target façades were shown to cover every source outdoor wall over its full length, checked before any normalisation (D-041); it left with infiltration (D-124), and the façade coverage is still checked for the rebuilt walls and windows (§10). Loads of one type with different bases are neither rejected nor converted to one basis: each basis is aggregated as its own component and conserved exactly, so no program assumption changes (D-047). A positive magnitude cannot be expressed in a target whose basis quantity is zero; this is an error. A zero total magnitude gives the value 0 and a constant-zero schedule.
 
 ---
 
@@ -672,6 +725,8 @@ For each load type:
 
 - total installed power conserved,
 - timestep-level aggregate scheduled load conserved.
+
+The load types are those of a zone program. Infiltration is not one (D-124): it is the envelope's and is applied to each zone's own surfaces or volume, so it has no check of its own and is conserved by construction through the conserved exterior wall, roof, exposed floor, and volume.
 
 ### Occupancy
 

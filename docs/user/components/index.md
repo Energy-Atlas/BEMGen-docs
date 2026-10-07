@@ -7,10 +7,10 @@ Every component and parameter of the BEMGen tab in Grasshopper, generated from t
 | Panel | Components | Parameters |
 | --- | --- | --- |
 | [0 Info](info.md) | 1 | 7 |
-| [1 Program](program.md) | 3 | 1 |
+| [1 Program](program.md) | 4 | 1 |
 | [1 Program Presets](program-presets.md) | 19 | 0 |
 | [2 Generate](generate.md) | 19 | 0 |
-| [3 Simplify](simplify.md) | 4 | 0 |
+| [3 Simplify](simplify.md) | 5 | 0 |
 | [4 Aggregate](aggregate.md) | 4 | 0 |
 | [5 Convert](convert.md) | 2 | 0 |
 | [6 Inspect](inspect.md) | 3 | 0 |
@@ -30,6 +30,7 @@ Every component and parameter of the BEMGen tab in Grasshopper, generated from t
 | ![](../../assets/icons/CareHubComponent.png) | [Care Hub](generate.md#care-hub) | `CHub` | Generate |
 | ![](../../assets/icons/CleanCorridorPresetComponent.png) | [Clean Corridor Preset](program-presets.md#clean-corridor-preset) | `Clean` | Program Presets |
 | ![](../../assets/icons/ClinicalSupportPresetComponent.png) | [Clinical Support Preset](program-presets.md#clinical-support-preset) | `ClinS` | Program Presets |
+| ![](../../assets/icons/ConditionedMergeComponent.png) | [Conditioned Merge](simplify.md#conditioned-merge) | `Z1c` | Simplify |
 | ![](../../assets/icons/Convert2BemComponent.png) | [Convert2BEM](convert.md#convert2bem) | `2BEM` | Convert |
 | ![](../../assets/icons/Convert2IdfComponent.png) | [Convert2IDF](convert.md#convert2idf) | `2IDF` | Convert |
 | ![](../../assets/icons/CorePresetComponent.png) | [Core Preset](program-presets.md#core-preset) | `Core` | Program Presets |
@@ -52,6 +53,7 @@ Every component and parameter of the BEMGen tab in Grasshopper, generated from t
 | ![](../../assets/icons/LobbyPresetComponent.png) | [Lobby Preset](program-presets.md#lobby-preset) | `Lobby` | Program Presets |
 | ![](../../assets/icons/MallPresetComponent.png) | [Mall Preset](program-presets.md#mall-preset) | `Mall` | Program Presets |
 | ![](../../assets/icons/MapSourceToTargetComponent.png) | [Map Source to Target](inspect.md#map-source-to-target) | `Map` | Inspect |
+| ![](../../assets/icons/MixProgramsComponent.png) | [Mix Programs](program.md#mix-programs) | `Mix` | Program |
 | ![](../../assets/icons/NoSimplificationComponent.png) | [No Simplification](simplify.md#no-simplification) | `Z0` | Simplify |
 | ![](../../assets/icons/OfficePlateComponent.png) | [Office Plate](generate.md#office-plate) | `OPlate` | Generate |
 | ![](../../assets/icons/OfficePresetComponent.png) | [Office Preset](program-presets.md#office-preset) | `Office` | Program Presets |

@@ -1,6 +1,6 @@
 # ADR-007: Load-basis aggregation
 
-Status: Accepted
+Status: Accepted; superseded in part by [ADR-017](ADR-017-program-mix-and-building-infiltration.md) (the exterior-wall basis and fraction left the program with infiltration, D-124)
 
 Date: 2026-10-01
 

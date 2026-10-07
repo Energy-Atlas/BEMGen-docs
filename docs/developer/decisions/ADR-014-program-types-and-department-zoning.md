@@ -1,6 +1,6 @@
 # ADR-014: Program types and department zoning
 
-Status: Accepted (by the controller under D-098; provisional pending the owner's reading)
+Status: Accepted (by the controller under D-098; provisional pending the owner's reading); the example presets' infiltration values are dropped by [ADR-017](ADR-017-program-mix-and-building-infiltration.md) (D-124)
 
 Date: 2026-10-02
 

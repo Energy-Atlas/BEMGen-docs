@@ -6,11 +6,12 @@
 Read the pages in this order the first time:
 
 1. [Getting started](getting-started.md): what you need, how to install the plugin, and a first definition that runs.
-2. [Concepts](concepts.md): the words this guide uses (plan, zone, program preset, simplifier, floor aggregator, multiplier, validation, provenance, levels of detail).
-3. [Workflow](workflow.md): every step from presets to *Convert2BEM* and *Convert2IDF*, with the choices at each step.
-4. [End-to-end example](example-end-to-end.md): one complete definition with every input value and the results you should see.
-5. [Typologies](typologies.md): the eighteen plan generators, their inputs and defaults, and their example definitions.
-6. [Component reference](components/index.md): every component with its icon, inputs, outputs, and defaults, generated from the plugin.
+2. [What's new in 1.1.0](whats-new.md): *Conditioned Merge* and *Join Pieces*, *Mix Programs*, infiltration on *Envelope Preset*, and what happens to definitions saved with an earlier version.
+3. [Concepts](concepts.md): the words this guide uses (plan, zone, program preset, simplifier, floor aggregator, multiplier, validation, provenance, levels of detail).
+4. [Workflow](workflow.md): every step from presets to *Convert2BEM* and *Convert2IDF*, with the choices at each step.
+5. [End-to-end example](example-end-to-end.md): one complete definition with every input value and the results you should see.
+6. [Typologies](typologies.md): the eighteen plan generators, their inputs and defaults, and their example definitions.
+7. [Component reference](components/index.md): every component with its icon, inputs, outputs, and defaults, generated from the plugin.
 
 ## Conventions
 

@@ -91,6 +91,7 @@ nav:
   - User guide:
       - user/index.md
       - Getting started: user/getting-started.md
+      - What's new in 1.1.0: user/whats-new.md
       - Concepts: user/concepts.md
       - Workflow: user/workflow.md
       - End-to-end example: user/example-end-to-end.md

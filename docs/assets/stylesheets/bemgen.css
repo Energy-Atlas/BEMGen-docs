@@ -824,6 +824,22 @@ html {
   padding: 0;
 }
 
+/*
+ * Where an empty sidebar margin moves the grid in from the frame, the grid closes its outer edge with its own rule,
+ * drawn just outside the margin so that the cells' text keeps its alignment.
+ */
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--primary[hidden] ~ .md-content .md-typeset .grid.cards > :is(ul, ol) {
+    border-left: 1px solid var(--ea-border-subtle);
+    margin-left: -1px;
+  }
+
+  .md-sidebar--secondary[hidden] ~ .md-content .md-typeset .grid.cards > :is(ul, ol) {
+    border-right: 1px solid var(--ea-border-subtle);
+    margin-right: -1px;
+  }
+}
+
 .md-typeset .grid.cards > :is(ul, ol) > li {
   border: 0;
   border-radius: 0;

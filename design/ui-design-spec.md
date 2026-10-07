@@ -134,6 +134,7 @@ Moving between pages must not flicker or shift the layout:
 
 - A cell whose title is a link is clickable as a whole and goes to the title's address; hovering it shifts the surface and turns the title blue. Other links in the cell (its button, a link in its description) keep their own targets.
 - A cell's text is padded by the same gutter as the prose, so cell text, strip labels, and paragraphs share one left edge.
+- Every cell is closed on all four sides. Where an empty sidebar margin (section 0.7) moves a grid in from the frame, the grid draws its own outer left and right rules at the margin; elsewhere the frame lines close it.
 
 ---
 

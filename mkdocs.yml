@@ -17,12 +17,15 @@ strict: true
 theme:
   name: material
   language: en
+  # No font host: docs/assets/stylesheets/fonts.css serves the fonts from the site (design/ui-design-spec.md, 0.4).
+  font: false
   features:
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.sections
     - navigation.indexes
     - navigation.top
+    - navigation.path
     - navigation.footer
     - search.highlight
     - search.suggest
@@ -31,20 +34,21 @@ theme:
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: teal
-      accent: deep orange
+      primary: custom
+      accent: custom
       toggle:
         icon: material/weather-night
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: teal
-      accent: deep orange
+      primary: custom
+      accent: custom
       toggle:
         icon: material/weather-sunny
         name: Switch to light mode
 
 extra_css:
+  - assets/stylesheets/fonts.css
   - assets/stylesheets/bemgen.css
 
 plugins:

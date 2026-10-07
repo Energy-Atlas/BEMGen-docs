@@ -6,7 +6,7 @@ The public documentation site and the release files of BEMGen, a Grasshopper plu
 
 | Path | Owner | How it changes |
 | --- | --- | --- |
-| `docs/index.md`, `docs/user/*.md`, `docs/developer/index.md`, `docs/assets/stylesheets/` | This repository | Edited here |
+| `docs/index.md`, `docs/user/*.md`, `docs/developer/index.md`, `docs/assets/stylesheets/`, `docs/assets/fonts/` | This repository | Edited here |
 | `docs/user/components/`, `docs/assets/icons/`, `docs/assets/screenshots/` | Generated from the export | `import_reference.py` only, never by hand |
 | `docs/developer/**` except `index.md` | BEMGen (`docs/`, `GLOBAL.md`, `AGENTS.md`) | `import_reference.py` only. A fix to a developer page is made in BEMGen, then exported. |
 | The *Developer* block of `mkdocs.yml`, between its marker comments | Generated from `developer-nav.json` | `import_reference.py` only |

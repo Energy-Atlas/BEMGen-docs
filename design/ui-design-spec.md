@@ -30,6 +30,7 @@ Decided by the owner on 2026-10-07. These are implementation rules, not one-off 
 - Families: **Geist** (primary sans), **Geist Mono** (technical and monospace UI), **Cormorant Garamond** (sparse editorial serif accent, italic).
 - Self-host them. The browser must not contact Google Fonts or any other font host when the site is viewed.
 - Prefer Material for MkDocs' `privacy` plugin, which downloads external fonts at build time and serves them from the site. If it cannot cover a family, vendor the webfont files under `docs/assets/fonts/` with their licences and declare them with `@font-face`.
+- **Outcome:** the fonts are vendored. The `privacy` plugin creates symbolic links for the extensionless Google Fonts style-sheet URL; Windows refuses them without developer mode, and the plugin's warning fails `mkdocs build --strict` on the Windows machines that build this site. The Latin and Latin Extended subsets (variable Geist and Geist Mono, Cormorant Garamond italic 500) are in `docs/assets/fonts/` with their OFL licences, declared in `docs/assets/stylesheets/fonts.css`; `theme.font` is `false`, so Material loads no font itself. Builds need no network.
 
 ### 0.5 Colour roles
 

@@ -113,6 +113,11 @@
  * Page frame
  * ------------------------------------------------------------------------------------------------------------------ */
 
+/* Reserve the scrollbar's width on every page, so that moving between short and long pages does not shift the layout. */
+html {
+  scrollbar-gutter: stable;
+}
+
 .md-grid {
   max-width: 76rem;
 }
@@ -165,6 +170,11 @@
 
 .md-tabs {
   border-bottom: 1px solid var(--ea-border-subtle);
+}
+
+/* The loading bar of instant navigation: a thin accent rule along the top edge. */
+.md-progress {
+  background-color: var(--ea-accent);
 }
 
 .md-tabs__item {

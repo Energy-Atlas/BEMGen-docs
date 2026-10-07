@@ -16,10 +16,15 @@ strict: true
 
 theme:
   name: material
+  # overrides/main.html preloads the main fonts, so a full page load draws its first frame with them.
+  custom_dir: overrides
   language: en
   # No font host: docs/assets/stylesheets/fonts.css serves the fonts from the site (design/ui-design-spec.md, 0.4).
   font: false
   features:
+    # Instant navigation swaps only the page content, so the header, sidebars, and fonts persist between pages.
+    - navigation.instant
+    - navigation.instant.progress
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.sections

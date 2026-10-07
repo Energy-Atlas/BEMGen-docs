@@ -120,6 +120,14 @@ What to take from the ArtCraft reference:
 - **Feature row:** three equal cells sharing their borders with each other and with the hero cell above. Each cell: a one-letter mono index (`A`, `B`, `C`) at the top left in muted grey, a bold title of about 28px, two lines of grey description, and optionally a small square outlined button with a mono uppercase label and a small icon.
 - **Not adopted:** the right-hand scroll ruler with tick numbers and percentage, and the oversized outline section names in the right margin. They are page-specific decoration and conflict with section 19.
 
+### 0.12 Stable page changes
+
+Moving between pages must not flicker or shift the layout:
+
+- `navigation.instant` is on: a link swaps only the page content, so the header, sidebars, scrollbars, and loaded fonts persist. `navigation.instant.progress` shows the load as a thin accent rule along the top edge.
+- `html` reserves the scrollbar's width (`scrollbar-gutter: stable`), so short and long pages have the same content width.
+- `overrides/main.html` preloads `geist-latin.woff2` and `geist-mono-latin.woff2`, so a full page load draws its first frame without a font swap.
+
 ---
 
 ## 1. Design Intent

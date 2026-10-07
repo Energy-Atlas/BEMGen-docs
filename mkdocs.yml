@@ -134,6 +134,7 @@ nav:
           - developer/decisions/ADR-013-vertical-aggregation-methods.md
           - developer/decisions/ADR-014-program-types-and-department-zoning.md
           - developer/decisions/ADR-015-plans-per-storey.md
+          - developer/decisions/ADR-017-program-mix-and-building-infiltration.md
       - Plans:
           - developer/plans/2026-09-30-implementation-roadmap.md
           - developer/plans/2026-10-01-s0-foundation.md
@@ -160,6 +161,8 @@ nav:
           - developer/plans/2026-10-03-s9-release.md
           - developer/plans/2026-10-03-zero-width-artefacts.md
           - developer/plans/2026-10-04-dropdown-enums.md
+          - developer/plans/2026-10-06-conditioned-merge.md
+          - developer/plans/2026-10-06-program-mix.md
       - Research:
           - developer/research/envelope-presets.md
           - developer/research/precedents/hdhm-typologies.md

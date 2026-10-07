@@ -1,6 +1,6 @@
 # ADR-010: Convert2IDF
 
-Status: Accepted (owner's scope answers D-112; the controller's realisation choices provisional pending the owner's reading)
+Status: Accepted (owner's scope answers D-112; the controller's realisation choices provisional pending the owner's reading); superseded in part by [ADR-017](ADR-017-program-mix-and-building-infiltration.md) (infiltration is written once per zone from the envelope preset, not as a program load, D-124)
 
 Date: 2026-10-02
 

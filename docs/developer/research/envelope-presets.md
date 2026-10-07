@@ -1,10 +1,10 @@
 # Envelope Presets
 
-> **Status:** Current as of S6 (part B) · **Date:** 2026-10-02 · **Decisions:** D-023, D-031, D-069, D-112; [ADR-010](../decisions/ADR-010-convert2idf.md)
+> **Status:** Current as of S6 (part B); infiltration added in D-124 · **Date:** 2026-10-02 · **Decisions:** D-023, D-031, D-069, D-112, D-124; [ADR-010](../decisions/ADR-010-convert2idf.md), [ADR-017](../decisions/ADR-017-program-mix-and-building-infiltration.md)
 >
 > **Read this first:** the envelope that ships with BEMGen (`ExampleEnvelopePresets.Example`) holds **illustrative round numbers chosen for development and tests. Its layers and glazing are NOT taken from ASHRAE 90.1, the DOE prototype buildings, a national code, or any other standard**, and no result based on it may be presented as if they were. Sourced envelopes are an open research input (§4), like sourced program presets ([program presets](program-presets.md) §3).
 
-An envelope preset describes the constructions of a building: one layered construction per envelope role and one simple glazing for every window (ADR-010, D-112). It is separate from the program presets on purpose: the envelope is the same at every level of detail, whatever zones are merged, so geometry effects are not confounded with envelope changes (GLOBAL.md scientific rule 4). *Convert2BEM* and *Convert2IDF* take the same preset, so both outputs describe one envelope.
+An envelope preset describes the constructions of a building: one layered construction per envelope role, one simple glazing for every window (ADR-010, D-112), and since D-124 the building's infiltration. It is separate from the program presets on purpose: the envelope is the same at every level of detail, whatever zones are merged, so geometry effects are not confounded with envelope changes (GLOBAL.md scientific rule 4). *Convert2BEM* and *Convert2IDF* take the same preset, so both outputs describe one envelope.
 
 ## 1. What an envelope preset is
 
@@ -15,7 +15,8 @@ In code an envelope preset is an `EnvelopePreset` (`src/Lod.Core/Envelope/Envelo
 | `Layer` | `Name`, `Thickness` (m), `Conductivity` (W/(m·K)), `Density` (kg/m³), `SpecificHeat` (J/(kg·K)) | `EmptyName`; `EnvelopeValue` when a property is not positive and finite |
 | `Construction` | `Name` and 1 to 10 `Layers`, listed from the outside to the inside as the zone whose surface it is sees them | `EmptyName`; `ConstructionLayers` for no layers or more than 10 (the EnergyPlus limit) |
 | `GlazingSpec` | `Name`, `UFactor` (W/(m²·K)), `SolarHeatGainCoefficient`, `VisibleTransmittance` of the whole window | `EmptyName`; `EnvelopeValue` when the U-factor is not in (0, 7] or SHGC or VT is not in (0, 1) |
-| `EnvelopeValues` | `Name`, one construction per role (below), and `Window` | `EmptyName` for the preset name |
+| `Infiltration` | `DesignRate` (finite, not negative), `Basis` (`InfiltrationBasis`), and a fraction `Schedule`, the same for every zone (§2.5) | `InfiltrationValue` when the rate is negative or not finite or the basis is not defined; `ScheduleKindMismatch` when the schedule is not a fraction schedule |
+| `EnvelopeValues` | `Name`, one construction per role (below), `Window`, and `Infiltration` | `EmptyName` for the preset name |
 
 Names identify materials and constructions in the converters' output, so `ToPreset` also checks that they are unambiguous, ignoring case as EnergyPlus does (`DuplicateEnvelopeName`): one material name per set of layer properties, one construction name per layer sequence, and the glazing name, which names both the window construction and its glazing material, used by no other material or construction. Names are written as they are, so they must also be valid IDF names (`EnvelopeName`): at most 100 characters, the generated `"{Name} Reversed"` included, and none of `,` `;` `!`. The same `Construction` may serve several roles, and a layer used by several constructions is checked once.
 
@@ -76,10 +77,22 @@ Layers from the outside to the inside; the resistance is that of the layers alon
 - The interior wall is symmetric and the interior floor is not, so both cases of interzone pairing (a construction that is its own reverse and one that is not) are exercised.
 - Internal mass uses the interior floor construction, because a slab that becomes internal mass keeps its construction (D-031).
 
+### 2.5 Infiltration (D-124)
+
+Infiltration is the building's, not a space type's: its magnitude follows each zone's exterior surfaces or volume, which a program preset does not know, so it left the program presets and is a field of the envelope preset ([ADR-017](../decisions/ADR-017-program-mix-and-building-infiltration.md); [program presets](program-presets.md) §1.1). One design rate with a basis and a fraction schedule applies to every zone, at every level of detail, so zoning does not change the infiltration the model assumes (GLOBAL.md scientific rule 4).
+
+| `InfiltrationBasis` | The rate is per | EnergyPlus method of *Convert2IDF* |
+| --- | --- | --- |
+| `PerExteriorSurfaceArea` | m² of the zone's exterior surface: the gross area, windows included, of its outdoor walls, roofs, and exposed floors, not its ground floor (m³/h per m²) | `Flow/ExteriorArea` |
+| `PerExteriorWallArea` | m² of the zone's gross outdoor wall area (m³/h per m²) | `Flow/ExteriorWallArea` |
+| `AirChangesPerHour` | the zone's volume per hour (1/h) | `AirChanges/Hour` |
+
+`ExampleEnvelopePresets` has **0.3 air changes per hour, always on** (the schedule `Example Always On`, constant 1). Like the rest of the example envelope it is illustrative: 0.3 was the value most of the example program presets carried before infiltration moved here, and it is NOT taken from ASHRAE 90.1, the DOE prototypes, or any other standard. The per-type rates those presets had (mall 0.8, lobby 0.6, retail 0.5, operating theatre 0.1) are dropped, not moved ([program presets](program-presets.md) §2.2). A sourced envelope would state its infiltration with the source, for example a rate per exterior surface area as the prototype models give it (§4).
+
 ## 3. Using an envelope preset
 
 - **In C#:** `ExampleEnvelopePresets.Example`, or `(ExampleEnvelopePresets.Values with { Window = new GlazingSpec("My Glazing", 1.4, 0.35, 0.6) }).ToPreset()`, or a new `EnvelopeValues` with your own constructions.
-- **In Grasshopper:** *Envelope Preset* (panel *1 Program Presets*) outputs the example envelope; its inputs *Name*, *Glazing*, *U-Factor*, *SHGC*, and *VT* default to the example values and replace the name and the glazing. The layered constructions are the example's. *Convert2BEM* takes the preset on its *Envelope* input (the example when unconnected) and outputs each surface's and window's construction ([convert2bem.md](../architecture/convert2bem.md)).
+- **In Grasshopper:** *Envelope Preset* (panel *1 Program Presets*) outputs the example envelope; its inputs *Name*, *Glazing*, *U-Factor*, *SHGC*, *VT*, *Infiltration Rate* (default 0.3), *Infiltration Basis* (an enum input; default `AirChangesPerHour`, right-click lists `PerExteriorSurfaceArea`, `PerExteriorWallArea`, and `AirChangesPerHour`), and the optional *Infiltration Schedule* (unset: always on) default to the example values and replace the name, the glazing, and the infiltration. The layered constructions are the example's. *Convert2BEM* takes the preset on its *Envelope* input (the example when unconnected) and outputs each surface's and window's construction and the infiltration with each zone's design flow ([convert2bem.md](../architecture/convert2bem.md)); *Convert2IDF* writes one `ZoneInfiltration:DesignFlowRate` per zone ([convert2idf.md](../architecture/convert2idf.md#infiltration)).
 
 ## 4. Sourced envelopes: an open research input
 

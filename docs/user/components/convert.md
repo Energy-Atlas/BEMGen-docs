@@ -15,7 +15,7 @@ Panel *5 Convert* of the BEMGen tab: 2 components. Back to the [component refere
 
 Component · nickname `2BEM` · GUID `d091d70c-4de3-4f29-a900-ea4c9b777ba3` · exposure primary
 
-Building to zone geometry, programs, and surfaces as data trees (branch {i} = zone i), ready to wire into a ClimateStudio definition. Provisional layout.
+Building to zone geometry, programs, surfaces, and infiltration as data trees (branch {i} = zone i), ready to wire into a ClimateStudio definition. Outputs: zones, names, space types, multipliers, conditioning, loads, setpoints, surfaces, boundaries, windows, internal mass, provenance, constructions, window constructions, then the envelope's infiltration once (rate, basis, schedule) and each zone's infiltration flow. Provisional layout.
 
 **Inputs**
 
@@ -49,6 +49,10 @@ Building to zone geometry, programs, and surfaces as data trees (branch {i} = zo
 | Provenance | `P` | Text | item | Building provenance, validation report, heat-transfer options, envelope preset, and any override. |
 | Constructions | `Con` | Text | tree | {i}: construction of each Surfaces item from the envelope preset, by its envelope role; a ceiling between storeys gets the reversed interior floor. |
 | Window Constructions | `WCon` | Text | tree | {i}: construction of each Windows item: the envelope preset's glazing. |
+| Infiltration Rate | `IR` | Number | item | The envelope preset's infiltration design rate, the same for every zone, in the unit of Infiltration Basis: m³/h per m², or 1/h. |
+| Infiltration Basis | `IB` | Text | item | What Infiltration Rate is per: PerExteriorSurfaceArea, PerExteriorWallArea, AirChangesPerHour (exterior surface area: outdoor walls, roofs, and exposed floors, windows included). |
+| Infiltration Schedule | `IS` | Number | list | 8760 fractions multiplying the infiltration of every zone. |
+| Infiltration Flows | `IF` | Number | tree | {i}: design infiltration flow of one instance of zone i, m³/h: Infiltration Rate times the zone's exterior surface area, outdoor wall area, or volume, by the basis. Times Infiltration Schedule it is the hourly flow; times Multipliers, that of every instance. |
 
 **Example definitions:** `branching-mall.gh` ([canvas](../../assets/screenshots/canvas/branching-mall.png)), `cafeteria.gh` ([canvas](../../assets/screenshots/canvas/cafeteria.png)), `care-hub.gh` ([canvas](../../assets/screenshots/canvas/care-hub.png)), `court-cluster.gh` ([canvas](../../assets/screenshots/canvas/court-cluster.png)), `enclosed-court.gh` ([canvas](../../assets/screenshots/canvas/enclosed-court.png)), `end-to-end.gh` ([canvas](../../assets/screenshots/canvas/end-to-end.png)), `foyer-halls.gh` ([canvas](../../assets/screenshots/canvas/foyer-halls.png)), `gallery-bar.gh` ([canvas](../../assets/screenshots/canvas/gallery-bar.png)), `linear-plan.gh` ([canvas](../../assets/screenshots/canvas/linear-plan.png)), `office-plate.gh` ([canvas](../../assets/screenshots/canvas/office-plate.png)), `open-court.gh` ([canvas](../../assets/screenshots/canvas/open-court.png)), `operating-suite.gh` ([canvas](../../assets/screenshots/canvas/operating-suite.png)), `point-plate.gh` ([canvas](../../assets/screenshots/canvas/point-plate.png)), `radial-lobes.gh` ([canvas](../../assets/screenshots/canvas/radial-lobes.png)), `stair-bay-bar.gh` ([canvas](../../assets/screenshots/canvas/stair-bay-bar.png)), `stair-pair.gh` ([canvas](../../assets/screenshots/canvas/stair-pair.png)), `stepped-band.gh` ([canvas](../../assets/screenshots/canvas/stepped-band.png)), `terrace-row.gh` ([canvas](../../assets/screenshots/canvas/terrace-row.png)), `winged-band.gh` ([canvas](../../assets/screenshots/canvas/winged-band.png)).
 

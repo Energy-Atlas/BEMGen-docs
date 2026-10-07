@@ -44,6 +44,18 @@
 >
 > **Progress:** 2026-10-03 · S9 Release complete (version 1.0.0, D-116; the tag `v1.0.0` is set at the fresh-clone gate and pushing waits for the owner). A local MkDocs docs site (user part and developer part, served on localhost, never published), the component reference generated from the plugin's metadata with icons and screenshots, 19 example definitions built by the headless harness (one per plan generator and the end-to-end example), the `sync-docs` project skill, a local Yak build (`scripts/package-yak.ps1`), and the MIT license. The headless check found a Grasshopper freeze: BEMGen's Goo types lacked a public parameterless constructor, so a wire of the wrong type, the "Data conversion failed" message, or component help opened Grasshopper's modal assert dialog in every version up to `v0.9.1`; fixed, and the smoke check now asserts expected errors. `scripts/verify.ps1` and `mkdocs build --strict` pass; all 12 rhino-smoke specs pass and all 19 examples reopen and solve; 346 core, 518 generator, 635 export, and 1573 integration tests pass on `net8.0`. Open for a person: the examples on screen, the Yak install, the toolbar icons, and a first EnergyPlus run (D-112). Next: the first EnergyPlus run and sourced presets (D-112, D-023).
 >
+> **Progress:** 2026-10-03 · The docs site move, BEMGen side, complete (version 1.0.1, D-117 to D-119; tag `v1.0.1`). The MkDocs site left this repository for the public `energy-atlas/BEMGen-docs`; `scripts/docs-export/` writes what the site takes from BEMGen, `scripts/package-release.ps1` builds each version's release files for that repository's GitHub Releases (D-118), and decision numbers left every user-visible string. Step C, the import and release there, belongs to the docs repository.
+>
+> **Progress:** 2026-10-05 · Enum inputs complete (version 1.0.2, D-120, D-121; tag `v1.0.2`, released with a docs export). Five inputs that took an enum name as typed text list its values in the right-click menu, and *Extract parameter* on them places a dropdown; 13 rhino-smoke specs pass, and 346 core, 518 generator, 635 export, and 1573 integration tests pass on `net8.0`.
+>
+> **Progress:** 2026-10-06 · Conditioned Merge and joined pieces built on `feature/conditioned-merge` and reviewed (D-123); not merged: the merge, version, and tag are the owner's. A new plan simplifier merges conditioned and unconditioned zones separately (Z1c) and keeps conditioned floor area exactly; *Semantic Merge* and *Conditioned Merge* take *Join Pieces*, one zone per connected piece (default) or one per class made of its pieces. `scripts/verify.ps1` passes (412 core, 518 generator, 2620 integration, 1024 export tests) and all 14 rhino-smoke specs pass. Open for a person: the merge checklist.
+>
+> **Progress:** 2026-10-07 · Program mix and building-level infiltration built on `feature/program-mix` and reviewed (D-124, ADR-017); not merged: the merge, version, and tag are the owner's. *Mix Programs* mixes presets by floor-area share as a zone merge would (absolute loads raw, setpoints over the conditioned inputs); infiltration leaves programs and becomes an *Envelope Preset* input written per zone in EnergyPlus's own method. `scripts/verify.ps1` passes (417 core, 518 generator, 1624 integration, 705 export tests), all 14 rhino-smoke specs pass, and the IDD check of 579 files finds 0 problems. Open for a person: the program-mix checklist.
+>
+> **Progress:** 2026-10-07 · The program mix (D-124) rebased onto Conditioned Merge (D-123) on `feature/program-mix`, for release 1.1.0; not merged: the merge and tag are the owner's. Zones of several pieces take the envelope's infiltration over the outdoor surfaces of every piece; the merge modes run through the infiltration and program-mix matrices; the four Conditioned Merge snapshots change only by infiltration (three floor snapshots lose their infiltration load lines, and the stair-bay bar's IDF snapshot gains the header line and the envelope's schedule); the IDD-check files of the joined merge modes are written under plain file names (a colon had hidden 288 of them in alternate data streams). `scripts/verify.ps1` passes (484 core, 518 generator, 2695 integration, 1148 export tests) and the IDD check of 1016 files finds 0 problems. Open: the rebuilt examples and the headless Rhino run of all specs.
+>
+> **Progress:** 2026-10-07 · Version 1.1.0 (D-125): Conditioned Merge and joined pieces (D-123) and the program mix with building-level infiltration (D-124, ADR-017) integrated into one linear history and released as `v1.1.0`; the owner approved the merge, the tag, the push, and the release on 2026-10-07. `scripts/verify.ps1` passes (484 core, 518 generator, 2695 integration, 1148 export tests) and the IDD check of 1016 files finds 0 problems; the headless Rhino check of every spec and the example rebuild are recorded in D-125. Open for a person: the Conditioned Merge and program-mix checklists in the smoke test. The S10 atlas presets (D-122) are not in this release; they wait on `feature/archetype-data`. Next: the first EnergyPlus run and sourced presets (D-112, D-023).
+>
 > **Revisions:** v1 (2026-09-30) initial draft · v2 (2026-09-30) pipeline-first restructure after D-015 to D-024: Grasshopper objects instead of JSON, the D-018 pipeline vocabulary, ClimateStudio output without simulation, precedent study moved after the pipeline works · v3 (2026-10-01) plan review: conditioning from presets (D-038), explicit windows and a separate window-transformation stage S5 with later stages renumbered (D-039), multiplier without multiplied ground or roof (D-040), enforced façade coverage (D-041); facts established while writing the S0–S4 plans · v4 (2026-10-01) plan review: representative storeys at their true elevations (D-045), exposed storeys of multiplied floor types split off automatically so floor types may differ in footprint (D-046, supersedes D-040), loads aggregated per load type and basis (D-047) · v5 (2026-10-01) Checkpoint 1 review: revision stage S4.1 before S5 (D-061 to D-064) · v6 (2026-10-01) S4.1 review: revision stage S4.2 before S5 (D-068 to D-077) · v7 (2026-10-01) windows of merged zones: one centred window per rebuilt wall with the wall's glazed area, window levels W1–W5 dropped, S5 renamed "Centred windows on rebuilt walls" (D-079, ADR-012) · v8 (2026-10-02) precedent source *High-Density Housing*, studied in a separate repository, replaces the S7 research (D-082); one plan generator per typology family (D-083); S8 split into S8.1–S8.3 (D-084) · v9 (2026-10-02) four-source precedent set `SYN-TYP-001`–`019` (D-093), non-residential programs in scope (D-094), plans per storey (D-095), `013` set aside (D-096), department zoning (D-097), sub-stages S8.4–S8.7 before S6 (D-098).
 >
 > **For agentic workers:** this is a stage-level roadmap, not an executable task list. Before starting a stage, write its detailed test-first plan as `docs/plans/YYYY-MM-DD-sN-<stage-name>.md` (bite-sized tasks, exact files, test code, commands), using superpowers:writing-plans, then execute it with superpowers:subagent-driven-development or superpowers:executing-plans.
@@ -57,7 +69,7 @@ program presets (x, y, ...)
   → PlanGenerator (LinearPlanGenerator, ...)        → IGeneratedPlan      Z0: one zone per dwelling unit or department, explicit windows
   → PlanTransform (optional, D-070)                 → IGeneratedPlan      rotation about z, translation in x and y
   → IPlanSimplifier                                  → IFloor              one centred window per rebuilt wall (D-079)
-       NoSimplification | SemanticMerge | PerimeterCore | SingleZonePerFloor
+       NoSimplification | SemanticMerge | ConditionedMerge | PerimeterCore | SingleZonePerFloor
   → IFloorAggregator (IFloor[])                      → IGeneratedBuilding
        Stack | StackedFloorZoneMultiplier | SingleZonePerFloorType | SingleZoneBuilding (whole building = 1 zone)
   → Convert2BEM                                      → ClimateStudio-ready Grasshopper inputs
@@ -109,6 +121,8 @@ program presets (x, y, ...)
 | S8.7 | Plans that differ by storey (D-095, with an ADR) and stepped bands with terraces (family 012) | S8.6 | `v0.8.6` |
 | S8.8 | Storey previews, any-program preset, and the preset panel (revision stage, D-108) | S8.7 | `v0.8.7` |
 | S9 | Release: docs site, examples, Yak package (D-115) | S6, S8.8 | `v1.0.0` |
+| — | Conditioned Merge and joined pieces for both merge simplifiers (revision, D-123) | S9 | `v1.1.0` |
+| Mix | Program mix and building-level infiltration (revision stage, D-124, [ADR-017](../decisions/ADR-017-program-mix-and-building-infiltration.md)) | S9 | `v1.1.0` |
 
 ```text
 S0 ── S1 ── S2 ── S3 ── S4 ── S4.1 ── S4.2 ── S5 Windows ── S8.1 ── S8.2 ── S8.3 ── S8.4 ── S8.5 ── S8.6 ── S8.7 ── S8.8 ── S6 Convert2IDF ── S9 Release
@@ -142,6 +156,10 @@ Test-first plans for S0–S4, written on 2026-10-01 from code that was built (wa
 | S6 | [2026-10-02-s6-convert2idf.md](2026-10-02-s6-convert2idf.md) (design note, D-111) | 294 core, 518 generators, 475 export, 1518 integration |
 | S9 | [2026-10-03-s9-release.md](2026-10-03-s9-release.md) (design note, D-111) | 346 core, 518 generators, 635 export, 1573 integration |
 | Docs move | [2026-10-03-docs-site-move.md](2026-10-03-docs-site-move.md) (D-117 to D-119), version 1.0.1 | unchanged; developer-page export: 8 unit tests |
+| Enum inputs | [2026-10-04-dropdown-enums.md](2026-10-04-dropdown-enums.md) (design note, D-111, D-120), version 1.0.2 (D-121) | unchanged: 346 core, 518 generators, 635 export, 1573 integration |
+| Conditioned Merge | [2026-10-06-conditioned-merge.md](2026-10-06-conditioned-merge.md) (design note, D-111, D-123), released in version 1.1.0 (D-125) | 412 core, 518 generators, 1024 export, 2620 integration |
+| Mix | [2026-10-06-program-mix.md](2026-10-06-program-mix.md) (design note, D-111, D-124), released in version 1.1.0 (D-125) | 417 core, 518 generators, 705 export, 1624 integration |
+| 1.1.0 | The two stages integrated in one linear history (D-125), no design note | 484 core, 518 generators, 1148 export, 2695 integration |
 
 Where a stage plan and this roadmap differ, the stage plan and its ADRs are authoritative; each plan lists its deviations under "Notes for the reviewer".
 
@@ -169,7 +187,7 @@ src/
     Model/         surfaces, zones, provenance, IGeneratedPlan, IFloor, IGeneratedBuilding, TextReport
     Layout/        LayoutSurfaceBuilder, LayoutMeasures
     Plans/         PlanGenerator (abstract), PlanParameters, PlanTransform
-    Simplification/ IPlanSimplifier, NoSimplification, OverlapMapper, TransferMatrix, FacadeAttribution, WindowRehosting, CentredWindows, SemanticMerge, PerimeterCore, SingleZonePerFloor
+    Simplification/ IPlanSimplifier, NoSimplification, OverlapMapper, TransferMatrix, FacadeAttribution, WindowRehosting, CentredWindows, SemanticMerge, ConditionedMerge, PerimeterCore, SingleZonePerFloor
     Buildings/     IFloorAggregator, Storeys, Stack, StackedFloorZoneMultiplier, SingleZonePerFloorType, SingleZoneBuilding
     Validation/    Totals, FloorValidator, BuildingValidator, ValidationReport
     Conversion/    HeatTransferOptions (export options shared by the converters)
@@ -220,7 +238,7 @@ Per D-004 and D-005.
 
   Opening a GitHub PR and using **Rebase and merge** is equally valid and leaves a visible record for collaborators.
 - **GitHub settings (no CI involved):** protect `main` against force pushes and deletion; require linear history; enable "Rebase and merge" only.
-- **Tags:** annotated `v0.N.0` when a stage's exit criteria are met; `v1.0.0` after S9.
+- **Tags:** annotated `v0.N.0` when a stage's exit criteria are met; `v1.0.0` after S9; the revisions since are patch or minor versions (`v1.0.1`, `v1.0.2`, `v1.1.0`, D-125).
 - **Reproducibility:** every `IGeneratedBuilding` carries a provenance record (generator parameters and presets, simplifier, floor aggregator, plugin version with commit SHA). Tagged history is never rewritten.
 - **Stage method (D-111):** a short design note in `docs/plans/` before the build (scope, decisions, acceptance criteria, task list, no copied code); one test-first build on feature branches in a worktree, independent parts in parallel worktrees; a review of the diff by a second agent before each merge; `scripts/verify.ps1` before each merge; the headless Rhino check `scripts/rhino-smoke/` once per stage on the merge candidate; a fresh clone of the tag passing `scripts/verify.ps1`; pushes only with the owner's approval.
 - **Stage bookkeeping:** at each stage end, one decision-log entry (choices and completion), the README status, a dated progress line at the top of this roadmap, and a row in the detailed-plans table; AGENTS.md "Project state" only when its summary changes (D-111).

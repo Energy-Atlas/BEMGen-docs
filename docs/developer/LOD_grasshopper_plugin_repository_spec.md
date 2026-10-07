@@ -330,7 +330,7 @@ Initial load types:
 - GasEquipment
 - DHW
 - Ventilation
-- Infiltration
+- Infiltration (since D-124 an envelope input, not a load type of a zone program; [ADR-017](decisions/ADR-017-program-mix-and-building-infiltration.md))
 
 Initial control schedules:
 

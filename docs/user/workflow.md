@@ -32,18 +32,19 @@ Inputs, in order:
 | Conditioned | Cond | Whether the space is heated and cooled; the setpoints are ignored when it is not. |
 | Heating | H | Constant heating setpoint, °C. |
 | Cooling | C | Constant cooling setpoint, °C. |
-| one number per load | e.g. Occ, Lt, Eq, Inf | The design value of each load of the preset, in its unit (people/m², W/m², 1/h, …, stated in the input's description). |
+| one number per load | e.g. Occ, Lt, Eq | The design value of each load of the preset, in its unit (people/m², W/m², 1/h, …, stated in the input's description). Infiltration is not one of them: it is set on the [envelope preset](#envelope-preset). |
 | one schedule per load | e.g. OccS, LtS | Optional fraction schedule that replaces the load's built-in schedule when connected. |
 
-The loads depend on the space type. For example *Dwelling Unit Preset* has *Occupancy* (0.03 people/m²), *Lighting* (5 W/m²), *Equipment* (5 W/m²), and *Infiltration* (0.3 air changes per hour), WWR 0.3, conditioned at 21 °C / 24 °C; *Corridor Preset* has *Lighting* and *Infiltration*, WWR 0.2, conditioned; *Stair Preset* has *Lighting* (3 W/m²) and *Infiltration*, WWR 0.1, and is unconditioned. The values of all eighteen presets and their schedules are listed in [program presets](../developer/research/program-presets.md).
+The loads depend on the space type. For example *Dwelling Unit Preset* has *Occupancy* (0.03 people/m²), *Lighting* (5 W/m²), and *Equipment* (5 W/m²), WWR 0.3, conditioned at 21 °C / 24 °C; *Corridor Preset* has *Lighting* (5 W/m²), WWR 0.2, conditioned; *Stair Preset* has *Lighting* (3 W/m²), WWR 0.1, and is unconditioned. The values of all eighteen presets and their schedules are listed in [program presets](../developer/research/program-presets.md).
 
 ### General presets
 
-Panel *1 Program* builds a preset for any space type from scratch:
+Panel *1 Program* builds a preset for any space type from scratch, or mixes presets:
 
 - *Schedule* (Sch): an 8760-hour schedule from a *Name*, a *Kind* (`Fraction` for loads, `Temperature` for setpoints), 24 hourly *Weekday* values (Monday to Friday), 24 hourly *Weekend* values (Saturday and Sunday), and the *First Day* of the year (default `Monday`). Holidays are not modelled.
-- *Load* (Load): a load from its *Type* (`Occupancy`, `Lighting`, `ElectricEquipment`, `GasEquipment`, `DomesticHotWater`, `Ventilation`, `Infiltration`), *Basis* (`PerFloorArea`, `PerPerson`, `Absolute`, `PerExteriorWallArea`, `AirChangesPerHour`), *Value* in the basis' unit, and a fraction *Schedule*.
+- *Load* (Load): a load from its *Type* (`Occupancy`, `Lighting`, `ElectricEquipment`, `GasEquipment`, `DomesticHotWater`, `Ventilation`), *Basis* (`PerFloorArea`, `PerPerson`, `Absolute`, `AirChangesPerHour`), *Value* in the basis' unit, and a fraction *Schedule*. The type `Infiltration` and the basis `PerExteriorWallArea` are not accepted: the component shows `'Infiltration': infiltration is not a program load: set it on the Envelope Preset.`
 - *Program Preset* (Preset): a preset from a *Name*, a *Space Type* (one of the space type names), a list of *Loads* (at most one per type and basis), *Conditioned* (default true), *Heating* and *Cooling* temperature schedules (required when conditioned), and a *WWR*.
+- *Mix Programs* (Mix): one preset from several. *Presets* is the list of program presets (any-program presets too) and *Weights* one weight for each, in the same order, each greater than 0: the preset's share of the floor area, in any unit. The optional *Name*, *Space Type*, and *WWR* replace the defaults: a name built from the preset names and normalised weights, the space type of the preset with the largest weight, and the weighted mean WWR. Loads per floor area and air changes are weighted by share, per-person loads by occupants, and absolute loads are added unweighted; schedules and setpoints combine as in a zone merge, and the mix is conditioned when any preset is. Absolute occupancy in one preset beside a per-person load in another is an error. [What's new in 1.1.0](whats-new.md#mix-programs) has an example.
 - **Choosing a value.** *Kind* and *First Day* of *Schedule*, *Type* and *Basis* of *Load*, and *Space Type* of *Program Preset* take the name of a value as text, typed in any case. You can type it or wire a panel. You can also right-click the input and pick the value from the menu, where the current one is ticked. Or choose *Extract parameter* on the input: this places a dropdown (a *Value List*) with every value, wired into the input and set to its current value.
 
 Text inputs are matched case-insensitively; an unknown name gives an error that lists the valid names.
@@ -54,7 +55,15 @@ A preset of one space type cannot be wired into an input of another: an *Office 
 
 ### Envelope preset
 
-*Envelope Preset* (Env), in panel *1 Program Presets*, gives the constructions to both converters. Its layered constructions are those of the illustrative *Example Envelope*; its inputs set the preset *Name* (default `Example Envelope`) and the window's simple glazing: *Glazing* name (`Example Double Glazing`), *U-Factor* (1.8 W/(m²·K), at most 7), *SHGC* (0.4), and *VT* (0.7). If a converter's *Envelope* input is left unconnected, the converter uses the *Example Envelope*; if it is connected but receives no envelope preset, the converter warns and uses the example too. The constructions are described in [envelope presets](../developer/research/envelope-presets.md).
+*Envelope Preset* (Env), in panel *1 Program Presets*, gives the constructions and the infiltration to both converters. Its layered constructions are those of the illustrative *Example Envelope*; its inputs set the preset *Name* (default `Example Envelope`), the window's simple glazing: *Glazing* name (`Example Double Glazing`), *U-Factor* (1.8 W/(m²·K), at most 7), *SHGC* (0.4), and *VT* (0.7), and the infiltration of the whole building:
+
+| Input | Nickname | Default | Meaning |
+| --- | --- | --- | --- |
+| Infiltration Rate | Inf | 0.3 | Design rate of every zone, finite and not negative, in the unit of the basis. |
+| Infiltration Basis | InfB | `AirChangesPerHour` | What the rate is per: `PerExteriorSurfaceArea` (m³/h per m² of the zone's outdoor walls, roofs, and exposed floors, windows included), `PerExteriorWallArea` (m³/h per m² of its outdoor walls), or `AirChangesPerHour` (1/h of its volume). Right-click the input to choose one, or extract it as a dropdown. |
+| Infiltration Schedule | InfS | always on | Optional fraction schedule that multiplies the rate. |
+
+Every zone gets the same rate and schedule, applied to its own surfaces or volume, so a change of zoning does not change the infiltration the surfaces and volume imply. If a converter's *Envelope* input is left unconnected, the converter uses the *Example Envelope*; if it is connected but receives no envelope preset, the converter warns and uses the example too. The constructions are described in [envelope presets](../developer/research/envelope-presets.md).
 
 ## 2. Generate a plan
 
@@ -79,16 +88,19 @@ Every component with a viewport preview (the generators, *Transform Plan*, the s
 
 ## 3. Simplify the plan
 
-Panel *3 Simplify* has four plan simplifiers. Each takes a *Plan* and outputs a *Floor*.
+Panel *3 Simplify* has five plan simplifiers. Each takes a *Plan* and outputs a *Floor*.
 
 | Component | Level | Result |
 | --- | --- | --- |
 | *No Simplification* (Z0) | Z0 | The plan's own zones and surfaces, unchanged. |
-| *Semantic Merge* (Z1) | Z1 | Connected zones of the same space type merged into one zone each (for example all dwelling units of a wing). |
+| *Semantic Merge* (Z1) | Z1 | Connected zones of the same space type merged into one zone each (for example all dwelling units of a wing). With *Join Pieces* true, all zones of a space type on the floor become one zone, even where they do not touch. |
+| *Conditioned Merge* (Z1c) | Z1c | Connected conditioned zones merged into one zone, and connected unconditioned zones (stairs) into another, named `Conditioned-1`, `Unconditioned-1`, and so on. With *Join Pieces* true, one conditioned and one unconditioned zone per floor. |
 | *Perimeter Core* (Z2) | Z2 | One perimeter zone per orientation, *Depth* deep (default 4.57 m), plus a core; corners split on the bisectors. Courts get their own perimeter zones. |
 | *Single Zone per Floor* (Z3) | Z3 | The whole floor as one zone. |
 
-Merged zones get the area-weighted programs of their sources: installed loads and the scheduled load at every hour are conserved, air changes are volume weighted, and the setpoints are floor-area weighted over the conditioned sources. A merged zone is conditioned if any source is, so merging the unconditioned stair into a conditioned zone enlarges the conditioned floor area; validation reports this as a note. Every rebuilt outdoor wall gets one centred window with the glazed area of the windows it covers.
+Merged zones get the area-weighted programs of their sources: installed loads and the scheduled load at every hour are conserved, air changes are volume weighted, and the setpoints are floor-area weighted over the conditioned sources. A merged zone is conditioned if any source is, so *Perimeter Core* and *Single Zone per Floor*, which merge the unconditioned stair into conditioned zones, enlarge the conditioned floor area; validation reports this as a note. *Conditioned Merge* never merges the two kinds, so it keeps the conditioned floor area exactly. Every rebuilt outdoor wall gets one centred window with the glazed area of the windows it covers. Infiltration is not merged: it follows each zone's own surfaces or volume ([envelope preset](#envelope-preset)).
+
+*Semantic Merge* and *Conditioned Merge* have the Boolean input *Join Pieces* (J, default false). False gives one zone per connected piece of a class; true gives one zone per class on the floor, made of all its pieces, which may be apart. A zone of several pieces is one zone with one program and one multiplier; the previews draw one solid per piece, *Convert2BEM* gives one Brep per piece, and *Convert2IDF* writes one `Zone` with the surfaces of every piece. [What's new in 1.1.0](whats-new.md#conditioned-merge) has an example.
 
 *Perimeter Core* needs every wing of the footprint to be wider than twice the *Depth*; otherwise it fails with `PlanTooNarrow`. Reduce *Depth* or use another simplifier.
 
@@ -138,7 +150,7 @@ Inputs:
 
 The building is validated first. If it fails and *Override* is false, the component shows the error `ValidationFailed` and only *Provenance* is set, so you can read the failing checks. If *Override* is true it converts, warns `ValidationOverridden`, and ends *Provenance* with `OVERRIDE: converted despite failed validation`.
 
-Outputs are trees with one branch `{i}` per zone, in building order:
+Outputs are trees with one branch `{i}` per zone, in building order, except *Provenance* and the three outputs of the envelope's infiltration (*Infiltration Rate*, *Basis*, and *Schedule*), which are the same for every zone:
 
 | Output | Nickname | Branch `{i}` holds |
 | --- | --- | --- |
@@ -154,11 +166,17 @@ Outputs are trees with one branch `{i}` per zone, in building order:
 | Boundaries | B | per surface: `Outdoors`, `Ground`, `Adiabatic`, or `Interzone:<zone ID>` |
 | Windows | W | the windows of the zone's walls |
 | Internal Mass | IM | exposed internal-mass area, m² |
-| Provenance | P | provenance, validation report, options, envelope, override |
+| Provenance | P | provenance, validation report, options, envelope, infiltration, override |
 | Constructions | Con | per surface, the construction name from the envelope preset |
 | Window Constructions | WCon | per window, the glazing name |
+| Infiltration Rate | IR | the envelope preset's infiltration rate, one number for every zone, in the unit of the basis |
+| Infiltration Basis | IB | the basis: `PerExteriorSurfaceArea`, `PerExteriorWallArea`, or `AirChangesPerHour` |
+| Infiltration Schedule | IS | the 8760 fractions that multiply the infiltration of every zone |
+| Infiltration Flows | IF | the design flow of one instance of the zone, m³/h: the rate times the zone's exterior surface area, outdoor wall area, or volume, by the basis |
 
-A zone without windows (an interior core) or without loads has no branch in *Windows* or the load outputs: match branches by path, not by position.
+*Infiltration Flows* times *Infiltration Schedule* is the hourly flow of one instance of a zone, and times *Multipliers* the flow of every instance. The infiltration is also written in *Provenance* as `INFILTRATION: <rate> <basis> (EnergyPlus <method>), schedule <name>`.
+
+A zone without windows (an interior core) or without loads has no branch in *Windows* or the load outputs: match branches by path, not by position. Every zone has a branch in *Infiltration Flows*.
 
 ### Heat transfer between zones
 
@@ -166,7 +184,7 @@ The two heat-transfer options decide how surfaces between two zones are written;
 
 ## 7. Convert2IDF
 
-*Convert2IDF* (2IDF), panel *5 Convert*, writes an EnergyPlus 25.2 input file: constructions from the envelope preset, ideal-loads HVAC for every conditioned zone, exact hourly schedules, loads, internal mass, and zone multipliers. It does not run EnergyPlus; the file holds only the minimum simulation objects, so add a weather file and the outputs you need before simulating.
+*Convert2IDF* (2IDF), panel *5 Convert*, writes an EnergyPlus 25.2 input file: constructions from the envelope preset, ideal-loads HVAC for every conditioned zone, exact hourly schedules, loads, one infiltration object per zone from the envelope preset, internal mass, and zone multipliers. It does not run EnergyPlus; the file holds only the minimum simulation objects, so add a weather file and the outputs you need before simulating.
 
 | Input | Nickname | Default | Meaning |
 | --- | --- | --- | --- |
@@ -179,7 +197,7 @@ The two heat-transfer options decide how surfaces between two zones are written;
 | Write | W | false | Write the file to *Path*; when false nothing is written. |
 | Overwrite | O | false | Replace an existing file; when false an existing file is kept and the error `FileExists` is shown. |
 
-Outputs: *IDF* (the file text; empty when validation blocks the conversion), *Provenance* (provenance, validation report, options, envelope, `ENERGYPLUS: 25.2`, any override, and `FILE: written <path>` or `FILE: not written (<reason>)`), and *Written* (whether the file was written in this solution).
+Outputs: *IDF* (the file text; empty when validation blocks the conversion), *Provenance* (provenance, validation report, options, envelope, infiltration, `ENERGYPLUS: 25.2`, any override, and `FILE: written <path>` or `FILE: not written (<reason>)`), and *Written* (whether the file was written in this solution).
 
 !!! warning "Keep Write off while editing"
     Every solution with *Write* and *Overwrite* both true rewrites the file. Keep *Write* false while you build the definition and read the *IDF* text or wire it into a panel; set *Write* true when you want the file, for example with a *Button* or a *Boolean Toggle*.

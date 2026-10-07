@@ -85,6 +85,8 @@ A real but restrained hero, followed immediately by the shared-border grid. Not 
   `Generate building energy models` in Geist; `at urban scale.` in Cormorant Garamond italic.
 - Supporting copy is short: one or two sentences.
 - Below the hero, the existing landing-page cards (User guide, Developer documentation) become one continuous shared-border grid (section 6), not separate cards.
+- The landing page hides both sidebars but keeps their widths as empty margins, without their vertical rules, so its text starts where the text of every other page starts. Only the content moves: strips and the top and bottom rules of grids still run from frame to frame. Any page that hides a sidebar behaves the same way.
+- The hero headline is sized to the hero's width, so `Generate building energy models` stays on one line on desktop.
 - No oversized CTAs, imagery, or animation.
 
 ### 0.8 Numbered section strips
@@ -127,6 +129,11 @@ Moving between pages must not flicker or shift the layout:
 - `navigation.instant` is on: a link swaps only the page content, so the header, sidebars, scrollbars, and loaded fonts persist. `navigation.instant.progress` shows the load as a thin accent rule along the top edge.
 - `html` reserves the scrollbar's width (`scrollbar-gutter: stable`), so short and long pages have the same content width.
 - `overrides/main.html` preloads `geist-latin.woff2` and `geist-mono-latin.woff2`, so a full page load draws its first frame without a font swap.
+
+### 0.13 Grid cells
+
+- A cell whose title is a link is clickable as a whole and goes to the title's address; hovering it shifts the surface and turns the title blue. Other links in the cell (its button, a link in its description) keep their own targets.
+- A cell's text is padded by the same gutter as the prose, so cell text, strip labels, and paragraphs share one left edge.
 
 ---
 

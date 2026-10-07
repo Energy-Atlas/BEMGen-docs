@@ -143,6 +143,32 @@ html {
   padding-top: 1.2rem;
 }
 
+/*
+ * A page that hides a sidebar (the landing page hides both) keeps the sidebar's width as an empty margin, without its
+ * rule, so its text lines up with the text of every other page. Only the content moves: strips and grids still run
+ * from frame to frame. --ea-inset-left and --ea-inset-right hold the empty margins.
+ */
+.md-content {
+  --ea-inset-left: 0rem;
+  --ea-inset-right: 0rem;
+}
+
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--primary[hidden] ~ .md-content {
+    --ea-inset-left: 12.1rem;
+  }
+
+  .md-sidebar--secondary[hidden] ~ .md-content {
+    --ea-inset-right: 12.1rem;
+  }
+}
+
+[dir] .md-main__inner > .md-content > .md-content__inner.md-typeset,
+[dir] .md-main__inner > .md-content > .md-path {
+  margin-left: calc(var(--ea-gutter) + var(--ea-inset-left));
+  margin-right: calc(var(--ea-gutter) + var(--ea-inset-right));
+}
+
 /* ---------------------------------------------------------------------------------------------------------------------
  * Header and tabs
  * ------------------------------------------------------------------------------------------------------------------ */
@@ -735,10 +761,11 @@ html {
   gap: 0.5rem;
   letter-spacing: 0.14em;
   line-height: 1.3;
-  margin: 3.2rem calc(-1 * var(--ea-gutter)) 1.6rem;
+  margin: 3.2rem calc(-1 * (var(--ea-gutter) + var(--ea-inset-right))) 1.6rem
+    calc(-1 * (var(--ea-gutter) + var(--ea-inset-left)));
   max-width: none;
   min-height: 2.2rem;
-  padding: 0.5rem var(--ea-gutter);
+  padding: 0.5rem calc(var(--ea-gutter) + var(--ea-inset-right)) 0.5rem calc(var(--ea-gutter) + var(--ea-inset-left));
   position: relative;
   text-transform: uppercase;
 }
@@ -771,17 +798,30 @@ html {
 
 /* ---------------------------------------------------------------------------------------------------------------------
  * Grids of cells (spec sections 6 and 8). Material's `grid cards` markup becomes one continuous grid with shared
- * borders: each cell draws its right and bottom rule, and the grid clips the rules at its outer edge.
+ * borders. The outer block draws the top and bottom rules from frame to frame; the list inside it is the grid, inset
+ * like the text, and each cell draws its right and bottom rule, which the list clips at its outer edge. Cells pad
+ * their text by the gutter, so it lines up with the prose above and below.
  * ------------------------------------------------------------------------------------------------------------------ */
 
 .md-typeset .grid.cards {
   border-bottom: 1px solid var(--ea-border-subtle);
   border-top: 1px solid var(--ea-border-subtle);
+  display: block;
+  margin: 1.6rem calc(-1 * (var(--ea-gutter) + var(--ea-inset-right))) 1.6rem
+    calc(-1 * (var(--ea-gutter) + var(--ea-inset-left)));
+  max-width: none;
+  padding: 0 var(--ea-inset-right) 0 var(--ea-inset-left);
+}
+
+.md-typeset .grid.cards > :is(ul, ol) {
   counter-reset: ea-cell;
+  display: grid;
   gap: 0;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-  margin: 1.6rem calc(-1 * var(--ea-gutter));
+  list-style: none;
+  margin: 0;
   overflow: hidden;
+  padding: 0;
 }
 
 .md-typeset .grid.cards > :is(ul, ol) > li {
@@ -791,7 +831,9 @@ html {
   counter-increment: ea-cell;
   display: flex;
   flex-direction: column;
-  padding: 1.4rem 1.8rem 1.6rem;
+  margin: 0;
+  padding: 1.4rem var(--ea-gutter) 1.6rem;
+  position: relative;
   transition: background-color var(--ea-transition);
 }
 
@@ -799,6 +841,35 @@ html {
   background-color: var(--ea-bg-surface-1);
   border-color: transparent;
   box-shadow: 1px 0 0 var(--ea-border-subtle), 0 1px 0 var(--ea-border-subtle);
+}
+
+/*
+ * A cell whose title is a link is a link as a whole: the title link stretches over the cell. Other links in the cell
+ * (a button, a link in the description) stay above it and keep their own targets.
+ */
+.md-typeset .grid.cards > :is(ul, ol) > li > p:first-of-type > a:only-child::after {
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+.md-typeset .grid.cards > :is(ul, ol) > li a:not(p:first-of-type > a:only-child) {
+  position: relative;
+  z-index: 1;
+}
+
+.md-typeset .grid.cards > :is(ul, ol) > li:has(> p:first-of-type > a:only-child):hover > p:first-of-type > a {
+  color: var(--ea-accent);
+}
+
+/* The stretched link gives the cell its focus ring, so a keyboard user sees the whole cell selected. */
+.md-typeset .grid.cards > :is(ul, ol) > li > p:first-of-type > a:only-child:focus-visible {
+  outline: none;
+}
+
+.md-typeset .grid.cards > :is(ul, ol) > li > p:first-of-type > a:only-child:focus-visible::after {
+  outline: 1px solid var(--ea-accent);
+  outline-offset: -2px;
 }
 
 /* The cell index: A, B, C in a list; 01, 02, 03 in a numbered list. */
@@ -851,7 +922,7 @@ html {
 
 /* Compact cells: the numbered reading lists of the section index pages. */
 .md-typeset .grid.cards.compact > :is(ul, ol) > li {
-  padding: 1.1rem 1.2rem 1.2rem;
+  padding: 1.1rem var(--ea-gutter) 1.2rem;
 }
 
 .md-typeset .grid.cards.compact > :is(ul, ol) > li::before {
@@ -875,16 +946,17 @@ html {
  * ------------------------------------------------------------------------------------------------------------------ */
 
 .md-typeset .ea-hero {
+  container-type: inline-size;
   padding: 2.4rem 0 3.2rem;
 }
 
+/* Sized to the hero's own width: "Generate building energy models" is about 15.2 em wide, so 6.2cqi keeps it on one line. */
 .md-typeset .ea-hero h1 {
-  font-size: clamp(2rem, 4.2vw, 3.2rem);
+  font-size: clamp(1.6rem, 6.2cqi, 3.2rem);
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.02;
   margin: 0 0 1.6rem;
-  max-width: 18em;
 }
 
 .md-typeset .ea-hero h1 em {

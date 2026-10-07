@@ -12,7 +12,7 @@ To propose a fix to a page, open an [issue](https://github.com/energy-atlas/BEMG
 1. [Project rules](GLOBAL.md): the non-negotiable scientific, architecture, quality, and git rules, and the [working instructions](AGENTS.md) for contributors and coding agents (commands, architecture boundaries, commit format, stage workflow).
 2. [Pipeline](architecture/pipeline.md): every step of the pipeline, its types, components, and decisions.
 3. [Domain model](architecture/domain-model.md): the core types, units, and diagnostic codes; [validation](architecture/validation.md): every check and tolerance; the converters [Convert2BEM](architecture/convert2bem.md) and [Convert2IDF](architecture/convert2idf.md).
-4. [Decision log](decisions/decision-log.md): every project decision, newest at the bottom, and the architecture decision records (ADR-001 to ADR-015) it links.
+4. [Decision log](decisions/decision-log.md): every project decision, newest at the bottom, and the architecture decision records (ADR-001 to ADR-015 and ADR-017) it links.
 5. [Implementation roadmap](plans/2026-09-30-implementation-roadmap.md): the stages and their progress log; each stage's design note is in *Plans*.
 6. [Research brief](LOD_geometric_zoning_equivalence_research_brief.md) and [repository specification](LOD_grasshopper_plugin_repository_spec.md): the research questions, levels of detail, equivalence rules, and the original architecture.
 

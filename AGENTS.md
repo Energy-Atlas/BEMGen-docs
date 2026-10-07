@@ -41,6 +41,7 @@ The public documentation site and the release files of BEMGen, a Grasshopper plu
    - a release here has the tag `v<plugin version>` and the files of exactly that BEMGen version;
    - backward compatibility is not required yet, so the docs follow the current version only.
 8. **Deployment:** GitHub Actions only (`.github/workflows/pages.yml`); never `mkdocs gh-deploy`, there is no `gh-pages` branch. Pull requests build strictly but do not deploy.
+9. **UI design:** UI and visual styling changes must follow `design/ui-design-spec.md`; preserve its typography, palette, grid, component, accessibility, and responsive-design principles unless explicitly instructed otherwise. Its section 0 holds the decisions for this site and wins over the rest of it. `design/` is not part of the published site.
 
 ## Commands
 

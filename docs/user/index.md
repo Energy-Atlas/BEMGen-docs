@@ -13,9 +13,9 @@ Read the pages in this order the first time.
 
     What you need, how to install the plugin, and a first definition that runs.
 
-2.  [What's new in 1.1.0](whats-new.md)
+2.  [What's new](whats-new.md)
 
-    *Conditioned Merge* and *Join Pieces*, *Mix Programs*, infiltration on *Envelope Preset*, and what happens to definitions saved with an earlier version.
+    1.2.0: *Program JSON* and richer programs. 1.1.0: *Conditioned Merge* and *Join Pieces*, *Mix Programs*, and infiltration on *Envelope Preset*. And what happens to definitions saved with an earlier version.
 
 3.  [Concepts](concepts.md)
 

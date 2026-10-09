@@ -201,7 +201,7 @@ Example: `operating-suite.gh` ([canvas](../assets/screenshots/canvas/operating-s
 
 ## Example definitions
 
-The examples zip of each [release](https://github.com/energy-atlas/BEMGen-docs/releases), `bemgen-<version>-examples.zip`, holds one Grasshopper definition per typology and `end-to-end.gh`. Each reads left to right: the default preset components, the generator with its default inputs, a plan simplifier, a floor aggregator with a panel of storey multipliers, *Validate*, and *Convert2BEM* and *Convert2IDF* with *Write* off, in coloured groups with short notes. The simplifiers and aggregators vary across the examples so that each appears several times (except *Conditioned Merge*, which no example uses); any simplifier works with any aggregator. Open one in Grasshopper with the plugin installed; each solves without warnings or errors and validates.
+The examples zip of each [release](https://github.com/energy-atlas/BEMGen-docs/releases), `bemgen-<version>-examples.zip`, holds one Grasshopper definition per typology, `end-to-end.gh`, and `program-json-office.gh`. Each reads left to right: the default preset components, the generator with its default inputs, a plan simplifier, a floor aggregator with a panel of storey multipliers, *Validate*, and *Convert2BEM* and *Convert2IDF* with *Write* off, in coloured groups with short notes. The simplifiers and aggregators vary across the examples so that each appears several times (except *Conditioned Merge*, which no example uses); any simplifier works with any aggregator. Open one in Grasshopper with the plugin installed; each solves without warnings or errors and validates.
 
 | Definition | Simplifier | Aggregator | Multipliers |
 | --- | --- | --- | --- |
@@ -224,5 +224,6 @@ The examples zip of each [release](https://github.com/energy-atlas/BEMGen-docs/r
 | `court-cluster.gh` | Semantic Merge | Stacked Floor Zone Multiplier | 3 |
 | `stepped-band.gh` | Perimeter Core | Stack Floors | none: one plan per storey, one floor each |
 | `end-to-end.gh` | Perimeter Core (Depth 4.57) | Stack Floors | 1, 3, 1 ([end-to-end example](example-end-to-end.md)) |
+| `program-json-office.gh` | Semantic Merge | Stacked Floor Zone Multiplier | 3 |
 
-All values are the components' defaults. The zip's `README.md` describes the definitions.
+All values are the components' defaults, except in `program-json-office.gh`: an *Office Plate* whose office preset comes from *Program JSON*, which holds the atlas's Medium Office program in a panel, with *Space Type* `Office` and the default WWR 0.4, beside the default *Core Preset*; its program values are the atlas's, not illustrative. The zip's `README.md` describes the definitions.

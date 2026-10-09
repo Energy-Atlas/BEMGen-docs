@@ -34,17 +34,20 @@ Inputs, in order:
 | Cooling | C | Constant cooling setpoint, °C. |
 | one number per load | e.g. Occ, Lt, Eq | The design value of each load of the preset, in its unit (people/m², W/m², 1/h, …, stated in the input's description). Infiltration is not one of them: it is set on the [envelope preset](#envelope-preset). |
 | one schedule per load | e.g. OccS, LtS | Optional fraction schedule that replaces the load's built-in schedule when connected. |
+| Heating On | HOn | Whether a conditioned space is heated (default true); when false, *Heating* is ignored. |
+| Cooling On | COn | Whether a conditioned space is cooled (default true); when false, *Cooling* is ignored. A conditioned space needs one of the two. |
 
 The loads depend on the space type. For example *Dwelling Unit Preset* has *Occupancy* (0.03 people/m²), *Lighting* (5 W/m²), and *Equipment* (5 W/m²), WWR 0.3, conditioned at 21 °C / 24 °C; *Corridor Preset* has *Lighting* (5 W/m²), WWR 0.2, conditioned; *Stair Preset* has *Lighting* (3 W/m²), WWR 0.1, and is unconditioned. The values of all eighteen presets and their schedules are listed in [program presets](../developer/research/program-presets.md).
 
 ### General presets
 
-Panel *1 Program* builds a preset for any space type from scratch, or mixes presets:
+Panel *1 Program* builds a preset for any space type from scratch, mixes presets, or reads one from program JSON:
 
-- *Schedule* (Sch): an 8760-hour schedule from a *Name*, a *Kind* (`Fraction` for loads, `Temperature` for setpoints), 24 hourly *Weekday* values (Monday to Friday), 24 hourly *Weekend* values (Saturday and Sunday), and the *First Day* of the year (default `Monday`). Holidays are not modelled.
-- *Load* (Load): a load from its *Type* (`Occupancy`, `Lighting`, `ElectricEquipment`, `GasEquipment`, `DomesticHotWater`, `Ventilation`), *Basis* (`PerFloorArea`, `PerPerson`, `Absolute`, `AirChangesPerHour`), *Value* in the basis' unit, and a fraction *Schedule*. The type `Infiltration` and the basis `PerExteriorWallArea` are not accepted: the component shows `'Infiltration': infiltration is not a program load: set it on the Envelope Preset.`
-- *Program Preset* (Preset): a preset from a *Name*, a *Space Type* (one of the space type names), a list of *Loads* (at most one per type and basis), *Conditioned* (default true), *Heating* and *Cooling* temperature schedules (required when conditioned), and a *WWR*.
-- *Mix Programs* (Mix): one preset from several. *Presets* is the list of program presets (any-program presets too) and *Weights* one weight for each, in the same order, each greater than 0: the preset's share of the floor area, in any unit. The optional *Name*, *Space Type*, and *WWR* replace the defaults: a name built from the preset names and normalised weights, the space type of the preset with the largest weight, and the weighted mean WWR. Loads per floor area and air changes are weighted by share, per-person loads by occupants, and absolute loads are added unweighted; schedules and setpoints combine as in a zone merge, and the mix is conditioned when any preset is. Absolute occupancy in one preset beside a per-person load in another is an error. [What's new in 1.1.0](whats-new.md#mix-programs) has an example.
+- *Schedule* (Sch): an 8760-hour schedule from a *Name*, a *Kind* (`Fraction` for loads, `Temperature` for setpoints and hot-water temperatures, `Activity` for the occupants' activity in W per person), 24 hourly *Weekday* values (Monday to Friday), 24 hourly *Weekend* values (Saturday and Sunday), and the *First Day* of the year (default `Monday`). Holidays are not modelled.
+- *Load* (Load): a load from its *Type* (`Occupancy`, `Lighting`, `ElectricEquipment`, `GasEquipment`, `DomesticHotWater`, `Ventilation`), *Basis* (`PerFloorArea`, `PerPerson`, `Absolute`, `AirChangesPerHour`, `PerDwellingUnit`), *Value* in the basis' unit, and a fraction *Schedule*. Optional: an *End Use* (unset, the type's snake-case name, such as `lighting`), the heat fractions *Radiant*, *Latent*, *Lost*, *Visible*, and *Return Air* of lighting and equipment, and the *Target Temperature* and *Inlet Temperature* schedules of hot water (unset, 60 °C and 10 °C). The type `Infiltration` and the basis `PerExteriorWallArea` are not accepted: the component shows `'Infiltration': infiltration is not a program load: set it on the Envelope Preset.`
+- *Program Preset* (Preset): a preset from a *Name*, a *Space Type* (one of the space type names), a list of *Loads* (at most one per type, end use, and basis), *Conditioned* (default true), *Heating* and *Cooling* temperature schedules (a conditioned space needs at least one), a *WWR*, *Heating On* and *Cooling On* (default true), and the occupants' *Activity* schedule (unset, 120 W per person), *People Radiant* (unset, 0.3), and *People Sensible* (a number, or `autocalculate`, the default).
+- *Mix Programs* (Mix): one preset from several. *Presets* is the list of program presets (any-program presets too) and *Weights* one weight for each, in the same order, each greater than 0: the preset's share of the floor area, in any unit. The optional *Name*, *Space Type*, and *WWR* replace the defaults: a name built from the preset names and normalised weights, the space type of the preset with the largest weight, and the weighted mean WWR. Loads per floor area and air changes are weighted by share, per-person loads by occupants, and absolute loads are added unweighted; schedules and setpoints combine as in a zone merge, and the mix is conditioned when any preset is. Absolute occupancy in one preset beside a per-person load in another is an error. Per-dwelling loads, heat fractions, hot-water temperatures, and the people settings are mixed too ([Mix Programs](components/program.md#mix-programs)). [What's new](whats-new.md#mix-programs) has an example.
+- *Program JSON* (PJson): a preset from the text of a program JSON 2.0.0 file of the Energy Archetype Atlas, defaulted export only, with its schedules expanded on *Year* (default 2007) and *Holidays*. *WWR* (default 0.4) and the optional *Name*, *Space Type*, *Loads*, heating and cooling, and people inputs complete or override the JSON; *Source*, *Assumptions*, *Overrides*, and *Left Out* say where every value came from. See [What's new](whats-new.md#program-json) and the example `program-json-office.gh`.
 - **Choosing a value.** *Kind* and *First Day* of *Schedule*, *Type* and *Basis* of *Load*, and *Space Type* of *Program Preset* take the name of a value as text, typed in any case. You can type it or wire a panel. You can also right-click the input and pick the value from the menu, where the current one is ticked. Or choose *Extract parameter* on the input: this places a dropdown (a *Value List*) with every value, wired into the input and set to its current value.
 
 Text inputs are matched case-insensitively; an unknown name gives an error that lists the valid names.
@@ -150,7 +153,7 @@ Inputs:
 
 The building is validated first. If it fails and *Override* is false, the component shows the error `ValidationFailed` and only *Provenance* is set, so you can read the failing checks. If *Override* is true it converts, warns `ValidationOverridden`, and ends *Provenance* with `OVERRIDE: converted despite failed validation`.
 
-Outputs are trees with one branch `{i}` per zone, in building order, except *Provenance* and the three outputs of the envelope's infiltration (*Infiltration Rate*, *Basis*, and *Schedule*), which are the same for every zone:
+Outputs are trees with one branch `{i}` per zone, in building order, except *Provenance*, the three outputs of the envelope's infiltration (*Infiltration Rate*, *Basis*, and *Schedule*), and *Calendar*, which are the same for every zone:
 
 | Output | Nickname | Branch `{i}` holds |
 | --- | --- | --- |
@@ -161,7 +164,7 @@ Outputs are trees with one branch `{i}` per zone, in building order, except *Pro
 | Conditioned | Cd | whether the zone is conditioned |
 | Load Types, Load Bases, Load Values | LT, LB, LV | one item per load, aligned |
 | Load Schedules | LS | branch `{i;k}`: 8760 fractions of load *k* |
-| Heating Setpoints, Cooling Setpoints | HS, CS | 8760 values, °C; empty for an unconditioned zone |
+| Heating Setpoints, Cooling Setpoints | HS, CS | 8760 values, °C; empty for an unconditioned zone, and the side a conditioned zone does not have |
 | Surfaces | S | walls, floors, and ceilings, each facing out of the zone |
 | Boundaries | B | per surface: `Outdoors`, `Ground`, `Adiabatic`, or `Interzone:<zone ID>` |
 | Windows | W | the windows of the zone's walls |
@@ -173,6 +176,13 @@ Outputs are trees with one branch `{i}` per zone, in building order, except *Pro
 | Infiltration Basis | IB | the basis: `PerExteriorSurfaceArea`, `PerExteriorWallArea`, or `AirChangesPerHour` |
 | Infiltration Schedule | IS | the 8760 fractions that multiply the infiltration of every zone |
 | Infiltration Flows | IF | the design flow of one instance of the zone, m³/h: the rate times the zone's exterior surface area, outdoor wall area, or volume, by the basis |
+| Load End Uses | LE | per load, its end use, aligned with *Load Values* |
+| Heat Fractions | HF | branch `{i;k}`: radiant, latent, lost, visible, and return-air fraction of load *k*; empty for loads other than lighting and equipment |
+| Dwelling Units | DU | the dwellings of one instance of the zone, which per-dwelling loads are multiplied by |
+| Activity | Act | 8760 activity levels of the occupants, W per person |
+| People Radiant, People Sensible | PR, PS | the occupants' radiant fraction, and their sensible fraction (a number or `autocalculate`) |
+| Water Target, Water Inlet | WT, WI | branch `{i;k}`: 8760 target and inlet temperatures, °C, of hot-water load *k*; empty for other loads |
+| Calendar | Cal | one item: the calendar the schedules were expanded on (year and holidays); none for the built-in presets |
 
 *Infiltration Flows* times *Infiltration Schedule* is the hourly flow of one instance of a zone, and times *Multipliers* the flow of every instance. The infiltration is also written in *Provenance* as `INFILTRATION: <rate> <basis> (EnergyPlus <method>), schedule <name>`.
 
@@ -184,7 +194,7 @@ The two heat-transfer options decide how surfaces between two zones are written;
 
 ## 7. Convert2IDF
 
-*Convert2IDF* (2IDF), panel *5 Convert*, writes an EnergyPlus 25.2 input file: constructions from the envelope preset, ideal-loads HVAC for every conditioned zone, exact hourly schedules, loads, one infiltration object per zone from the envelope preset, internal mass, and zone multipliers. It does not run EnergyPlus; the file holds only the minimum simulation objects, so add a weather file and the outputs you need before simulating.
+*Convert2IDF* (2IDF), panel *5 Convert*, writes an EnergyPlus 25.2 input file: constructions from the envelope preset, ideal-loads HVAC for every conditioned zone, exact hourly schedules, loads, one infiltration object per zone from the envelope preset, internal mass, and zone multipliers. A zone with heating and cooling gets a dual-setpoint thermostat, a zone with one side a single heating or cooling one; the people, lighting, equipment, and hot-water objects take the program's heat fractions, activity, and water temperatures; and the run period's year is that of the building's calendar, or 2007, which starts on a Monday, without one. It does not run EnergyPlus; the file holds only the minimum simulation objects, so add a weather file and the outputs you need before simulating.
 
 | Input | Nickname | Default | Meaning |
 | --- | --- | --- | --- |

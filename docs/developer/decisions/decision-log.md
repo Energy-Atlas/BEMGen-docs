@@ -275,7 +275,7 @@ Chronological record of project decisions made in conversations, meetings, or re
 
 ### D-047 — Loads are aggregated per load type and basis
 
-- **Date:** 2026-10-01 · **Decided by:** Cheng Xuan Li (raised in plan review) · **Status:** Accepted
+- **Date:** 2026-10-01 · **Decided by:** Cheng Xuan Li (raised in plan review) · **Status:** Accepted · Superseded in part by D-126 (one load per load type, end use, and basis)
 - Why: simplified zones merge different programs, and programs may express the same load type in different bases (e.g. ventilation per person in one, per floor area in another; ASHRAE 62.1 ventilation is per person plus per area within one program). Rejecting mixed bases would block legitimate combinations.
 - A program may hold one load per load type and basis; components of the same type add up. Each (type, basis) component is aggregated on its own with the ADR-007 magnitude rule, so its design magnitude and its hourly scheduled magnitude are conserved exactly; sources without the component contribute nothing to it. Mixed bases are no longer an error (`MixedLoadBasis` is removed).
 - Occupancy may also have several components; a zone's design occupants are their sum, and per-person components use that sum.
@@ -1073,3 +1073,85 @@ Chronological record of project decisions made in conversations, meetings, or re
     - the icons of *Conditioned Merge* and *Mix Programs*, the order of *3 Simplify*, and the piece previews in the viewport;
     - the layouts of *Envelope Preset* and *Convert2BEM*;
     - a pre-change file with a wired *Preview Location*, the rebuilt examples in the editor, and the install from the release.
+
+### D-126 — Program presets from program JSON 2.0.0; the atlas fetch components retired
+
+- **Date:** 2026-10-07 · **Decided by:** Cheng Xuan Li. The owner decided:
+  - to retire the S10 atlas fetch components (D-122) without backward compatibility;
+  - one parser component that takes the JSON text, with inputs that complete or override it: a WWR with an ordinary default (0.4), loads the JSON lacks (such as ventilation), each thermostat side and its schedule, the activity schedule, and the people fractions;
+  - to extend the program model to hold what the contract describes: a per-dwelling-unit basis; an activity schedule and people fractions; two lighting loads (end uses); two setpoint schedules, each with its own on/off; a hot-water target and an inlet temperature; and heat fractions of power loads;
+  - per-dwelling loads merge weighted by dwelling count, after the conflict with GLOBAL.md scientific rule 1 was raised (area weighting would not conserve installed power);
+  - shared services are not added;
+  - a merge of a sensible fraction that mixes a number with `autocalculate` gives `autocalculate` with a warning, and the other merge rules proposed stand;
+  - an override load replaces the JSON loads of the same type and end use, or is added;
+  - *Year* defaults to 2007, with a *Holidays* input, and a leap year is an error;
+  - design-day rules are checked and not used;
+  - the old branch is tagged `archive/archetype-data`, then deleted;
+  - a JSON Schema library is bundled to validate the JSON;
+  - the two atlas schemas and the Medium Office example may be committed;
+  - one stage for version 1.2.0;
+  - the build runs without supervision, with a stop line before the merge, the tag, the push, the docs export, and the release;
+  - the agent may close Rhino when it must.
+
+  The controller decided the realisation, which is Provisional ([ADR-018](ADR-018-program-json-and-extended-programs.md)). · **Status:** Provisional, pending the owner's reading; not merged. · **Supersedes:** D-122 (it exists only in the archive tag) · **Supersedes in part:** D-047, as to one load per type and basis (now per type, end use, and basis)
+- **Numbering.** D-122 (the S10 atlas stage) and its ADR-016 exist only in the tag `archive/archetype-data` (`cf88cee`); the numbers stay unused in this log. The branch was never on `origin`. Part A of the stage archived it: an annotated local tag, the worktree removed, the branch deleted.
+- **Retired identities, never to be reused:**
+  - the components *Atlas Snapshot* `c231969e-a062-4f0b-a2b4-45ca60b7cc3e`, *Atlas Query* `ec2037f0-b14e-432b-a907-23a6e4566e94`, and *Atlas Program Preset* `43b5b5c4-b180-4be5-94ce-74d982640fd9`;
+  - the parameter *Atlas Snapshot* `dbf8128f-fdd3-4f36-a941-89d849668161`;
+  - the examples `atlas-office-plate.gh` and `atlas-explorer.gh`.
+
+  Nothing of the atlas code was on `main` except `ProgramPreset.Source`, which stays: the JSON preset fills it. From the archive only the ruleset expansion with its calendar and the strict JSON reading were ported, adapted to the 2.0.0 shape.
+- **How it was built.** From the [design note](../plans/2026-10-07-program-json.md) (Done), as D-111 sets out: test-first on `feature/program-json` in the worktree `D:\worktrees\program-json`, the library in parallel on a second branch, then reviewed by a second agent. The note's Build log holds the findings and the review.
+- **Realisation (controller, pending the owner's reading)** — the details are in ADR-018, [program-json.md](../architecture/program-json.md), and the research documents:
+  - **Model.** `LoadBasis.PerDwellingUnit` with a dwelling count on every zone (1 per generated dwelling-unit zone, Σ fᵢ·Nᵢ after a merge); `LoadDefinition.EndUse` with a program holding one load per type, end use, and basis; `HeatFractions` (radiant, latent, lost, visible, return air) on lighting and equipment, with a non-zero value in a field the EnergyPlus object lacks an error; `PeopleProperties` (activity schedule, radiant fraction, sensible fraction or `autocalculate`); a `Thermostat` with optional heating and cooling sides; `WaterTemperatures` (target and inlet); `ScheduleCalendar` (a non-leap year and its holidays) with `CalendarMismatch` for programs on different calendars. The defaults are the values the IDF writer used before, so BEMGen's own presets are unchanged.
+  - **Aggregation.** The zone-merge rule value* = Q*/B* with the dwelling count as a basis quantity; heat fractions weighted by the transferred magnitude; the activity weighted every hour by the transferred scheduled occupants; the people fractions by design occupants; the hot-water target and inlet every hour by the transferred scheduled flow; each thermostat side over the sources that have it; a merge whose heating exceeds its cooling is an error. *Mix Programs* inherits all of it (a weight stands for a share of dwellings as well as of floor area).
+  - **Library.** `Lod.ProgramJson` (a `net7.0` library): strict parse, mode, schema (JsonSchema.Net 7.2.3, MIT; the program schema embedded byte for byte), the contract's checks, expansion to 8760 values, mapping to a preset. A rule starting on 29 February starts on 1 March in a non-leap year, and one ending on it ends on 28 February, each with a warning (the contract is silent; reported to the atlas).
+  - **Components.** *Program JSON* (`abb0aeb9-5a9f-40ff-b3a1-bb125cfb675c`, `PJson`, panel *1 Program*, 14 inputs and 5 outputs) is new; *Load*, *Schedule*, *Program Preset*, and the default preset components gain appended inputs; *Convert2BEM* gains appended outputs 22 to 30. No existing GUID changed. The example `examples/program-json-office.gh` and the smoke spec `program-json` are new.
+  - **Export.** Heat fractions, per-dwelling levels (written as absolute levels), people properties, water temperatures, single-sided thermostats (`SingleHeating` and `SingleCooling`), and the run period from the calendar (2007 starting on a Monday without one).
+  - **Validation.** The conservation checks run per load component and for the building's dwelling count; `PerDwellingLoads` and `Calendar` are new checks; the aggregation records are required for the new derived fields.
+  - **New tolerance.** `ToleranceSettings.AbsoluteFraction` (1e-9), for sums of fractions ([ADR-004](ADR-004-tolerances.md) amended).
+  - **Research documents** (GLOBAL.md scientific rule 7): the research brief and [program-presets.md](../research/program-presets.md) record the new rules and defaults.
+- **Snapshots changed**, each with its reason (none was updated to make a test pass):
+  - 28 text reports gain only lines for the new fields; a script confirmed that removing those lines restores the originals exactly;
+  - 6 IDF snapshots gain the calendar header line, and their `RunPeriod` year moves from 2018 to 2007, both years starting on a Monday;
+  - no IDF snapshot had a water use, so the predicted change of the water-use temperature fields did not occur in snapshots; the fields are covered by the export tests and the IDD check.
+- **Two regressions found in Rhino and fixed:**
+  - Grasshopper's reader opens its IO dialog for every current parameter that has no saved chunk, so all 19 examples saved with 1.1.0 stalled on reopening. The components now set the appended parameters aside while the saved ones are read, which keeps saved values and wires; the examples spec reads each archive first and fails instead of stalling.
+  - Definitions saved before infiltration left the programs have trailing *Infiltration* inputs at the positions of the new *Heating On* and *Cooling On*, and were read into them. Trailing saved parameters whose name differs are no longer counted as saved.
+- **Review fixes** (after the realisation above, `4d65af3` and `36b55a2`):
+  - a mix with occupancy in more than one basis and a per-person load, or different people properties among the inputs with occupants, is the error `MixedOccupancyBases` (the virtual zone of a mix would weight them by a wrong split);
+  - equal setpoints merged over different sources stay exactly equal, so equal heating and cooling setpoints no longer cross by rounding; `Thermostat` and `WaterTemperatures` allow `AbsoluteSchedule` of slack, as the importer does;
+  - end uses are keys ignoring case, so an override *End Use* `Lighting` replaces the JSON's `lighting`.
+  - concurrent schema evaluations of the one shared schema instance could report an invalid document as valid (a flaky test that failed about one run in eight); evaluations are now serialised (`fe03c32`), and a test on 16 threads that failed 15 of 15 runs before passes 15 of 15.
+- **Checks** (on `fe03c32`, the last code commit, and the documentation after it):
+  - `scripts/verify.ps1` passed with 0 warnings: 614 core, 518 generator, 160 `Lod.ProgramJson`, 2698 integration, and 1219 export tests.
+  - The IDD check against the EnergyPlus 25.2.0 template IDD: 1073 files, 0 problems, with `SingleHeating`, `SingleCooling`, the water-use temperatures, and the people sensible fraction covered.
+  - All 16 `scripts/rhino-smoke` specs ran once each in Rhino 8.25.25314.11001 on .NET 8.0.31, every one done with no failed checks. `program-json` has 16 scenarios and 57 checks. The examples spec reopened 20 of 20 definitions, each with *Validate* True. Earlier in the build, one examples run stalled on the IO dialog (the first regression below) and Rhino was ended under the owner's permission.
+  - A trial docs export wrote version 1.2.0 with 60 screenshots and 0 description gaps.
+  - The fresh-clone gate: a clean clone of `feature/program-json` at `3d7e19c` passed `scripts/verify.ps1` with the same counts, the atlas fixtures byte-exact.
+- **Contract gaps reported to the atlas, not worked around:**
+  1. 29 February in a non-leap model year is unspecified.
+  2. With a non-empty holiday list, defaulted schedules without a `Hol` rule fall to the prepended `Default` rule: the Medium Office's lighting and equipment are off on holidays while its occupancy keeps its `Default` value.
+  3. "Heating does not exceed cooling in the relevant active periods" is vague; BEMGen checks every hour in which both sides are on.
+  4. The annual schedule's `allOf` constrains `rules`, which annual schedules lack (harmless).
+  5. Design-day coverage is required by the checks, though a consumer without sizing never uses it.
+- **Open.**
+  - **For a person in Rhino 8:** the canvas look of `program-json-office.gh` and of the *Program JSON* icon, a definition saved with 1.1.0 opened in the editor (the headless run proved that it reads without the IO dialog, not how it looks), and the install from the `.yak`.
+  - **The owner's choices:** the merge, the version and tag (`v1.2.0`), the push, the docs export, and the release. The stage stops before all of them (D-111). Only `program-json-office.gh` was rebuilt; the 19 other examples were reopened, not rebuilt.
+  - **Pending the owner's reading:** ADR-018 and the design note's controller choices (the end-use default names, heat fractions in a field EnergyPlus lacks as an error, the 29 February rule, the 64 MiB size bound, the dwelling counts after a split, the water temperatures 60 and 10 °C, a crossed merge as an error, the order of the *Convert2BEM* additions).
+  - **Known limits:** shared services are not modelled; design-day profiles are not used (the IDF gives design days the Sunday profile); a schema error lists every failing branch, so one wrong rule can give several messages.
+
+### D-127 — Version 1.2.0: program JSON, released with a docs export
+
+- **Date:** 2026-10-09 · **Decided by:** Cheng Xuan Li (asked for the merge, the tag `v1.2.0`, and the release on the docs site on 2026-10-09) · **Status:** Accepted
+- **Version.** 1.2.0, tag `v1.2.0`, a minor version as D-125 reasons: D-064 waives backward compatibility, and the stage changed no GUID.
+- **What it merges.** `feature/program-json` (D-126, [ADR-018](ADR-018-program-json-and-extended-programs.md)), fast-forwarded into `main` at `79e3adf`; it was 39 commits ahead of `0d301c5` and none behind. D-126 stays as written, with its "not merged"; this entry gives what holds for `main`.
+- **Checks on `main`:**
+  - `scripts/verify.ps1` passed with 0 warnings before the merge: 614 core, 518 generator, 160 `Lod.ProgramJson`, 2698 integration, and 1219 export tests, the counts D-126 gives.
+  - **Examples.** All 20 example definitions were rebuilt with the 1.2.0 plugin at `79e3adf` (`BEMGEN_EXAMPLES_WRITE=1`, Rhino 8.25.25314.11001), as `examples/README.md` asks at a release: every one reopened and solved with one *Validate* True, no warnings, errors, or exceptions. D-126 had rebuilt only `program-json-office.gh`.
+  - **Fresh-clone gate.** A clean clone of `main` at `8a64e25` (the rebuilt examples) passed `scripts/verify.ps1` with the same counts.
+- **What follows:**
+  - the release on the docs repository's GitHub Releases (D-118), with the files of `scripts/package-release.ps1` built from the tagged commit: the plugin zip, the `.yak`, the examples zip, and `SHA256SUMS.txt`;
+  - a docs export of `v1.2.0` carries *Program JSON*, the appended inputs and outputs, the new example, and the developer pages to the public site; the docs repository imports it and runs its own `sync-docs`;
+  - the release notes say that definitions saved with 1.1.0 open with their values and wires, and that definitions saved before 1.1.0 still lose their presets' infiltration values (D-124).
+- **Open:** the items D-126 leaves to a person in Rhino 8 and to the owner's reading (ADR-018 and the design note's controller choices).

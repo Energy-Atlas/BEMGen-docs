@@ -193,7 +193,8 @@ Each source zone or space should support at least:
 - lighting schedule,
 - equipment schedule,
 - DHW schedule where relevant,
-- semantic category.
+- semantic category,
+- since D-126, also: the number of dwellings (for loads per dwelling unit), the end use of each load, the heat fractions of lighting and equipment, the activity level and heat fractions of the occupants, the target and inlet temperatures of hot water, heating and cooling as separate controls, and the calendar of the schedules (see §7).
 
 Schedules should use a common normalized representation, preferably dimensionless fractions over a fixed timestep.
 
@@ -280,6 +281,49 @@ T^\*(t) = \frac{\sum_{i \in C} w_i T_i(t)}{\sum_{i \in C} w_i}, \qquad w_i = f_i
 
 where \(w_i\) is the floor area of source zone \(i\) transferred to the target zone: its area fraction \(f_i\) times its floor area \(A_i\), which is the overlap area when a source zone is split between targets. There is no method parameter and no fallback; exposed-surface-area weighting was rejected because it would make the control assumption depend on geometry. This is a prescribed control rule, not a conservation invariant, so validation checks it against its definition rather than against a conserved total. Merging conditioned and unconditioned sources enlarges the conditioned floor area; validation reports this change without enforcing it, because it is a consequence of the zoning simplification under study. Each aggregated setpoint schedule records its source zones, the method, and the weights.
 
+### Extended program properties (D-126)
+
+The atlas's program JSON 2.0.0 describes more than power densities, schedules, and setpoints, and a program that ignored the rest would change program assumptions silently (GLOBAL.md scientific rule 3). BEMGen's program therefore holds the properties below ([ADR-018](decisions/ADR-018-program-json-and-extended-programs.md)), each with an explicit aggregation rule so that the invariants of §17 still hold. The notation is that of §9: source \(i\) transfers the fraction \(f_i\) of its floor area \(A_i\); for a load component (a load type with an end use in a basis) \(T_i = f_i Q_i\) is the transferred design magnitude, \(Q^\* = \sum_i T_i\), and \(s^\*(t) = \sum_i T_i s_i(t) / Q^\*\) as before. A component is identified by its **type, end use, and basis**: components with different end uses (lighting and additional lighting) are never merged with each other, and the conservation of §17 holds for each separately.
+
+**Loads per dwelling unit.** The basis quantity of a zone is its dwelling count \(N\): 1 for a generated zone of space type `DwellingUnit` (a dwelling is one zone and is never subdivided, D-009), 0 for any other generated zone, and \(N^\* = \sum_i f_i N_i\) for a target zone, fractional when a source is split. A per-dwelling load of value \(v\) has the design magnitude \(Q = N v\), and the general rule \(v^\* = Q^\*/B^\*\) with \(B^\* = N^\*\) gives
+
+\[
+v^\* = \frac{\sum_i f_i N_i v_i}{\sum_i f_i N_i}, \qquad
+s^\*(t) = \frac{\sum_i f_i N_i v_i s_i(t)}{\sum_i f_i N_i v_i}.
+\]
+
+Weighting by floor area instead would not conserve installed power when the merged dwellings differ in size: dwellings of 80 m² and 40 m² at 100 and 400 W/dwelling hold 500 W, and the area-weighted 200 W/dwelling on two dwellings gives 400 W; the dwelling-count rule gives 250 W/dwelling and 500 W. The owner chose the dwelling-count weighting for that reason. A zone with a per-dwelling load and no dwellings (\(N = 0\)) has no magnitude and is an error. The building's dwelling count \(\sum_z m_z N_z\) (multipliers \(m_z\)) is a conserved total (§17). In a mix of presets (*Mix Programs*) the virtual zone has no dwellings of its own, so each input's weight stands for its share of dwellings as it stands for its share of floor area: \(v^\* = \sum_i \hat w_i v_i\).
+
+**Heat fractions.** A lighting, electric equipment, or gas equipment component carries the fractions \(\varphi^k\) of its heat that are radiant, latent, lost, visible, and return air (\(k\)), each in \([0, 1]\), with the convective fraction \(1 - \sum_k \varphi^k \ge 0\). A merge weights each fraction by the transferred magnitude,
+
+\[
+\varphi^{k\*} = \frac{\sum_i T_i \varphi_i^k}{Q^\*}, \qquad\text{so}\qquad Q^\* \varphi^{k\*} = \sum_i T_i \varphi_i^k,
+\]
+
+and the installed power that goes to each heat path is conserved; the sum stays at most 1 because a weighted mean of values summing to at most 1 does. When \(Q^\* = 0\) the weights are the transferred floor areas \(f_i A_i\). The EnergyPlus `Lights` object has no latent or lost fraction, and `ElectricEquipment` and `GasEquipment` no visible or return-air fraction, so a non-zero value in such a field is an error and is never dropped (GLOBAL.md scientific rule 3).
+
+**People.** Let \(o_i(t)\) be the transferred scheduled occupants of source \(i\) (its occupancy components times their schedules) and \(a_i(t)\) its activity level in W per person. The merged activity level
+
+\[
+a^\*(t) = \frac{\sum_i o_i(t)\, a_i(t)}{\sum_i o_i(t)}
+\]
+
+conserves the heat the occupants give off, \(\sum_i o_i(t) a_i(t) = o^\*(t) a^\*(t)\), in every hour. An hour without occupants takes the weights \(D_i\), the transferred design occupants, and a merge with no occupants at all takes \(f_i A_i\). The radiant fraction of the sensible heat is the mean weighted by \(D_i\) (by \(f_i A_i\) without occupants). The sensible heat fraction is a number in \([0, 1]\) or `autocalculate` (EnergyPlus computes it): when every weighted source is `autocalculate` the merge is; when every one is a number it is the \(D_i\)-weighted mean; when they mix, the merge is `autocalculate` with the warning `MixedSensibleFraction`, since a fraction that EnergyPlus computes has no number to average with (the owner's rule). A mean of equal values is that value exactly.
+
+**Hot-water temperatures.** A hot-water component carries a target and an inlet (cold-water) temperature schedule, \(\vartheta_{\mathrm{t},i}(t)\) and \(\vartheta_{\mathrm{in},i}(t)\), the target never below the inlet. With the transferred scheduled flow \(q_i(t) = T_i s_i(t)\) as the weight, both are weighted by the same weights,
+
+\[
+\vartheta^\*(t) = \frac{\sum_i q_i(t)\, \vartheta_i(t)}{\sum_i q_i(t)},
+\]
+
+so the water heat \(\sum_i q_i(t)\,(\vartheta_{\mathrm{t},i} - \vartheta_{\mathrm{in},i})\) is conserved in every hour, and the merged target is not below the merged inlet. An hour without flow takes \(T_i\), and a component with no flow at all takes \(f_i A_i\). The IDF gives the water temperatures to `WaterUse:Equipment` and adds no heat to a zone from water; the heat above is the quantity the temperatures stand for.
+
+**Heating and cooling separately.** A zone's thermostat has an optional heating and an optional cooling setpoint schedule, at least one. A merged zone is heated when any contributing source heats, and its heating setpoint is the floor-area-weighted mean of the setpoints of those sources only, as in the rule above; cooling is the same over the sources that cool. A merge whose heating setpoint exceeds its cooling setpoint in any hour is an error that names the sources, because EnergyPlus rejects a dual setpoint with heating above cooling. Setpoints stay a prescribed control rule, not a conservation invariant.
+
+**Calendar.** Every schedule has 8760 values on a non-leap year. A program records the calendar (year and holidays) its schedules were expanded on, or none for BEMGen's own presets, which assume a year whose 1 January is a Monday. Sources of a merge, inputs of a mix, and zones of a building must share one calendar, and a program without one agrees only with a calendar that starts on a Monday; otherwise the combination is an error (`CalendarMismatch`), because the same hourly index would mean different days. The calendar passes through the merge unchanged.
+
+**Left out.** Shared services of the contract (equipment serving several zones) are not modelled, and the design-day profiles of a schedule are not used; both are reported when a program JSON is imported.
+
 ### Mixing program presets (D-124)
 
 Programs are also combined without any geometry, to give the program of a space made of several programs by floor-area share (*Mix Programs*, [ADR-017](decisions/ADR-017-program-mix-and-building-infiltration.md)). Take inputs \(i = 1,\ldots,m\) with weights \(w_i > 0\), normalised to \(\hat w_i = w_i / \sum_k w_k\); for each component (a load type in a basis) its value \(v_i\) and schedule \(s_i(t)\), a missing component being \(v_i = 0\); the design occupants per m² of floor area \(o_i\), the summed occupancy components; and the heating and cooling setpoints \(\theta_i(t)\) of the set \(C\) of conditioned inputs.
@@ -303,7 +347,7 @@ By construction, for every component and hour the scheduled magnitude of the mix
 **Equivalence with a zone merge.** Let one source zone stand for each input, with floor areas \(A_i = \hat w_i A\) for any \(A > 0\) and one common height, merged whole into one target zone of area \(A\). The merge rule gives exactly the mixed values \(v^\*\), schedules \(s^\*(t)\), conditioning, and setpoints \(\theta^\*(t)\), whatever \(A\) is: area-weighted densities, volume-weighted air changes, occupant-weighted per-person values, raw sums of absolute loads, and floor-area-weighted setpoints over the conditioned inputs. So a mix of weights \(w_i\) is the merge of zones whose floor areas are in the ratio of the weights; `ProgramMixEquivalenceTests` compares the two for zones of 70 m² and 30 m² against weights 0.7 and 0.3, component by component, with every schedule and setpoint at every hour. Two things bound the statement:
 
 - The merge adds an absolute value once per source zone, so a preset that stands for \(k\) zones of a plan adds it \(k\) times, and a source zone split between targets transfers only its fraction of it; a mix has one input per preset and no split.
-- Absolute occupancy beside a per-person load has no such equivalent. The merge's per-person value then depends on the area \(A\) (the absolute occupants do not scale with it, the others do), and a mix has no area, so at unit area an absolute occupancy would dilute the other inputs' per-person load by a factor that no real zone has; for example a hall of 5 people mixed half and half with an office of 0.1 people/m² at 30 m³/h per person would give 2.97 m³/h on a zone of 100 m², and merged zones of 50 m² and 50 m² give 150 m³/h. The mix rejects this combination (`PerPersonWithAbsoluteOccupancy`) in any inputs.
+- Absolute occupancy beside a per-person load has no such equivalent. The merge's per-person value then depends on the area \(A\) (the absolute occupants do not scale with it, the others do), and a mix has no area, so at unit area an absolute occupancy would dilute the other inputs' per-person load by a factor that no real zone has; for example a hall of 5 people mixed half and half with an office of 0.1 people/m² at 30 m³/h per person would give 2.97 m³/h on a zone of 100 m², and merged zones of 50 m² and 50 m² give 150 m³/h. The mix rejects this combination (`PerPersonWithAbsoluteOccupancy`) in any inputs. The same reasoning applies to occupancy in any two bases (per m², per dwelling, absolute), because the virtual zone has unit floor area and one dwelling: with such occupancy a per-person load, or people properties that differ between the inputs with occupants, would be weighted by a split that no real zone has, and the mix rejects it (`MixedOccupancyBases`, D-126).
 
 The setpoint rule is a prescribed control rule, not a conservation invariant, and chaining mixes renormalises over the conditioned inputs step by step, so a mix of mixes can differ from the same inputs mixed once; this is accepted. The window-to-wall ratio of a mix, when not given, is the weighted mean \(\sum_i \hat w_i \mathrm{WWR}_i\), glazing per wall shared like floor area, recorded as derived.
 
@@ -442,13 +486,13 @@ Examples:
 
 The transfer matrix should be retained as part of the output metadata so every simplified model can be traced back to its source model.
 
-Rule adopted for this project (ADR-007, D-019, D-041, D-047): loads are aggregated per component, one per load type and basis; a program may express a load type in several bases (e.g. ventilation per person plus per floor area), and its components add up. Every component is converted to its absolute design magnitude \(Q_i\) = value × basis quantity, where the basis quantity is the floor area, the design occupants (the sum of the zone's occupancy components), 1 for absolute loads, or the zone volume for air changes per hour (D-124: no basis depends on the envelope). Source zone \(i\) transfers \(T_{ji} = f_{ji} Q_i\) to target zone \(j\), where \(f_{ji}\) is the floor-area fraction; a source without the component contributes nothing to it. The target magnitude \(Q_j = \sum_i T_{ji}\) is re-expressed in the component's basis as \(v_j = Q_j / B_j\), and the target schedule is
+Rule adopted for this project (ADR-007, D-019, D-041, D-047): loads are aggregated per component, one per load type, end use, and basis (D-126; D-047 said type and basis); a program may express a load type in several bases (e.g. ventilation per person plus per floor area) and several end uses (lighting and additional lighting), and its components add up. Every component is converted to its absolute design magnitude \(Q_i\) = value × basis quantity, where the basis quantity is the floor area, the design occupants (the sum of the zone's occupancy components), 1 for absolute loads, the zone volume for air changes per hour (D-124: no basis depends on the envelope), or the zone's dwelling count for loads per dwelling unit (D-126). Source zone \(i\) transfers \(T_{ji} = f_{ji} Q_i\) to target zone \(j\), where \(f_{ji}\) is the floor-area fraction; a source without the component contributes nothing to it. The target magnitude \(Q_j = \sum_i T_{ji}\) is re-expressed in the component's basis as \(v_j = Q_j / B_j\), and the target schedule is
 
 \[
 s_j(t) = \frac{\sum_i T_{ji} s_i(t)}{Q_j}
 \]
 
-This yields area weighting for densities, occupancy weighting for per-person loads, summation for absolute loads, and volume weighting for air changes per hour, \(ACH^\* = \sum_i V_i ACH_i / \sum_i V_i\) (D-019). Transfer fractions are normalised per source, \(\sum_j f_{ji} = 1\), so every extensive quantity is conserved to floating-point precision regardless of polygon rounding; how well the target zones cover each source is checked separately. Through S8 a second, exterior-wall fraction transferred loads per exterior wall area, and was used only after the target façades were shown to cover every source outdoor wall over its full length, checked before any normalisation (D-041); it left with infiltration (D-124), and the façade coverage is still checked for the rebuilt walls and windows (§10). Loads of one type with different bases are neither rejected nor converted to one basis: each basis is aggregated as its own component and conserved exactly, so no program assumption changes (D-047). A positive magnitude cannot be expressed in a target whose basis quantity is zero; this is an error. A zero total magnitude gives the value 0 and a constant-zero schedule.
+This yields area weighting for densities, occupancy weighting for per-person loads, summation for absolute loads, and volume weighting for air changes per hour, \(ACH^\* = \sum_i V_i ACH_i / \sum_i V_i\) (D-019), and dwelling-count weighting for loads per dwelling unit, \(v^\* = \sum_i f_i N_i v_i / \sum_i f_i N_i\) (D-126; the other properties that came with it are in §7). Transfer fractions are normalised per source, \(\sum_j f_{ji} = 1\), so every extensive quantity is conserved to floating-point precision regardless of polygon rounding; how well the target zones cover each source is checked separately. Through S8 a second, exterior-wall fraction transferred loads per exterior wall area, and was used only after the target façades were shown to cover every source outdoor wall over its full length, checked before any normalisation (D-041); it left with infiltration (D-124), and the façade coverage is still checked for the rebuilt walls and windows (§10). Loads of one type with different bases are neither rejected nor converted to one basis: each basis is aggregated as its own component and conserved exactly, so no program assumption changes (D-047). A positive magnitude cannot be expressed in a target whose basis quantity is zero; this is an error. A zero total magnitude gives the value 0 and a constant-zero schedule.
 
 ---
 
@@ -681,7 +725,10 @@ The schema should include:
 ### Load Definition
 
 - load type,
+- end use (D-126),
+- basis,
 - density or absolute value,
+- heat fractions (lighting and equipment) or water temperatures (hot water), D-126,
 - schedule ID,
 - aggregation method.
 
@@ -725,6 +772,8 @@ For each load type:
 
 - total installed power conserved,
 - timestep-level aggregate scheduled load conserved.
+
+Since D-126 the check runs for each load component (type, end use, and basis), per-dwelling components included, and the building's dwelling count is a conserved total. That the installed power of each heat path (radiant, latent, lost, visible, return air), the heat the occupants give off (occupants × activity), and the water heat (flow × (target − inlet)) are conserved in every timestep follows from the aggregation rules of §7 and is proven by the aggregation's invariant tests; it is not an enforced validation check. Validation also requires that a per-dwelling load is only in a zone with dwellings and that every zone shares one calendar.
 
 The load types are those of a zone program. Infiltration is not one (D-124): it is the envelope's and is applied to each zone's own surfaces or volume, so it has no check of its own and is conserved by construction through the conserved exterior wall, roof, exposed floor, and volume.
 

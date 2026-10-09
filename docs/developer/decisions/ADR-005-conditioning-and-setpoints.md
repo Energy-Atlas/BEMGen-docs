@@ -1,6 +1,6 @@
 # ADR-005: Conditioning and setpoint aggregation
 
-Status: Accepted
+Status: Accepted; superseded in part by [ADR-018](ADR-018-program-json-and-extended-programs.md) (heating and cooling are separate sides: a conditioned zone needs one or both setpoints, each side is aggregated over the sources that have it, and a merge whose heating exceeds its cooling is an error)
 
 Date: 2026-10-01
 

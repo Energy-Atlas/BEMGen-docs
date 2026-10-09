@@ -40,7 +40,7 @@ Program preset of an activity hall for sport or community use; space type Activi
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Activity Hall` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.2` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `18` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `25` | Constant cooling setpoint, °C. |
 | Occupancy | `Occ` | Number | item | no | `0.1` | Occupancy design value, people/m². |
@@ -49,6 +49,8 @@ Program preset of an activity hall for sport or community use; space type Activi
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Community Hours' when connected. |
 | Equipment | `Eq` | Number | item | no | `2` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Community Hours' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -72,7 +74,7 @@ Program preset of a group of care bedrooms; space type CareBedroom. Every input 
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Care Bedroom` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.3` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `22` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `25` | Constant cooling setpoint, °C. |
 | Occupancy | `Occ` | Number | item | no | `0.04` | Occupancy design value, people/m². |
@@ -81,6 +83,8 @@ Program preset of a group of care bedrooms; space type CareBedroom. Every input 
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Care Bedroom Lighting' when connected. |
 | Equipment | `Eq` | Number | item | no | `3` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Care Bedroom Equipment' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -104,7 +108,7 @@ Program preset of the communal and service hub of a care home; space type CareCo
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Care Communal` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.4` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `22` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `25` | Constant cooling setpoint, °C. |
 | Occupancy | `Occ` | Number | item | no | `0.15` | Occupancy design value, people/m². |
@@ -113,6 +117,8 @@ Program preset of the communal and service hub of a care home; space type CareCo
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Care Communal Hours' when connected. |
 | Equipment | `Eq` | Number | item | no | `5` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Care Communal Hours' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -136,11 +142,13 @@ Program preset of the clean route of an operating suite; space type CleanCorrido
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Clean Corridor` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.1` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `20` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Lighting | `Lt` | Number | item | no | `8` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Always On' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -164,7 +172,7 @@ Program preset of the support rooms of an operating suite; space type ClinicalSu
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Clinical Support` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.2` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `21` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Occupancy | `Occ` | Number | item | no | `0.05` | Occupancy design value, people/m². |
@@ -173,6 +181,8 @@ Program preset of the support rooms of an operating suite; space type ClinicalSu
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Theatre Services' when connected. |
 | Equipment | `Eq` | Number | item | no | `10` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Theatre Services' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -196,13 +206,15 @@ Program preset of an office service core: lifts, stairs, toilets, risers; space 
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Core` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `21` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Lighting | `Lt` | Number | item | no | `5` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Office Lighting' when connected. |
 | Equipment | `Eq` | Number | item | no | `3` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Office Equipment' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -210,7 +222,7 @@ Program preset of an office service core: lifts, stairs, toilets, risers; space 
 | --- | --- | --- | --- | --- |
 | Preset | `P` | [Program Preset](info.md#program-preset) | item | The program preset. |
 
-**Example definitions:** `office-plate.gh` ([canvas](../../assets/screenshots/canvas/office-plate.png)).
+**Example definitions:** `office-plate.gh` ([canvas](../../assets/screenshots/canvas/office-plate.png)), `program-json-office.gh` ([canvas](../../assets/screenshots/canvas/program-json-office.png)).
 
 ## Corridor Preset
 
@@ -226,11 +238,13 @@ Program preset of a corridor. Every input defaults to the illustrative example v
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Corridor` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.2` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `21` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Lighting | `Lt` | Number | item | no | `5` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Always On' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -254,7 +268,7 @@ Program preset of a dining field; space type Dining. Every input defaults to the
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Dining` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.4` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `21` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Occupancy | `Occ` | Number | item | no | `0.6` | Occupancy design value, people/m². |
@@ -263,6 +277,8 @@ Program preset of a dining field; space type Dining. Every input defaults to the
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Dining Hours' when connected. |
 | Equipment | `Eq` | Number | item | no | `2` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Dining Hours' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -286,11 +302,13 @@ Program preset of the dirty (disposal) route of an operating suite; space type D
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Dirty Corridor` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.1` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `20` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Lighting | `Lt` | Number | item | no | `8` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Always On' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -314,7 +332,7 @@ Program preset of a dwelling unit (one zone per unit). Every input defaults to t
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Dwelling Unit` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.3` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `21` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Occupancy | `Occ` | Number | item | no | `0.03` | Occupancy design value, people/m². |
@@ -323,6 +341,8 @@ Program preset of a dwelling unit (one zone per unit). Every input defaults to t
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Dwelling Lighting' when connected. |
 | Equipment | `Eq` | Number | item | no | `5` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Dwelling Equipment' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -373,7 +393,7 @@ Program preset of a kitchen with its servery, one food-service department; space
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Kitchen` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.1` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `18` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `26` | Constant cooling setpoint, °C. |
 | Occupancy | `Occ` | Number | item | no | `0.05` | Occupancy design value, people/m². |
@@ -386,6 +406,8 @@ Program preset of a kitchen with its servery, one food-service department; space
 | Gas Equipment Schedule | `GasS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Gas Equipment; replaces the built-in schedule 'Example Kitchen Gas' when connected. |
 | Ventilation | `Vent` | Number | item | no | `15` | Ventilation design value, 1/h (air changes per hour). |
 | Ventilation Schedule | `VentS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Ventilation; replaces the built-in schedule 'Example Kitchen Hours' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -409,13 +431,15 @@ Program preset of a public foyer or entrance lobby; space type Lobby. Every inpu
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Lobby` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.5` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `20` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Occupancy | `Occ` | Number | item | no | `0.1` | Occupancy design value, people/m². |
 | Occupancy Schedule | `OccS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Occupancy; replaces the built-in schedule 'Example Community Occupancy' when connected. |
 | Lighting | `Lt` | Number | item | no | `10` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Community Hours' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -439,13 +463,15 @@ Program preset of the public mall route; space type Mall. Every input defaults t
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Mall` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.2` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `20` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Occupancy | `Occ` | Number | item | no | `0.1` | Occupancy design value, people/m². |
 | Occupancy Schedule | `OccS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Occupancy; replaces the built-in schedule 'Example Retail Occupancy' when connected. |
 | Lighting | `Lt` | Number | item | no | `10` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Retail Lighting' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -469,7 +495,7 @@ Program preset of an office work area (one zone per work-area department); space
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Office` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.4` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `21` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Occupancy | `Occ` | Number | item | no | `0.1` | Occupancy design value, people/m². |
@@ -478,6 +504,8 @@ Program preset of an office work area (one zone per work-area department); space
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Office Lighting' when connected. |
 | Equipment | `Eq` | Number | item | no | `10` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Office Equipment' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -501,7 +529,7 @@ Program preset of a bank of operating theatres; space type OperatingTheatre. Eve
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Operating Theatre` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `20` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `22` | Constant cooling setpoint, °C. |
 | Occupancy | `Occ` | Number | item | no | `0.1` | Occupancy design value, people/m². |
@@ -512,6 +540,8 @@ Program preset of a bank of operating theatres; space type OperatingTheatre. Eve
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Theatre Services' when connected. |
 | Ventilation | `Vent` | Number | item | no | `20` | Ventilation design value, 1/h (air changes per hour). |
 | Ventilation Schedule | `VentS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Ventilation; replaces the built-in schedule 'Example Theatre Ventilation' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -535,7 +565,7 @@ Program preset of the shops of one mall wing or an anchor store; space type Reta
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Retail` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.3` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `20` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Occupancy | `Occ` | Number | item | no | `0.2` | Occupancy design value, people/m². |
@@ -544,6 +574,8 @@ Program preset of the shops of one mall wing or an anchor store; space type Reta
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Retail Lighting' when connected. |
 | Equipment | `Eq` | Number | item | no | `5` | Equipment design value, W/m². |
 | Equipment Schedule | `EqS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Equipment; replaces the built-in schedule 'Example Retail Equipment' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -567,11 +599,13 @@ Program preset of service or support rooms: changing rooms, stores, toilets; spa
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Service` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.1` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `True` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `18` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `26` | Constant cooling setpoint, °C. |
 | Lighting | `Lt` | Number | item | no | `6` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Community Hours' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 
@@ -595,11 +629,13 @@ Program preset of a stair. Every input defaults to the illustrative example valu
 | --- | --- | --- | --- | --- | --- | --- |
 | Name | `N` | Text | item | no | `Example Stair` | Preset name; descriptive only (reports, provenance, messages), never used for matching. |
 | WWR | `WWR` | Number | item | no | `0.1` | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. |
-| Conditioned | `Cond` | Boolean | item | no | `False` | Whether the space is conditioned; the setpoints are ignored when it is not. |
+| Conditioned | `Cond` | Boolean | item | no | `False` | Whether the space is conditioned; the setpoints are ignored when it is not. A conditioned space needs Heating On or Cooling On. |
 | Heating | `H` | Number | item | no | `21` | Constant heating setpoint, °C. |
 | Cooling | `C` | Number | item | no | `24` | Constant cooling setpoint, °C. |
 | Lighting | `Lt` | Number | item | no | `3` | Lighting design value, W/m². |
 | Lighting Schedule | `LtS` | [Schedule](info.md#schedule) | item | yes | – | Optional fraction schedule of Lighting; replaces the built-in schedule 'Example Always On' when connected. |
+| Heating On | `HOn` | Boolean | item | no | `True` | Whether a conditioned space is heated at the Heating setpoint; when false, Heating is ignored. |
+| Cooling On | `COn` | Boolean | item | no | `True` | Whether a conditioned space is cooled at the Cooling setpoint; when false, Cooling is ignored. |
 
 **Outputs**
 

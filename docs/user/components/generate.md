@@ -357,7 +357,7 @@ Central service core within an office plate (SYN-TYP-017): a rectangular plate w
 
 ![Building preview of the Office Plate example](../../assets/screenshots/office-plate-building.png)
 
-**Example definitions:** `office-plate.gh` ([canvas](../../assets/screenshots/canvas/office-plate.png)).
+**Example definitions:** `office-plate.gh` ([canvas](../../assets/screenshots/canvas/office-plate.png)), `program-json-office.gh` ([canvas](../../assets/screenshots/canvas/program-json-office.png)).
 
 ## Open Court
 

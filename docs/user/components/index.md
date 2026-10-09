@@ -7,7 +7,7 @@ Every component and parameter of the BEMGen tab in Grasshopper, generated from t
 | Panel | Components | Parameters |
 | --- | --- | --- |
 | [0 Info](info.md) | 1 | 7 |
-| [1 Program](program.md) | 4 | 1 |
+| [1 Program](program.md) | 5 | 1 |
 | [1 Program Presets](program-presets.md) | 19 | 0 |
 | [2 Generate](generate.md) | 19 | 0 |
 | [3 Simplify](simplify.md) | 5 | 0 |
@@ -63,6 +63,7 @@ Every component and parameter of the BEMGen tab in Grasshopper, generated from t
 | ![](../../assets/icons/PerimeterCoreComponent.png) | [Perimeter Core](simplify.md#perimeter-core) | `Z2` | Simplify |
 | ![](../../assets/icons/PlanParameter.png) | [Plan](info.md#plan) | `Plan` | Info |
 | ![](../../assets/icons/PointPlateComponent.png) | [Point Plate](generate.md#point-plate) | `PPlate` | Generate |
+| ![](../../assets/icons/ProgramJsonComponent.png) | [Program JSON](program.md#program-json) | `PJson` | Program |
 | ![](../../assets/icons/ProgramPresetParameter.png) | [Program Preset](info.md#program-preset) | `P` | Info |
 | ![](../../assets/icons/ProgramPresetComponent.png) | [Program Preset](program.md#program-preset) | `Preset` | Program |
 | ![](../../assets/icons/RadialLobesComponent.png) | [Radial Lobes](generate.md#radial-lobes) | `RLobes` | Generate |
@@ -102,6 +103,7 @@ The definitions in the examples zip of each release, checked in Rhino before the
 - `open-court.gh` ([canvas](../../assets/screenshots/canvas/open-court.png))
 - `operating-suite.gh` ([canvas](../../assets/screenshots/canvas/operating-suite.png))
 - `point-plate.gh` ([canvas](../../assets/screenshots/canvas/point-plate.png))
+- `program-json-office.gh` ([canvas](../../assets/screenshots/canvas/program-json-office.png))
 - `radial-lobes.gh` ([canvas](../../assets/screenshots/canvas/radial-lobes.png))
 - `stair-bay-bar.gh` ([canvas](../../assets/screenshots/canvas/stair-bay-bar.png))
 - `stair-pair.gh` ([canvas](../../assets/screenshots/canvas/stair-pair.png))

@@ -1,6 +1,6 @@
 # ADR-010: Convert2IDF
 
-Status: Accepted (owner's scope answers D-112; the controller's realisation choices provisional pending the owner's reading); superseded in part by [ADR-017](ADR-017-program-mix-and-building-infiltration.md) (infiltration is written once per zone from the envelope preset, not as a program load, D-124)
+Status: Accepted (owner's scope answers D-112; the controller's realisation choices provisional pending the owner's reading); superseded in part by [ADR-017](ADR-017-program-mix-and-building-infiltration.md) (infiltration is written once per zone from the envelope preset, not as a program load, D-124) and by [ADR-018](ADR-018-program-json-and-extended-programs.md) (heat fractions, activity, people fractions, water temperatures, and single-sided thermostats come from the program, and the run period follows the building's calendar, D-126)
 
 Date: 2026-10-02
 

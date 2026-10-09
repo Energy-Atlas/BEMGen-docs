@@ -105,4 +105,4 @@ Representative storeys with zone multipliers (formerly Floor Area Multiplier). E
 | --- | --- | --- | --- | --- |
 | Building | `Bldg` | [Building](info.md#building) | item | The building. |
 
-**Example definitions:** `care-hub.gh` ([canvas](../../assets/screenshots/canvas/care-hub.png)), `court-cluster.gh` ([canvas](../../assets/screenshots/canvas/court-cluster.png)), `office-plate.gh` ([canvas](../../assets/screenshots/canvas/office-plate.png)), `point-plate.gh` ([canvas](../../assets/screenshots/canvas/point-plate.png)), `stair-bay-bar.gh` ([canvas](../../assets/screenshots/canvas/stair-bay-bar.png)).
+**Example definitions:** `care-hub.gh` ([canvas](../../assets/screenshots/canvas/care-hub.png)), `court-cluster.gh` ([canvas](../../assets/screenshots/canvas/court-cluster.png)), `office-plate.gh` ([canvas](../../assets/screenshots/canvas/office-plate.png)), `point-plate.gh` ([canvas](../../assets/screenshots/canvas/point-plate.png)), `program-json-office.gh` ([canvas](../../assets/screenshots/canvas/program-json-office.png)), `stair-bay-bar.gh` ([canvas](../../assets/screenshots/canvas/stair-bay-bar.png)).

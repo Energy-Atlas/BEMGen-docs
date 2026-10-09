@@ -103,7 +103,7 @@ Merges zones of the same space type that share a wall (Z1); Join Pieces decides 
 | --- | --- | --- | --- | --- |
 | Floor | `Floor` | [Floor](info.md#floor) | item | The simplified floor. |
 
-**Example definitions:** `court-cluster.gh` ([canvas](../../assets/screenshots/canvas/court-cluster.png)), `foyer-halls.gh` ([canvas](../../assets/screenshots/canvas/foyer-halls.png)), `radial-lobes.gh` ([canvas](../../assets/screenshots/canvas/radial-lobes.png)), `stair-bay-bar.gh` ([canvas](../../assets/screenshots/canvas/stair-bay-bar.png)), `terrace-row.gh` ([canvas](../../assets/screenshots/canvas/terrace-row.png)).
+**Example definitions:** `court-cluster.gh` ([canvas](../../assets/screenshots/canvas/court-cluster.png)), `foyer-halls.gh` ([canvas](../../assets/screenshots/canvas/foyer-halls.png)), `program-json-office.gh` ([canvas](../../assets/screenshots/canvas/program-json-office.png)), `radial-lobes.gh` ([canvas](../../assets/screenshots/canvas/radial-lobes.png)), `stair-bay-bar.gh` ([canvas](../../assets/screenshots/canvas/stair-bay-bar.png)), `terrace-row.gh` ([canvas](../../assets/screenshots/canvas/terrace-row.png)).
 
 ## Single Zone per Floor
 

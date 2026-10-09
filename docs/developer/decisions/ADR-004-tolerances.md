@@ -1,6 +1,6 @@
 # ADR-004: Numerical tolerances
 
-Status: Accepted
+Status: Accepted; amended by [ADR-018](ADR-018-program-json-and-extended-programs.md) (a sixth setting, `AbsoluteFraction`, for sums of fractions)
 
 Date: 2026-10-01
 
@@ -41,7 +41,7 @@ Tolerances are defined in one central configuration and nowhere else (GLOBAL.md 
 
 ## Decision
 
-`Lod.Core.Common.ToleranceSettings` is the only place where tolerances are defined: an immutable class with five values, each of which must be positive and finite (the constructor rejects zero, negative, NaN, and infinite values).
+`Lod.Core.Common.ToleranceSettings` is the only place where tolerances are defined: an immutable class with six values (five when this ADR was written; `AbsoluteFraction` was added in ADR-018), each of which must be positive and finite (the constructor rejects zero, negative, NaN, and infinite values).
 
 | Setting | Default | Unit | Used for |
 | --- | --- | --- | --- |
@@ -50,6 +50,7 @@ Tolerances are defined in one central configuration and nowhere else (GLOBAL.md 
 | `RelativeLoad` | 1e-9 | — | design and hourly scheduled magnitudes of loads, occupancy, and air flow |
 | `AbsoluteSchedule` | 1e-9 | unit of the schedule | schedule values |
 | `Angle` | 1e-6 | rad | parallelism and collinearity tests |
+| `AbsoluteFraction` | 1e-9 | — | sums of dimensionless fractions, absolute: a load's heat fractions sum to at most 1 (ADR-018) |
 
 - `ToleranceSettings.Default` holds these values. Services receive a `ToleranceSettings` through their constructor; nothing reads tolerances from global state.
 - Relative comparisons use a floor of 1: `|a − b| ≤ rel × max(1, |a|, |b|)` (`AreaEquals` with `RelativeArea`, `LoadEquals` with `RelativeLoad`). Schedule values compare absolutely: `|a − b| ≤ AbsoluteSchedule` (`ScheduleEquals`).

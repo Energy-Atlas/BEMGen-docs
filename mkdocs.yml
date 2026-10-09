@@ -126,6 +126,7 @@ nav:
           - developer/architecture/convert2idf.md
           - developer/architecture/domain-model.md
           - developer/architecture/pipeline.md
+          - developer/architecture/program-json.md
           - developer/architecture/validation.md
       - Decisions:
           - developer/decisions/decision-log.md
@@ -145,6 +146,7 @@ nav:
           - developer/decisions/ADR-014-program-types-and-department-zoning.md
           - developer/decisions/ADR-015-plans-per-storey.md
           - developer/decisions/ADR-017-program-mix-and-building-infiltration.md
+          - developer/decisions/ADR-018-program-json-and-extended-programs.md
       - Plans:
           - developer/plans/2026-09-30-implementation-roadmap.md
           - developer/plans/2026-10-01-s0-foundation.md
@@ -173,6 +175,7 @@ nav:
           - developer/plans/2026-10-04-dropdown-enums.md
           - developer/plans/2026-10-06-conditioned-merge.md
           - developer/plans/2026-10-06-program-mix.md
+          - developer/plans/2026-10-07-program-json.md
       - Research:
           - developer/research/envelope-presets.md
           - developer/research/precedents/hdhm-typologies.md

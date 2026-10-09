@@ -1,14 +1,14 @@
 # Program Presets
 
-> **Status:** Current as of S8.8 (`v0.8.7`) · **Date:** 2026-10-02 · **Decisions:** D-009, D-024, D-026, D-038, D-039, D-047, D-061, D-079, D-094, D-097, D-108, D-124; ADR-014, ADR-017 (infiltration is an envelope input; mixed presets, §6)
+> **Status:** Current as of S8.8 (`v0.8.7`) · **Date:** 2026-10-02 · **Decisions:** D-009, D-024, D-026, D-038, D-039, D-047, D-061, D-079, D-094, D-097, D-108, D-124, D-126; ADR-014, ADR-017 (infiltration is an envelope input; mixed presets, §6), ADR-018 (the extended program: §1.3; atlas programs from program JSON, §7)
 >
-> **Read this first:** the presets that ship with BEMGen (`ExampleResidentialPresets` and, since S8.4, `ExampleNonResidentialPresets`) hold **illustrative round numbers chosen for development and tests, and which of them are conditioned is an illustrative choice too. They are NOT taken from the DOE prototype buildings or from any standard.** Sourced presets are an open research input (§3).
+> **Read this first:** the presets that ship with BEMGen (`ExampleResidentialPresets` and, since S8.4, `ExampleNonResidentialPresets`) hold **illustrative round numbers chosen for development and tests, and which of them are conditioned is an illustrative choice too. They are NOT taken from the DOE prototype buildings or from any standard.** Sourced presets are an open research input (§3). The defaults of the heat fractions, the occupants' activity, and the water temperatures (§1.3) are the IDF writer's old fixed values, not sourced ones either. Presets made from the atlas's program JSON (§7) are different: their values are the atlas's.
 
 A program preset describes the energy-relevant program of one space type. This document defines what a preset contains, lists the example presets and their values, records how S1 deviates from the original plan for sourced values, states which prototype assumptions BEMGen deliberately does not reproduce, and explains how to build custom presets.
 
 ## 1. What a program preset is
 
-A program preset carries everything BEMGen assigns to a space of one type: its loads with their schedules, whether it is conditioned and, if so, its heating and cooling setpoints, and its window parameter (D-024, D-038). There is one preset per space type. Rooms are never modelled: at the most detailed level (Z0) a dwelling unit is one zone per storey (D-009, D-085), and a non-residential floor has one zone per department, a contiguous group of rooms of one program (D-097, ADR-014).
+A program preset carries everything BEMGen assigns to a space of one type: its loads with their schedules, whether it is conditioned and, if so, its heating and cooling setpoints, and its window parameter (D-024, D-038). Since the program JSON stage (D-126) it also carries the heat fractions of its power loads, the heat properties of its occupants, the temperatures of its hot water, and the calendar its schedules were expanded on (§1.3). There is one preset per space type. Rooms are never modelled: at the most detailed level (Z0) a dwelling unit is one zone per storey (D-009, D-085), and a non-residential floor has one zone per department, a contiguous group of rooms of one program (D-097, ADR-014).
 
 In code a preset is a `ProgramPreset` (`src/Lod.Core/Programs/ProgramPreset.cs`):
 
@@ -16,19 +16,20 @@ In code a preset is a `ProgramPreset` (`src/Lod.Core/Programs/ProgramPreset.cs`)
 | --- | --- | --- |
 | `Name` | Display name; descriptive only: it appears in reports, provenance, and messages and is never used for matching (D-061) | `EmptyName` when empty or white space |
 | `SpaceType` | The space type the preset applies to: `DwellingUnit`, `Corridor`, `Stair`, `Core`, `Lobby`, `Service`, `Mechanical`, `Other`, and since S8.4 the non-residential types `Office`, `Retail`, `Mall`, `Kitchen`, `Dining`, `OperatingTheatre`, `CleanCorridor`, `DirtyCorridor`, `ClinicalSupport`, `CareBedroom`, `CareCommunal`, and `ActivityHall` (ADR-014). (`Mixed` denotes a simplified zone that combines several space types.) | — |
-| `Program` | A `ZoneProgram`: at most one load per load type and basis, each with a fraction schedule, plus a `Thermostat` (heating and cooling setpoint schedules in °C) for a conditioned space, or no thermostat for an unconditioned one (§1.1, §1.2) | see §1.1 |
+| `Program` | A `ZoneProgram`: at most one load per load type, end use, and basis, each with a fraction schedule; the occupants' `PeopleProperties`; a `Thermostat` (a heating setpoint schedule, a cooling setpoint schedule, or both, in °C) for a conditioned space, or no thermostat for an unconditioned one; the calendar its schedules were expanded on, if any (§1.1 to §1.3) | see §1.1 |
 | `WindowToWallRatio` | Window-to-wall ratio, the single window parameter (D-026) | `WindowToWallRatio` when outside [0, 1) |
-| `Source` | Provenance of the values (D-122, D-124): `null` for a preset built from plain values, such as the examples; for a mix, the record of its inputs (§6.4) | — |
+| `Source` | Provenance of the values (D-124, D-126): `null` for a preset built from plain values, such as the examples; for a mix, the record of its inputs (§6.4); for a program JSON, the JSON's identity and checksum, its source program, the calendar, every override, and what was left out (§7) | — |
+| `Calendar` | The calendar the program's schedules were expanded on (`Program.Calendar`, §1.3); `null` for BEMGen's own presets | — |
 
 A plan generator takes one preset per space type it places, as a typed record (D-061): the linear plan generator takes `LinearPlanPresets(DwellingUnit, Corridor, Stair)`, and in Grasshopper the *Linear Plan Generator* has the three required inputs *Dwelling Unit*, *Corridor*, and *Stair*. A preset whose space type differs from its input's is an error (`PresetSpaceTypeMismatch`); each zone gets the preset of its space type. An any-program preset (S8.8, D-108) has no space type (`SpaceType` is `null`): `preset.AsAnyProgram()` returns any preset without its space type and with every other value unchanged, and every input of every generator accepts it; the zones keep the input's space type, take the preset's program and WWR, and the plan's provenance records `AnyProgramPreset.<Input>=<name>`. (Until S4.1 presets were passed as a `ProgramPresetSet`, a list with at most one preset per space type.)
 
-A preset can also be described by its plain values, `PresetValues`: name, space type, WWR, *Conditioned*, constant heating and cooling setpoints (°C), and loads (`PresetLoadValue`: type, basis, value, fraction schedule). `PresetValues.ToPreset()` builds the `ProgramPreset`; for a conditioned preset the setpoint schedules are constant temperature schedules named `"{Name} Heating Setpoint"` and `"{Name} Cooling Setpoint"`, and for an unconditioned preset the setpoints are ignored. Every invalid value is reported at once, with the diagnostics of §1.1.
+A preset can also be described by its plain values, `PresetValues`: name, space type, WWR, *Conditioned*, the switches `HeatingOn` and `CoolingOn` (default true), constant heating and cooling setpoints (°C), and loads (`PresetLoadValue`: type, basis, value, fraction schedule). `PresetValues.ToPreset()` builds the `ProgramPreset`; for a conditioned preset the setpoint schedules are constant temperature schedules named `"{Name} Heating Setpoint"` and `"{Name} Cooling Setpoint"`, one for each side that is on (a conditioned preset with both sides off is `NoSetpoint`), and for an unconditioned preset the setpoints are ignored. Every invalid value is reported at once, with the diagnostics of §1.1.
 
 **Windows.** Walls carry explicit windows (D-039). The S2 linear plan generator uses the preset's WWR for one simple rule: one window centred on each outdoor wall of a zone, with area = WWR × wall area (D-026). Where zones are merged and walls are rebuilt, each outdoor wall gets one window centred on it with the glazed area of the source windows it covers, shaped by the same rule, so the preset's glazing is conserved per wall, façade, orientation, and building (D-079, S5).
 
 ### 1.1 Loads, bases, and schedules
 
-A load is a `LoadDefinition`: a `LoadType`, a `LoadBasis`, a non-negative design value expressed per that basis, and a fraction schedule. Its **design magnitude** is value × basis quantity, and its scheduled magnitude at hour *t* is design magnitude × *s*(*t*) (ADR-007).
+A load is a `LoadDefinition`: a `LoadType`, an end use (a non-empty text, by default the type's snake-case name, §1.3), a `LoadBasis`, a non-negative design value expressed per that basis, and a fraction schedule; lighting and equipment loads also carry heat fractions and hot-water loads their temperatures (§1.3). Its **design magnitude** is value × basis quantity, and its scheduled magnitude at hour *t* is design magnitude × *s*(*t*) (ADR-007).
 
 | `LoadType` | Design magnitude |
 | --- | --- |
@@ -47,27 +48,54 @@ Infiltration is not a program property (D-124, [ADR-017](../decisions/ADR-017-pr
 | `PerPerson` | occupant | design occupants (the summed magnitude of the zone's occupancy loads) | m³/h per person |
 | `Absolute` | zone | 1 | W, people |
 | `AirChangesPerHour` | zone air volume per hour | volume, m³ | 1/h |
+| `PerDwellingUnit` (D-126) | dwelling | the zone's dwelling count: 1 for a generated dwelling-unit zone, 0 for any other zone, Σ fᵢ·Nᵢ of its sources for a merged zone (fractional after a split) | W/dwelling, people/dwelling |
 
 Validation, with the diagnostic code each rule raises:
 
 - A load type and a basis must be defined (`UndefinedLoadKind`, D-124).
 - A load value must be finite and non-negative (`LoadValue`).
-- Occupancy is expressed only `PerFloorArea` or `Absolute` (`LoadBasisNotAllowed`).
+- Occupancy is expressed only `PerFloorArea`, `Absolute`, or `PerDwellingUnit` (`LoadBasisNotAllowed`).
+- An end use, when given, must not be empty (`EmptyName`).
 - A load needs a fraction schedule (`ScheduleKindMismatch`); a thermostat's setpoints need temperature schedules (`ScheduleKindMismatch`, from `Thermostat.Create`).
-- A program has at most one load per load type and basis (`DuplicateLoadType`). A load type may appear in several bases, for example ventilation per person plus per floor area; these components add up (D-047).
+- A program has at most one load per load type, end use, and basis (`DuplicateLoadType`; D-047 said type and basis, D-126 adds the end use). A load type may appear in several bases, for example ventilation per person plus per floor area, and in several end uses, for example lighting and additional lighting; these components add up.
+- Heat fractions are given only for lighting and equipment loads, each in [0, 1] (`HeatFractionValue`), summing to at most 1 (`HeatFractionsExceedOne`), with no non-zero value in a field the EnergyPlus object lacks (`HeatFractionNotSupported`); water temperatures only for hot-water loads (`WaterTemperaturesNotAllowed`), the target never below the inlet (`WaterTargetBelowInlet`).
+- A zone with a per-dwelling load must have dwellings (`PerDwellingWithoutDwellings`, raised at plan generation and by validation): give a per-dwelling preset to dwelling-unit zones only, or express the load per floor area.
 - A per-person load needs an occupancy load in the same program (`PerPersonWithoutOccupancy`).
 
-Schedules hold 8760 hourly values for a non-leap year (ADR-003). A `Fraction` schedule's values lie in [0, 1]; a `Temperature` schedule holds finite values in °C. `Schedule.FromDailyProfiles` builds a year from one 24-hour weekday profile (Monday to Friday) and one weekend profile (Saturday and Sunday), given the weekday of 1 January; holidays are not modelled.
+Schedules hold 8760 hourly values for a non-leap year (ADR-003). A `Fraction` schedule's values lie in [0, 1]; a `Temperature` schedule holds finite values in °C (setpoints and hot-water temperatures); an `Activity` schedule (D-126) holds finite values of at least 0 in W per person. `Schedule.FromDailyProfiles` builds a year from one 24-hour weekday profile (Monday to Friday) and one weekend profile (Saturday and Sunday), given the weekday of 1 January; this factory does not model holidays. A program JSON expands its rule-based schedules on a calendar that has holidays (§7).
 
 ### 1.2 Conditioning
 
-Conditioning comes from the program preset (D-038). A preset whose program has a `Thermostat` is conditioned, with the thermostat's heating and cooling setpoint schedules; a preset without one is unconditioned and has no setpoints (`ZoneProgram.IsConditioned` is `false`).
+Conditioning comes from the program preset (D-038). A preset whose program has a `Thermostat` is conditioned, with the thermostat's heating setpoint schedule, its cooling setpoint schedule, or both (since D-126 each side is optional, at least one is needed, and where both exist the heating setpoint never exceeds the cooling setpoint at any hour, `SetpointsCross`); a preset without one is unconditioned and has no setpoints (`ZoneProgram.IsConditioned` is `false`).
 
 When a plan simplifier merges zones, the merged zone is conditioned if any source contributing floor area to it is conditioned ("any conditioned wins"). Its setpoints are floor-area weighted over the conditioned sources only, `T*(t) = Σ wᵢTᵢ(t) / Σ wᵢ` with `wᵢ` the transferred floor area of conditioned source *i*: a prescribed control rule, not a conservation invariant (ADR-005). A mix of presets follows the same rule with the user's weights in place of areas (§6). Merging conditioned and unconditioned spaces can therefore enlarge the conditioned floor area; from S3 on, validation reports that change without enforcing it, because it is a consequence of the zoning simplification under study (D-038).
+
+Since D-126 each side is merged on its own. Heating is on in the merged zone when any source contributing floor area heats, and its setpoint is floor-area weighted over those sources only; cooling likewise over the sources that cool. A merged zone whose heating setpoint would exceed its cooling setpoint at any hour is an error (`SetpointsCross`) that names the sources, because EnergyPlus rejects crossed setpoints; merge zones whose setpoints are compatible.
+
+### 1.3 Heat fractions, people, hot-water temperatures, and the calendar (D-126)
+
+The atlas's program contract describes more of a program than loads and setpoints, and a program that ignored the rest would replace the atlas's assumptions with BEMGen's silently. The program therefore holds the properties below ([ADR-018](../decisions/ADR-018-program-json-and-extended-programs.md)). **Each default is the value the IDF writer always used, so a preset that sets none of them behaves as before.** Like the example loads, the defaults are writer defaults, not values from a standard or a prototype.
+
+| Property | Held by | Rule | Default |
+| --- | --- | --- | --- |
+| End use | each load | a non-empty text; it tells loads of one type apart | the type's snake-case name: `occupancy`, `lighting`, `electric_equipment`, `gas_equipment`, `hot_water`, `ventilation` |
+| Heat fractions: radiant, latent, lost, visible, return air | lighting, electric equipment, and gas equipment loads only | each in [0, 1]; the sum is at most 1 within `ToleranceSettings.AbsoluteFraction` (1e-9); the convective fraction is what remains. A non-zero latent or lost fraction on lighting, or visible or return-air fraction on equipment, is an error: the EnergyPlus object has no such field | lighting: radiant 0.42, visible 0.18; electric equipment: radiant 0.5; gas equipment: radiant 0.3; every other fraction 0 |
+| Activity level | the program (its occupants) | an hourly `Activity` schedule, W per person, not negative | constant 120 W per person, named `BEMGen Activity Level` |
+| Radiant fraction of people | the program | in [0, 1], of the occupants' sensible heat | 0.3 |
+| Sensible fraction of people | the program | a number in [0, 1], or `autocalculate`, which lets EnergyPlus compute it | `autocalculate` |
+| Heating and cooling setpoints | the thermostat | each side optional, at least one (§1.2) | — |
+| Hot-water target and inlet temperatures | domestic hot-water loads only | hourly `Temperature` schedules, °C, the target never below the inlet by more than `AbsoluteSchedule` | constant 60 °C and 10 °C, named `BEMGen Hot Water Target Temperature` and `BEMGen Hot Water Inlet Temperature` |
+| Calendar | the program | a non-leap year and its distinct holidays; programs combined in a merge, a mix, or a building must share it (`CalendarMismatch`) | none: BEMGen's own presets record no calendar and assume a year whose 1 January is a Monday |
+
+A program without a calendar agrees only with a calendar whose 1 January is a Monday (2007 is the default year). The heat fractions, activity, and fractions of people, and the water temperatures, appear in the IDF as the fields of `Lights`, `ElectricEquipment`, `GasEquipment`, `People`, and `WaterUse:Equipment` ([convert2idf.md](../architecture/convert2idf.md#loads)); the calendar sets the run period's year. Water adds no heat to a zone in the IDF (the contract keeps plant and zone gains separate); the temperatures define the water heat the load stands for, flow × (target − inlet), which the aggregation conserves.
+
+How these properties combine when zones or presets are merged is in [the research brief, §7](../LOD_geometric_zoning_equivalence_research_brief.md#extended-program-properties-d-126) and in §6.2 for a mix.
 
 ## 2. Example presets
 
 > **The values below, and the choice of which spaces are conditioned, are illustrative and chosen for development and tests. They are NOT taken from the DOE prototype buildings, from any standard, or from measured data. Do not use them as research inputs, and do not present results obtained with them as representative of any prototype or real building.**
+
+The example presets take the defaults of §1.3 for their end uses, heat fractions, activity, people fractions, and water temperatures, and have no calendar.
 
 ### 2.1 Residential presets
 
@@ -378,15 +406,17 @@ Sourcing preset values from the DOE mid-rise apartment prototype, with citations
 3. be added alongside `ExampleResidentialPresets` (a new presets class, or presets built with the S2 components), leaving the example presets unchanged so existing tests keep their meaning;
 4. be recorded in the decision log (D-007) and in this document.
 
+Since D-126 there is a second route to sourced values: a program JSON exported by the Energy Archetype Atlas gives a preset whose values, schedules, and provenance come from the atlas (§7). It does not replace the first: the atlas's JSON is read as published, with its checks, and BEMGen's own example presets stay illustrative.
+
 ## 4. Prototype assumptions deliberately not reproduced
 
 Even with sourced values, BEMGen deliberately does not reproduce the following assumptions of a DOE prototype. Results must not be presented as if it did.
 
-1. **Conditioning detail (D-038).** A preset is either conditioned, with one heating and one cooling setpoint schedule, or unconditioned, with no setpoints. Any other conditioning arrangement a source describes must be mapped to one of these two, and the mapping stated (§3). HVAC systems themselves are not part of a preset (item 5).
+1. **Conditioning detail (D-038).** A preset is either conditioned, with a heating setpoint schedule, a cooling setpoint schedule, or both (D-126), or unconditioned, with no setpoints. Any other conditioning arrangement a source describes must be mapped to one of these two, and the mapping stated (§3). HVAC systems themselves are not part of a preset (item 5).
 2. **Zoning inside dwelling units (D-009).** Rooms are never modelled. Z0 has at most one zone per dwelling unit; non-dwelling spaces are their own zones.
 3. **Window layout (D-026, D-039).** The S2 generator places one window centred on each outdoor wall, sized by the preset's WWR, not the prototype's window geometry.
-4. **Calendar.** Schedules are 8760 hourly values over a non-leap year (ADR-003). Schedules built from daily profiles use one weekday and one weekend profile; holidays and special days are not modelled.
-5. **Systems and envelope.** A program preset holds loads, schedules, conditioning with setpoints, and WWR only: no HVAC system, construction, material, or infiltration data (infiltration is an envelope input since D-124). Constructions come from a separate envelope preset, the same at every level of detail ([envelope presets](envelope-presets.md), S6, ADR-010). The pipeline ends at Grasshopper-ready inputs without simulation (D-016); what the IDF export contains is decided in ADR-010 (S6).
+4. **Calendar.** Schedules are 8760 hourly values over a non-leap year (ADR-003). Schedules built from daily profiles use one weekday and one weekend profile, and holidays and special days are not modelled; only a program JSON is expanded on a calendar with holidays (D-126, §7), and the IDF holds the result as hourly values.
+5. **Systems and envelope.** A program preset holds loads (with their end uses, heat fractions, and hot-water temperatures), schedules, the occupants' heat properties, conditioning with setpoints, and WWR only: no HVAC system, construction, material, or infiltration data (infiltration is an envelope input since D-124). Constructions come from a separate envelope preset, the same at every level of detail ([envelope presets](envelope-presets.md), S6, ADR-010). The pipeline ends at Grasshopper-ready inputs without simulation (D-016); what the IDF export contains is decided in ADR-010 (S6).
 
 ## 5. Building custom presets
 
@@ -439,11 +469,13 @@ var presets = new LinearPlanPresets(unit.Value, corridor.Value, ExampleResidenti
 
 ### In Grasshopper (from S2)
 
-S2 adds components that wrap the same factories: *Schedule* (an 8760-hour schedule from a 24-hour weekday and weekend profile), *Load*, and *Program Preset* (any space type, with a *Conditioned* input; conditioned presets need both setpoints). Invalid inputs surface the diagnostics listed in §1 as component runtime messages.
+S2 adds components that wrap the same factories: *Schedule* (an 8760-hour schedule from a 24-hour weekday and weekend profile), *Load*, and *Program Preset* (any space type, with a *Conditioned* input; a conditioned preset needs a heating or a cooling setpoint, or both, since D-126). Invalid inputs surface the diagnostics listed in §1 as component runtime messages.
 
 S4.1 adds one default preset component per space type of the linear plan, *Dwelling Unit Preset*, *Corridor Preset*, and *Stair Preset*, and deletes *Example Residential Presets* (D-061). Every input of a default preset component has a default, the values of §2, so the component works with nothing connected: Name, WWR, Conditioned, Heating (°C), Cooling (°C), and per load a value input (people/m², W/m², or 1/h, as in its description) and an optional schedule input that replaces the built-in schedule when connected. Each shows the remark "Illustrative values; not sourced from DOE prototypes or standards." S8.4 adds one default preset component per non-residential space type of §2.2, *Office Preset*, *Core Preset*, *Retail Preset*, *Mall Preset*, *Kitchen Preset*, *Dining Preset*, *Operating Theatre Preset*, *Clean Corridor Preset*, *Dirty Corridor Preset*, *Clinical Support Preset*, *Care Bedroom Preset*, *Care Communal Preset*, *Lobby Preset*, *Activity Hall Preset*, and *Service Preset*, with the same inputs; *Gas Equipment* is in W/m², and *Ventilation* and *Infiltration* are in 1/h. Their inputs and outputs are listed in [pipeline.md](../architecture/pipeline.md#grasshopper-components-through-s88).
 
 Since D-124 the default preset components have no *Infiltration* and *Infiltration Schedule* inputs, because their presets have no infiltration load. *Mix Programs* (panel *1 Program*) mixes presets into one preset by weight (§6).
+
+D-126 appends inputs and outputs, so definitions saved with 1.1.0 open unchanged. *Load* gains *End Use*; *Radiant*, *Latent*, *Lost*, *Visible*, and *Return Air* (lighting and equipment only); and *Target Temperature* and *Inlet Temperature* (hot water only); its *Basis* offers `PerDwellingUnit`. *Schedule*'s *Kind* offers `Activity`. *Program Preset* gains *Heating On*, *Cooling On* (a side is on when *Conditioned* and its switch are true and its setpoint is connected), *Activity*, *People Radiant*, and *People Sensible*. Each default preset component gains *Heating On* and *Cooling On*, after its load inputs; its loads take the default end uses, heat fractions, and water temperatures. The new component *Program JSON* is described in §7. The inputs and outputs are listed in [pipeline.md](../architecture/pipeline.md).
 
 S8.8 moves the eighteen default preset components to their own panel, *1 Program Presets*; *Schedule*, *Load*, and *Program Preset* stay in *1 Program*, with the new parameter *Any Program Preset* (AnyP, D-108). Wire any preset into *Any Program Preset* and its output into any preset input of any generator to apply that program to the input's space type: for example an *Office Preset* through *Any Program Preset* into the *Corridor* input of the *Linear Plan Generator* gives the corridor the office program while it stays a `Corridor` zone. The preset keeps its name, loads, schedules, conditioning, setpoints, and WWR, and the plan's provenance records the use.
 
@@ -459,6 +491,7 @@ S8.8 moves the eighteen default preset components to their own panel, *1 Program
 - **WWR** is optional. When it is missing, the mix takes the weighted mean Σ ŵᵢ·WWRᵢ, glazing per wall shared like floor area, and records it as derived. A given WWR must lie in [0, 1) (`WindowToWallRatio`).
 - **Conditioning.** Mixing conditioned with unconditioned inputs is allowed, as in zone merges; the info `MixedConditioning` names the unconditioned inputs and the share that becomes conditioned.
 - **A per-person load beside absolute occupancy is an error** (`PerPersonWithAbsoluteOccupancy`) when they are in any of the inputs, one input or two. A mixed per-person value is weighted by the occupants per m² each input brings, and absolute occupants per m² depend on a zone area a mix does not know; at unit area an input's absolute occupancy would dilute another input's per-person load (a hall of 5 people mixed half and half with an office of 0.1 people/m² at 30 m³/h per person would give 2.97 m³/h on a 100 m² zone, where merged zones of 50 and 50 m² give 150 m³/h). Express the occupancy per floor area. Absolute occupancy is fine when no input has a per-person load.
+- **Occupancy in several bases is an error with a per-person load or different people properties** (`MixedOccupancyBases`, D-126). The virtual zone of a mix has unit floor area and one dwelling, so occupants per m², per dwelling, and absolute would be added as if they were one quantity, and the per-person values and the people properties would be weighted by a wrong split (0.05 person/m² at 10 m³/h per person mixed half and half with 3 person/dwelling at 30 m³/h per person would give 29.67 m³/h per person). A mix with one occupancy basis, or with identical people properties in the inputs with occupants and no per-person load, stays allowed. Express all occupancy in one basis.
 
 ### 6.2 The rule
 
@@ -468,12 +501,18 @@ The mix is the zone merge of [ADR-007](../decisions/ADR-007-load-basis-aggregati
 | --- | --- | --- |
 | Per floor area (lighting, equipment, occupancy, ventilation, hot water, …) | Σ ŵᵢ·vᵢ; a preset without the component contributes 0 | Σ ŵᵢ·vᵢ·sᵢ(t) / Σ ŵᵢ·vᵢ |
 | Air changes per hour | Σ ŵᵢ·vᵢ | the same form |
+| Per dwelling unit (D-126) | Σ ŵᵢ·vᵢ: each weight stands for the input's share of dwellings, as it stands for its share of floor area | the same form |
+| Heat fractions of a lighting or equipment component (D-126) | each fraction weighted by the transferred magnitude | — |
+| Activity of people (D-126) | weighted every hour by the transferred scheduled occupants | — |
+| Radiant and sensible fraction of people (D-126) | weighted by the occupants each input brings; a mixture of a number and `autocalculate` gives `autocalculate` and a warning | — |
+| Hot-water target and inlet temperatures (D-126) | each weighted every hour by the transferred scheduled flow | — |
 | Per person (ventilation per person, …) | Σ ŵᵢ·oᵢ·vᵢ / Σ ŵᵢ·oᵢ, weighted by the occupants per m² (oᵢ) each input brings | Σ ŵᵢ·oᵢ·vᵢ·sᵢ(t) / Σ ŵᵢ·oᵢ·vᵢ |
 | Absolute (a fixture's flow, …) | Σ vᵢ, **raw, not weighted** | Σ vᵢ·sᵢ(t) / Σ vᵢ |
 | Conditioning | conditioned when any input is | — |
-| Heating and cooling setpoints | Σ ŵᵢ·θᵢ(t) / Σ ŵᵢ over the conditioned inputs only, renormalised over them | — |
+| Heating setpoint | Σ ŵᵢ·θᵢ(t) / Σ ŵᵢ over the inputs that heat only, renormalised over them; heating is on when any input heats (D-126) | — |
+| Cooling setpoint | the same over the inputs that cool | — |
 
-Each component keeps its basis: different bases of one load type stay side by side and add up at export (D-047). A merged magnitude of zero gives value 0, a constant-zero schedule, and the info `ZeroLoadSchedule`. Absolute values are added raw whatever the weights (the owner's rule: fixed values are "just there"), so a mix of one preset is that preset and a mix of a preset with itself doubles its absolute loads. Setpoints are a prescribed control rule, not a conservation invariant (ADR-005); the caveat that chained mixes renormalise their conditioned inputs step by step, so a mix of mixes can differ from the one-step mix, is accepted ([ADR-017](../decisions/ADR-017-program-mix-and-building-infiltration.md)).
+Each component keeps its basis and its end use: different bases or end uses of one load type stay side by side and add up at export (D-047, D-126). A mix of presets expanded on different calendars is an error (`CalendarMismatch`); the mix carries the calendar the inputs share. Crossed heating and cooling setpoints after a mix are an error, as after a zone merge. A merged magnitude of zero gives value 0, a constant-zero schedule, and the info `ZeroLoadSchedule`. Absolute values are added raw whatever the weights (the owner's rule: fixed values are "just there"), so a mix of one preset is that preset and a mix of a preset with itself doubles its absolute loads. Setpoints are a prescribed control rule, not a conservation invariant (ADR-005); the caveat that chained mixes renormalise their conditioned inputs step by step, so a mix of mixes can differ from the one-step mix, is accepted ([ADR-017](../decisions/ADR-017-program-mix-and-building-infiltration.md)).
 
 Example: A (lighting 10 W/m², occupancy 0.1 people/m², ventilation 30 m³/h per person, hot water 0.5 m³/h absolute) and B (4 W/m², 0.02 people/m², 10 m³/h per person, 0.2 m³/h) with weights 7 and 3 give lighting 8.2 W/m², occupancy 0.076 people/m², ventilation (0.07·30 + 0.006·10) / 0.076 = 28.42 m³/h per person, and hot water 0.7 m³/h.
 
@@ -489,4 +528,14 @@ This equivalence is a unit test, not a runtime check: a mix has no source plan t
 
 ### 6.4 Provenance
 
-The mix is a `ProgramPreset` whose `Source` is `Provenance.Of("MixPrograms", …)`: one parameter `Input.k` per input holding the preset's name, the given weight, and the normalised weight (the source and weight pairs), the `SpaceType` and `WindowToWallRatio` with how each was chosen (`given`, `largest weight, Input.k`, or `weighted mean`), and each input's own `Source` as an input, so a mix of atlas presets traces to its records and a mix of mixes nests. Every mixed load and schedule has an `AggregationRecord` whose sources are the keys `Input.k`, not the preset names, which may repeat. A plan made from a mix records the source among its provenance inputs, and *Inspect* prints it.
+The mix is a `ProgramPreset` whose `Source` is `Provenance.Of("MixPrograms", …)`: one parameter `Input.k` per input holding the preset's name, the given weight, and the normalised weight (the source and weight pairs), the `SpaceType` and `WindowToWallRatio` with how each was chosen (`given`, `largest weight, Input.k`, or `weighted mean`), and each input's own `Source` as an input, so a mix of program JSON presets traces to their JSON records and a mix of mixes nests. Every mixed load and schedule has an `AggregationRecord` whose sources are the keys `Input.k`, not the preset names, which may repeat. A plan made from a mix records the source among its provenance inputs, and *Inspect* prints it.
+
+## 7. Atlas programs: program JSON (D-126)
+
+A preset can come from the Energy Archetype Atlas instead of from typed values: the *Program JSON* component (panel *1 Program*, nickname `PJson`) turns the text of a *program JSON 2.0.0* into a program preset. The contract, the mapping, the checks, and the overrides are in [program-json.md](../architecture/program-json.md); this section says what the preset is.
+
+- **What the JSON gives.** The loads of the program (occupancy, lighting, electric and gas equipment, hot water) with their end uses, bases, and heat fractions; every schedule they use, expanded to 8760 hourly values on the calendar of the *Year* (default 2007) and *Holidays* inputs; the heating and cooling switches and setpoint schedules; the occupants' activity schedule and radiant and sensible fractions; and the hot-water target and inlet temperature schedules. Only the `defaulted` export is read: the atlas has already replaced unknown values under its policy `atlas-program-defaults-1.0.0`, and the component lists each substitution it recorded in its *Assumptions* output.
+- **What it does not give.** A window-to-wall ratio (the *WWR* input, an illustrative 0.4 unless set, not from the JSON), a space type (unset: an any-program preset, §5), and any load the contract lacks, such as ventilation (the *Loads* input). Shared services are left out and listed.
+- **Whose values.** The values are the atlas's, not BEMGen's illustrative ones, and they stay the atlas's: BEMGen changes none of them except the unit of a hot-water flow (m³/s to m³/h). Overrides are explicit inputs and are recorded.
+- **Provenance.** The preset's `Source` records the JSON's id, name, scope, mode, and SHA-256, the source program (id, release, building type, template, evidence view), the default policy and the number of its substitutions, the calendar, the window-to-wall ratio and the space type with how each was chosen, every override, the demands that were combined, and the shared services left out. The JSON's `assumptions` and `evidence` are not copied into every schedule.
+- **Use.** The preset is an ordinary `ProgramPreset`: it goes into any preset input of a plan generator, into *Any Program Preset*, or into *Mix Programs*. It carries its calendar, so it can only be combined with programs on the same calendar (§1.3), and its per-dwelling loads (if any) need dwelling-unit zones.

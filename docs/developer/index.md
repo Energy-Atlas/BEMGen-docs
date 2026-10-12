@@ -21,11 +21,11 @@ To propose a fix to a page, open an [issue](https://github.com/energy-atlas/BEMG
 
 3.  [Domain model](architecture/domain-model.md)
 
-    The core types, units, and diagnostic codes; [validation](architecture/validation.md): every check and tolerance; the converters [Convert2BEM](architecture/convert2bem.md) and [Convert2IDF](architecture/convert2idf.md).
+    The core types, units, and diagnostic codes; [validation](architecture/validation.md): every check and tolerance; the converters [Convert2BEM](architecture/convert2bem.md) and [Convert2IDF](architecture/convert2idf.md); the [EnergyPlus runner](architecture/energyplus-runner.md) and the [experiment outputs](research/experiment-outputs.md) every simulated case yields.
 
 4.  [Decision log](decisions/decision-log.md)
 
-    Every project decision, newest at the bottom, and the architecture decision records (ADR-001 to ADR-015, ADR-017, and ADR-018) it links.
+    Every project decision, newest at the bottom, and the architecture decision records (ADR-001 to ADR-015, and ADR-017 to ADR-019) it links.
 
 5.  [Implementation roadmap](plans/2026-09-30-implementation-roadmap.md)
 

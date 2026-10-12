@@ -138,13 +138,13 @@ Place *Convert2IDF* (2IDF) from *5 Convert* and wire the *Building*. Leave *Enve
 
 | Output | Expected |
 | --- | --- |
-| IDF | the full IDF text; the component shows no runtime message |
+| IDF | the full IDF text; the component shows one remark, `NoWeatherFile`, because no weather file is connected |
 | Written | `False` |
-| Provenance | ends with `ENVELOPE: Example Envelope`, `INFILTRATION: 0.3 AirChangesPerHour (EnergyPlus AirChanges/Hour), schedule Example Always On`, `ENERGYPLUS: 25.2`, and `FILE: not written (Write is false)` |
+| Provenance | ends with `ENVELOPE: Example Envelope`, `INFILTRATION: 0.3 AirChangesPerHour (EnergyPlus AirChanges/Hour), schedule Example Always On`, `ENERGYPLUS: 26.2`, `SHADING: none (every storey is modelled)`, `WEATHER: none given (…)`, `GROUND: indoor minus 2 C; 20.5, …` (twelve times 20.5: the 21 and 24 °C setpoints' midpoint minus 2), and `FILE: not written (Write is false)` |
 
-The IDF holds 25 `Zone` objects, 150 `BuildingSurface:Detailed`, 20 `FenestrationSurface:Detailed`, 25 each of `People`, `Lights`, `ElectricEquipment`, and `ZoneInfiltration:DesignFlowRate` (the last one per zone, from the envelope preset, in EnergyPlus's air-changes-per-hour method), 25 thermostats with ideal-loads air systems, 8 materials, 1 simple glazing, 7 constructions (the six above and the window construction `Example Double Glazing`), and 4 monthly meters.
+The IDF holds 25 `Zone` objects, 150 `BuildingSurface:Detailed`, 20 `FenestrationSurface:Detailed`, 25 each of `People`, `Lights`, `ElectricEquipment`, and `ZoneInfiltration:DesignFlowRate` (the last one per zone, from the envelope preset, in EnergyPlus's air-changes-per-hour method), 25 thermostats with ideal-loads air systems, 8 materials, 1 simple glazing, 7 constructions (the six above and the window construction `Example Double Glazing`), monthly ground temperatures of 20.5 °C, and the hourly outputs: 5 output variables (the zone mean air temperature and four ideal-loads quantities) and 9 meters (heating, cooling, electricity, interior lights, and interior equipment), with the summary tables and SQLite output.
 
-To write the file, give *Path* a fully qualified path in an existing folder, for example `C:\models\end-to-end.idf`, and set *Write* to `True`; *Written* becomes `True` and *Provenance* ends with `FILE: written C:\models\end-to-end.idf`. Before simulating, add a weather file and the outputs you need; BEMGen does not run EnergyPlus.
+To write the file, give *Path* a fully qualified path in an existing folder, for example `C:\models\end-to-end.idf`, and set *Write* to `True`; *Written* becomes `True` and *Provenance* ends with `FILE: written C:\models\end-to-end.idf`. To simulate, connect a weather file to *Weather*, for example `C:\EnergyPlusV26-2-0\WeatherData\USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw`: the IDF then holds `Site:Location` for Chicago, and *Provenance* holds `WEATHER: USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw sha256 …`. Run it in EnergyPlus 26.2 with the same weather file; BEMGen does not run EnergyPlus.
 
 ## Variations to try
 

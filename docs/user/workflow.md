@@ -183,6 +183,7 @@ Outputs are trees with one branch `{i}` per zone, in building order, except *Pro
 | People Radiant, People Sensible | PR, PS | the occupants' radiant fraction, and their sensible fraction (a number or `autocalculate`) |
 | Water Target, Water Inlet | WT, WI | branch `{i;k}`: 8760 target and inlet temperatures, °C, of hot-water load *k*; empty for other loads |
 | Calendar | Cal | one item: the calendar the schedules were expanded on (year and holidays); none for the built-in presets |
+| Shading | Shd | not per zone: one list of opaque shading surfaces, the outdoor walls of the storeys *Stacked Floor Zone Multiplier* represents but does not model, at their true heights; empty under the other aggregators |
 
 *Infiltration Flows* times *Infiltration Schedule* is the hourly flow of one instance of a zone, and times *Multipliers* the flow of every instance. The infiltration is also written in *Provenance* as `INFILTRATION: <rate> <basis> (EnergyPlus <method>), schedule <name>`.
 
@@ -194,7 +195,7 @@ The two heat-transfer options decide how surfaces between two zones are written;
 
 ## 7. Convert2IDF
 
-*Convert2IDF* (2IDF), panel *5 Convert*, writes an EnergyPlus 25.2 input file: constructions from the envelope preset, ideal-loads HVAC for every conditioned zone, exact hourly schedules, loads, one infiltration object per zone from the envelope preset, internal mass, and zone multipliers. A zone with heating and cooling gets a dual-setpoint thermostat, a zone with one side a single heating or cooling one; the people, lighting, equipment, and hot-water objects take the program's heat fractions, activity, and water temperatures; and the run period's year is that of the building's calendar, or 2007, which starts on a Monday, without one. It does not run EnergyPlus; the file holds only the minimum simulation objects, so add a weather file and the outputs you need before simulating.
+*Convert2IDF* (2IDF), panel *5 Convert*, writes an EnergyPlus 26.2 input file ready to simulate: the site from a weather file when one is given, ground temperatures from the indoor setpoints (the monthly mean minus 2 °C), hourly outputs, constructions from the envelope preset, ideal-loads HVAC for every conditioned zone, exact hourly schedules, loads, one infiltration object per zone from the envelope preset, internal mass, zone multipliers, outdoor surfaces as convex pieces, and the shading of storeys a floor multiplier leaves out. A zone with heating and cooling gets a dual-setpoint thermostat, a zone with one side a single heating or cooling one; the people, lighting, equipment, and hot-water objects take the program's heat fractions, activity, and water temperatures; and the run period's year is that of the building's calendar, or 2007, which starts on a Monday, without one. It does not run EnergyPlus: run the file with the same weather file, for example with EP-Launch or `energyplus -w <file.epw> <file.idf>`. What the outputs are for: [Experiment outputs](../developer/research/experiment-outputs.md).
 
 | Input | Nickname | Default | Meaning |
 | --- | --- | --- | --- |
@@ -206,8 +207,9 @@ The two heat-transfer options decide how surfaces between two zones are written;
 | Path | P | — | Fully qualified path of the file to write (for example `C:\models\linear.idf`), in an existing folder; only used when *Write* is true. |
 | Write | W | false | Write the file to *Path*; when false nothing is written. |
 | Overwrite | O | false | Replace an existing file; when false an existing file is kept and the error `FileExists` is shown. |
+| Weather | Wthr | — | Fully qualified path of an `.epw` weather file (optional): the IDF gets `Site:Location` from it, and the header and *Provenance* name it with its SHA-256. Without it, EnergyPlus takes the location from the weather file it runs with. |
 
-Outputs: *IDF* (the file text; empty when validation blocks the conversion), *Provenance* (provenance, validation report, options, envelope, infiltration, `ENERGYPLUS: 25.2`, any override, and `FILE: written <path>` or `FILE: not written (<reason>)`), and *Written* (whether the file was written in this solution).
+Outputs: *IDF* (the file text; empty when validation blocks the conversion), *Provenance* (provenance, validation report, options, envelope, infiltration, `ENERGYPLUS: 26.2`, `SHADING:`, `WEATHER:`, `GROUND:`, any override, and `FILE: written <path>` or `FILE: not written (<reason>)`), and *Written* (whether the file was written in this solution).
 
 !!! warning "Keep Write off while editing"
     Every solution with *Write* and *Overwrite* both true rewrites the file. Keep *Write* false while you build the definition and read the *IDF* text or wire it into a panel; set *Write* true when you want the file, for example with a *Button* or a *Boolean Toggle*.
@@ -219,7 +221,7 @@ Surface types follow the building: ceilings facing outdoors are written as `Roof
 BEMGen's repository, private for now, has a checker that compares IDF files with the EnergyPlus data dictionary (`Energy+.idd`, shipped with EnergyPlus). With Python 3, in a clone of that repository:
 
 ```bash
-python scripts/idd-check/idd_check.py "C:\EnergyPlusV25-2-0\Energy+.idd" C:\models\linear.idf
+python scripts/idd-check/idd_check.py "C:\EnergyPlusV26-2-0\Energy+.idd" C:\models\linear.idf
 ```
 
 It also takes a folder of IDF files. What it checks and its last run: [IDD check](../developer/architecture/convert2idf.md#idd-check).

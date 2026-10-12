@@ -4,18 +4,18 @@
 
 - Windows with **Rhino 8.19 or later** (Rhino 7 is not supported). Rhino 8 runs plugins on .NET Core by default, which is what BEMGen is built for.
 - Grasshopper, which comes with Rhino 8.
-- To simulate the models later: ClimateStudio (for the output of *Convert2BEM*) or EnergyPlus 25.2 (for the files of *Convert2IDF*). BEMGen itself never runs a simulation.
+- To simulate the models later: ClimateStudio (for the output of *Convert2BEM*) or EnergyPlus 26.2 (for the files of *Convert2IDF*), with a weather file (`.epw`). The plugin itself never runs a simulation.
 
 ## Install the plugin
 
-Download the files of the latest version from the [Releases page](https://github.com/energy-atlas/BEMGen-docs/releases). This guide describes version 1.2.0, which has:
+Download the files of the latest version from the [Releases page](https://github.com/energy-atlas/BEMGen-docs/releases). This guide describes version 1.3.0, which has:
 
-- `bemgen-1.2.0-rh8_19-win.yak`, the Rhino package (`rh8_19` means Rhino 8.19 or later, `win` means Windows);
-- `bemgen-1.2.0-rh8-win.zip`, the same plugin as a folder;
-- `bemgen-1.2.0-examples.zip`, the example definitions;
+- `bemgen-1.3.0-rh8_19-win.yak`, the Rhino package (`rh8_19` means Rhino 8.19 or later, `win` means Windows);
+- `bemgen-1.3.0-rh8-win.zip`, the same plugin as a folder;
+- `bemgen-1.3.0-examples.zip`, the example definitions;
 - `SHA256SUMS.txt`, the checksums of the three files.
 
-Later versions have the same files with their own version number. If you are updating from an earlier version, read [What's new](whats-new.md) first: definitions saved with 1.1.0 open as they were, but those saved with 1.0.2 or earlier lose the infiltration values of their presets.
+Later versions have the same files with their own version number. If you are updating from an earlier version, read [What's new](whats-new.md) first: definitions saved with 1.1.0 or 1.2.0 open as they were, but those saved with 1.0.2 or earlier lose the infiltration values of their presets.
 
 Close Rhino before installing: Grasshopper loads plugins only when it starts. Install BEMGen in one way only; two copies of `BEMGen.gha` register the same components twice.
 

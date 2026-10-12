@@ -106,7 +106,7 @@ Chronological record of project decisions made in conversations, meetings, or re
 
 ### D-016 — Pipeline ends at Grasshopper-ready inputs; no simulation in the pipeline
 
-- **Date:** 2026-09-30 · **Decided by:** Cheng Xuan Li · **Status:** Accepted
+- **Date:** 2026-09-30 · **Decided by:** Cheng Xuan Li · **Status:** Accepted; refined by D-130 (the repository may run EnergyPlus outside the pipeline)
 - The pipeline's deliverable is Grasshopper output usable for (1) visualization and (2) wiring into a ClimateStudio definition. Simulation happens only afterwards, outside the pipeline.
 - ClimateStudio does not need to be run for now; the Stage 0 ClimateStudio capability spike is dropped. Refines D-006.
 
@@ -790,7 +790,7 @@ Chronological record of project decisions made in conversations, meetings, or re
 
 ### D-112 — Convert2IDF scope: EnergyPlus 25.x, an envelope preset, ideal loads, no runs yet
 
-- **Date:** 2026-10-02 · **Decided by:** Cheng Xuan Li · **Status:** Accepted
+- **Date:** 2026-10-02 · **Decided by:** Cheng Xuan Li · **Status:** Accepted; superseded in part by D-130 (EnergyPlus 26.2, weather and outputs chosen, EnergyPlus run in opt-in tests)
 - *Convert2IDF* (S6) targets EnergyPlus 25.x (25.2), and EnergyPlus is not run, neither by tests nor by the component; the IDF is checked as text and by parsing it back.
 - Constructions come from a new typed envelope preset, shared by *Convert2IDF* and *Convert2BEM* and the same at every level of detail.
 - HVAC is ideal loads for conditioned zones (unconditioned zones get none).
@@ -1155,3 +1155,75 @@ Chronological record of project decisions made in conversations, meetings, or re
   - a docs export of `v1.2.0` carries *Program JSON*, the appended inputs and outputs, the new example, and the developer pages to the public site; the docs repository imports it and runs its own `sync-docs`;
   - the release notes say that definitions saved with 1.1.0 open with their values and wires, and that definitions saved before 1.1.0 still lose their presets' infiltration values (D-124).
 - **Open:** the items D-126 leaves to a person in Rhino 8 and to the owner's reading (ADR-018 and the design note's controller choices).
+
+### D-130 — A simulation-ready IDF, the experiment outputs, and an EnergyPlus runner
+
+- **Date:** 2026-10-11 · **Decided by:** Cheng Xuan Li (scope, outputs, reference, ground rule, shading, convex split, the runner's rule change, version 1.3.0 without a tag); the realisation by the controller · **Status:** Accepted; the controller's realisation Provisional, pending the owner's reading
+- **Numbering.** D-128 and D-129 are held by the kept, unmerged branches `feature/program-popup-window` and `feature/program-popup-web` (the owner, 2026-10-11), so this stage takes D-130. Its ADR is [ADR-019](ADR-019-simulation-ready-idf-and-runner.md), the next free number after the archived ADR-016.
+- **Supersedes in part:**
+  - D-112: the EnergyPlus version 25.x, "EnergyPlus is not run", and "no weather, climates, or output selection";
+  - ADR-010: the fixed ground, the monthly meters, and non-convex surfaces left as they are;
+  - ADR-009: the empty gaps of a multiplied storey as part of the geometry effect.
+- **Refines** D-016: simulation stays outside the pipeline, but the repository can run EnergyPlus. GLOBAL.md gains architecture rule 7.
+- **Decided** (design note [2026-10-11-idf-out.md](../plans/2026-10-11-idf-out.md), "Decisions at a glance"):
+  1. *Convert2IDF* targets EnergyPlus 26.2.
+  2. A *Weather* input takes an `.epw` path: `Site:Location` from its header, with its name and SHA-256 in the header and provenance.
+  3. The outputs are the research set of [Experiment outputs](../research/experiment-outputs.md): hourly meters behind heating, cooling, and the total load, written only when used; hourly zone mean air temperature; the summary tables; SQLite; and a case record in the header. That page integrates the owner's specification "Experiment Output Variables" and refines §14 of the research brief:
+     - the reference case is *No Simplification* + *Stack* with both heat-transfer options on;
+     - EUI is reported per conditioned and per total floor area;
+     - the total load is the four facility meters, gas equipment included;
+     - peak duration is counted in hours above the reference's percentiles;
+     - both load-duration-curve measures are computed;
+     - the building temperature is reported over all zones and over conditioned zones;
+     - the metrics are computed in `Lod.Simulation`.
+  4. **Ground: "indoor minus 2 °C".** The building's floor-area-weighted monthly setpoint minus 2 °C, and 18 °C without a conditioned zone. The F-factor method was preferred but needs a sourced F-factor (D-023), and ISO 13370 was judged more than needed.
+  5. **Every non-convex outdoor surface is split** into convex pieces.
+  6. **The storeys a multiplied storey stands for cast shadows**, through shading surfaces at their walls, generated at converter level by *Convert2IDF* and *Convert2BEM* (the research brief's Z5 and V4 changed with it).
+  7. **EnergyPlus runs only outside the pipeline:** `Lod.Simulation` with opt-in tests (`BEMGEN_ENERGYPLUS`) and the C# tool `scripts/eplus-check`; a Grasshopper run component is deferred.
+  8. Finding F1 (slabs between × 1 storeys stay adiabatic under *Stacked Floor Zone Multiplier*) stays a finding.
+  9. The version is 1.3.0, with no tag in this stage.
+- **Built** on `feature/idf-out` (from `main` `3e46108`), as D-111 sets out:
+  - four parts by separate agents (writer, shading, runner, end-to-end set), the first three in parallel worktrees, rebased one after another;
+  - a review by a second agent, whose eight findings were fixed or merged;
+  - the headless Rhino check;
+  - the build log in the design note.
+- **Components and interfaces:**
+  - *Convert2IDF* gains the input *Weather*, and *Convert2BEM* the output *Shading*. Both are appended, both keep definitions saved with 1.2.0 readable, and no GUID changed.
+  - A new library `Lod.Simulation` (`netstandard2.0`, depending only on `Lod.Core`) and its test project.
+  - New diagnostics, among them `InvalidWeatherFile`, `NoWeatherFile`, `GroundTemperatureDefault`, `InfiltrationNotWritten`, `WindowBlocksConvexSplit`, and the runner's codes.
+- **Checks:**
+  - `scripts/verify.ps1` passed with 0 warnings: 629 core, 518 generator, 160 program JSON, 1382 export, 2726 integration, and 136 simulation tests, with the 5 opt-in EnergyPlus tests skipped.
+  - With `BEMGEN_ENERGYPLUS=D:\EnergyPlusV26-2-0`, the 144 simulation tests passed: 110 EnergyPlus cases, each completed with 0 severe errors and only the expected warning, with zones, areas, end uses, internal loads, and the case record checked.
+  - `scripts/eplus-check` passed all 1080 IDFs the export tests write.
+  - `scripts/idd-check` against the EnergyPlus 26.2.0 IDD: 1080 files, 0 problems.
+  - All 16 rhino-smoke specs passed, and the 20 examples reopened and solved.
+  - The fresh-clone gate: a clean clone of `feature/idf-out` at `e84ab84` passed `scripts/verify.ps1` with the same counts and 0 warnings. The tag `v1.3.0` is on the commit that records this gate.
+- **Findings:**
+  - ADR-010's two items "to verify on the first EnergyPlus run" hold: EnergyPlus uses the stated zone floor area, and the window construction named like its glazing runs.
+  - The total load's meters are complete: the end uses sum to it every hour.
+  - The floor aggregators conserve area, volume, and hourly internal loads through EnergyPlus.
+  - With shading, the enclosed court under the multiplier is within +0.09 % heating and +0.58 % cooling of the reference, against −2.9 % and +4.7 % without.
+- **The owner's answers to the build** (2026-10-11):
+  - The ground rule stays as it is. The mapping from zone setpoints to ground temperature is fixed, and that is all that is wanted; the values may differ between zonings, which is one of the differences the study characterises.
+  - Minimum warm-up days stay 6.
+  - The F-factor method, F1, and the run component are set aside for now.
+  - The tag `v1.3.0` is set locally. The branch is not merged or pushed while the owner reviews it by hand.
+- **Open for a person (D-058):** the *Weather* input and *Shading* output in Rhino, a 1.2.0 definition in the editor, and the toolbar look.
+
+### D-131 — Version 1.3.0: the simulation-ready IDF, released with a docs export
+
+- **Date:** 2026-10-12 · **Decided by:** Cheng Xuan Li (reviewed the branch by hand, then asked for the merge, the push, the docs export, and the release on 2026-10-12) · **Status:** Accepted
+- **Version.** 1.3.0, tag `v1.3.0`, a minor version as D-125 reasons: D-064 waives backward compatibility, and the stage changed no GUID. The tag was first set on `2827656` at the owner's request (D-130), before the merge, and was moved to this entry's commit at the release, as for `v1.2.0`. It had never been pushed.
+- **What it merges.** `feature/idf-out` (D-130, [ADR-019](ADR-019-simulation-ready-idf-and-runner.md)), fast-forwarded into `main` at `2827656`; it was 48 commits ahead of `3e46108` and none behind. D-130 stays as written; this entry gives what holds for `main`.
+- **Checks on `main`:**
+  - **Examples.** All 20 example definitions were rebuilt with the 1.3.0 plugin at `2827656` (`BEMGEN_EXAMPLES_WRITE=1`), as `examples/README.md` asks at a release (`035feff`). Every one reopened and solved with one *Validate* True and no warnings, errors, or exceptions, in the rebuild and in a separate reopen.
+  - **Fresh-clone gate.** A clean clone of `main` at `035feff` passed `scripts/verify.ps1` with 0 warnings: 629 core, 518 generator, 160 program JSON, 1382 export, 2726 integration, and 136 simulation tests, with the 5 opt-in EnergyPlus tests skipped. These are the counts D-130 gives.
+- **What follows:**
+  - the release on the docs repository's GitHub Releases (D-118), with the files of `scripts/package-release.ps1` built from the tagged commit: the plugin zip, the `.yak`, the examples zip, and `SHA256SUMS.txt`;
+  - a docs export of `v1.3.0`, which carries the *Weather* input, the *Shading* output, the new developer pages (experiment outputs, the EnergyPlus runner, ADR-019), and the rebuilt examples to the public site; the docs repository imports it and runs its own `sync-docs`;
+  - the release notes say that definitions saved with 1.2.0 open with their values and wires, and that IDFs now target EnergyPlus 26.2.
+- **Open** (from D-130, unchanged):
+  - The e2e set does not check that `eplusout.sql` is written.
+  - `envelope-presets.md` does not yet say that the F-factor method waits for a sourced F value.
+  - `experiment-outputs.md` does not mention the shading of unmodelled storeys.
+  - Set aside by the owner: the F-factor method, F1, and the run component.

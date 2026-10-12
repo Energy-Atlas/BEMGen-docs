@@ -434,6 +434,8 @@ Represent multiple geometrically similar floors using a single simulated floor w
 
 The experiment must clearly distinguish zoning simplification from the multiplier approximation.
 
+The storeys a multiplied storey stands for are not modelled as zones, but they cast shadows (D-130). Both converters write their outdoor walls, at their true elevations, as opaque shading surfaces, so the multiplier approximation does not also remove the building's self-shading. A first EnergyPlus run measured that self-shading: without the shading surfaces, the enclosed court's windows received 6.9 % more sun under the multiplier than with every storey modelled; with them, 0.1 % more.
+
 ### What the zoning levels do to the conditioned floor area
 
 Every zoning level Z0 to Z3, in every variant, conserves the quantities of §17. They differ in how they treat one quantity, the conditioned floor area, which §7 defines through the thermostat of the program (D-038) and validation reports without enforcing.
@@ -544,7 +546,7 @@ Use a single typical floor for the building.
 
 ### V4 — Floor Multiplier
 
-Use EnergyPlus multipliers for repeated floors.
+Use EnergyPlus multipliers for repeated floors. The storeys a multiplied storey stands for cast shadows through shading surfaces at their walls (D-130, see Z5), so that V4 differs from V0 in its thermal zones, not in its self-shading.
 
 This separation allows the study to distinguish:
 
@@ -605,6 +607,17 @@ Weather variation is intended to determine whether geometric simplification erro
 ---
 
 ## 14. Simulation Outputs
+
+> **Required set (D-130).** [Experiment outputs](research/experiment-outputs.md) defines what every simulated case must yield, from the owner's specification of 2026-10-11:
+>
+> - annual heating, cooling, and total loads, absolute and per conditioned floor area;
+> - their maximum, P99, P95, and P90 hourly loads, and the hours of total load above the reference case's percentiles;
+> - hourly CV(RMSE) and the load-duration-curve discrepancy (quantile NRMSE and Kolmogorov–Smirnov) against the reference case;
+> - the area-weighted building temperature;
+> - the runtime;
+> - a case record.
+>
+> It fixes each definition, the EnergyPlus output behind each quantity, and the raw outputs from which every metric is computed. The lists below are the broader set of candidates; an item not on that page is optional until a decision adds it.
 
 The downstream EnergyPlus workflow should collect at least:
 

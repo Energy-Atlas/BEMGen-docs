@@ -20,6 +20,7 @@ These rules apply to every change, by any contributor or agent. If a task seems 
 4. Pipeline objects (`IGeneratedPlan`, `IFloor`, `IGeneratedBuilding`, program presets) are plain C# types. RhinoCommon/Grasshopper types appear only in `Lod.Grasshopper`: Goo wrappers, previews, and `Convert2BEM`.
 5. Tool-specific formats (ClimateStudio inputs, IDF) appear only in the converters, which consume `IGeneratedBuilding`.
 6. Plan generation, plan simplification, floor aggregation, equivalent-property aggregation, validation, and conversion are separate, independently replaceable services.
+7. Simulation is a separate step after conversion, outside the pipeline. `Lod.Simulation` runs EnergyPlus on a written IDF and a weather file and changes no pipeline object. Tests that run EnergyPlus are opt-in; plain `dotnet test` never needs EnergyPlus.
 
 ## Quality rules
 

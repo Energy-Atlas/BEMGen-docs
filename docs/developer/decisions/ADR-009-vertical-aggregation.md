@@ -1,6 +1,6 @@
 # ADR-009: Vertical aggregation geometry
 
-Status: Accepted; superseded in part by [ADR-013](ADR-013-vertical-aggregation-methods.md) and by [ADR-012](ADR-012-centred-windows.md) (windows on rebuilt walls)
+Status: Accepted; superseded in part by [ADR-013](ADR-013-vertical-aggregation-methods.md), by [ADR-012](ADR-012-centred-windows.md) (windows on rebuilt walls), and by [ADR-019](ADR-019-simulation-ready-idf-and-runner.md) (the storeys a multiplied storey stands for cast shadows, D-130: the empty gaps no longer change solar exposure)
 
 Date: 2026-10-01
 

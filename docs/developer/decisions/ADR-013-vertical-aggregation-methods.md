@@ -1,6 +1,6 @@
 # ADR-013: Vertical aggregation methods
 
-Status: Accepted (by the controller under D-075; provisional pending the owner's reading); superseded in part by [ADR-012](ADR-012-centred-windows.md) (windows on rebuilt walls); footprints with holes noted in S8.3; storeys that differ (plans per storey, [ADR-015](ADR-015-plans-per-storey.md)) noted in S8.7
+Status: Accepted (by the controller under D-075; provisional pending the owner's reading); superseded in part by [ADR-012](ADR-012-centred-windows.md) (windows on rebuilt walls); footprints with holes noted in S8.3; storeys that differ (plans per storey, [ADR-015](ADR-015-plans-per-storey.md)) noted in S8.7; unmodelled storeys cast shadows through the converters' shading surfaces since [ADR-019](ADR-019-simulation-ready-idf-and-runner.md) (D-130)
 
 Date: 2026-10-01
 

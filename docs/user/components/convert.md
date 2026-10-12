@@ -15,7 +15,7 @@ Panel *5 Convert* of the BEMGen tab: 2 components. Back to the [component refere
 
 Component · nickname `2BEM` · GUID `d091d70c-4de3-4f29-a900-ea4c9b777ba3` · exposure primary
 
-Building to zone geometry, programs, surfaces, and infiltration as data trees (branch {i} = zone i), ready to wire into a ClimateStudio definition. Outputs: zones, names, space types, multipliers, conditioning, loads, setpoints, surfaces, boundaries, windows, internal mass, provenance, constructions, window constructions, then the envelope's infiltration once (rate, basis, schedule) and each zone's infiltration flow, then the loads' end uses and heat fractions, the zones' dwellings, the occupants' activity and radiant and sensible fractions, the hot-water temperatures, and the building's calendar. Provisional layout.
+Building to zone geometry, programs, surfaces, and infiltration as data trees (branch {i} = zone i), ready to wire into a ClimateStudio definition. Outputs: zones, names, space types, multipliers, conditioning, loads, setpoints, surfaces, boundaries, windows, internal mass, provenance, constructions, window constructions, then the envelope's infiltration once (rate, basis, schedule) and each zone's infiltration flow, then the loads' end uses and heat fractions, the zones' dwellings, the occupants' activity and radiant and sensible fractions, the hot-water temperatures, and the building's calendar, then the shading surfaces of unmodelled storeys. Provisional layout.
 
 **Inputs**
 
@@ -62,6 +62,7 @@ Building to zone geometry, programs, surfaces, and infiltration as data trees (b
 | Water Target | `WT` | Number | tree | {i;k}: 8760 target (mixed-water) temperatures, °C, of hot-water load k of zone i, k counted as in Load Schedules. Empty for loads other than hot water. |
 | Water Inlet | `WI` | Number | tree | {i;k}: 8760 inlet (cold-water supply) temperatures, °C, of hot-water load k of zone i, k counted as in Load Schedules. Empty for loads other than hot water. |
 | Calendar | `Cal` | Text | item | The calendar the building's schedules were expanded on (year and holidays), which Convert2IDF writes as its run period; none for BEMGen's own presets, which assume a year whose 1 January is a Monday. |
+| Shading | `Shd` | Brep | list | Opaque shading surfaces of the storeys the building represents but does not model (Stacked Floor Zone Multiplier): the outdoor walls of each such storey at its true elevation, windows included, facing the way the walls face; empty when every storey is modelled. Not part of any zone. |
 
 **Example definitions:** `branching-mall.gh` ([canvas](../../assets/screenshots/canvas/branching-mall.png)), `cafeteria.gh` ([canvas](../../assets/screenshots/canvas/cafeteria.png)), `care-hub.gh` ([canvas](../../assets/screenshots/canvas/care-hub.png)), `court-cluster.gh` ([canvas](../../assets/screenshots/canvas/court-cluster.png)), `enclosed-court.gh` ([canvas](../../assets/screenshots/canvas/enclosed-court.png)), `end-to-end.gh` ([canvas](../../assets/screenshots/canvas/end-to-end.png)), `foyer-halls.gh` ([canvas](../../assets/screenshots/canvas/foyer-halls.png)), `gallery-bar.gh` ([canvas](../../assets/screenshots/canvas/gallery-bar.png)), `linear-plan.gh` ([canvas](../../assets/screenshots/canvas/linear-plan.png)), `office-plate.gh` ([canvas](../../assets/screenshots/canvas/office-plate.png)), `open-court.gh` ([canvas](../../assets/screenshots/canvas/open-court.png)), `operating-suite.gh` ([canvas](../../assets/screenshots/canvas/operating-suite.png)), `point-plate.gh` ([canvas](../../assets/screenshots/canvas/point-plate.png)), `program-json-office.gh` ([canvas](../../assets/screenshots/canvas/program-json-office.png)), `radial-lobes.gh` ([canvas](../../assets/screenshots/canvas/radial-lobes.png)), `stair-bay-bar.gh` ([canvas](../../assets/screenshots/canvas/stair-bay-bar.png)), `stair-pair.gh` ([canvas](../../assets/screenshots/canvas/stair-pair.png)), `stepped-band.gh` ([canvas](../../assets/screenshots/canvas/stepped-band.png)), `terrace-row.gh` ([canvas](../../assets/screenshots/canvas/terrace-row.png)), `winged-band.gh` ([canvas](../../assets/screenshots/canvas/winged-band.png)).
 
@@ -71,7 +72,7 @@ Building to zone geometry, programs, surfaces, and infiltration as data trees (b
 
 Component · nickname `2IDF` · GUID `56dd6611-90b2-4299-b53c-650652843a1a` · exposure primary
 
-Building to an EnergyPlus 25.2 input file (IDF): constructions from the envelope preset, ideal-loads HVAC for conditioned zones, exact hourly schedules, loads, internal mass, and zone multipliers. EnergyPlus is not run; add a weather file and outputs before simulating.
+Building to an EnergyPlus 26.2 input file (IDF), ready to simulate: constructions from the envelope preset, ideal-loads HVAC for conditioned zones, exact hourly schedules, loads, internal mass, zone multipliers, the research outputs, and the site of the weather file when one is given. EnergyPlus is not run here.
 
 **Inputs**
 
@@ -85,13 +86,14 @@ Building to an EnergyPlus 25.2 input file (IDF): constructions from the envelope
 | Path | `P` | Text | item | yes | – | Absolute path of the IDF file to write, in an existing folder; only used when Write is true. |
 | Write | `W` | Boolean | item | no | `False` | Write the file to Path; when false nothing is written. |
 | Overwrite | `O` | Boolean | item | no | `False` | Replace an existing file at Path; when false an existing file is kept and an error is shown. |
+| Weather | `Wthr` | Text | item | yes | – | Fully qualified path of the EnergyPlus weather file (.epw) the IDF is written for: its location becomes Site:Location, and its name and checksum are recorded. When empty, the IDF has no Site:Location and EnergyPlus takes the location from the weather file it runs with. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
 | IDF | `IDF` | Text | item | The IDF text; empty when the conversion is blocked. |
-| Provenance | `P` | Text | item | Building provenance, validation report, heat-transfer options, envelope preset, EnergyPlus version, any override, and what happened to the file. |
+| Provenance | `P` | Text | item | Building provenance, validation report, heat-transfer options, envelope preset, EnergyPlus version, weather file, ground temperatures, any override, and what happened to the file. |
 | Written | `Wr` | Boolean | item | Whether the file was written in this solution. |
 
 **Example definitions:** `branching-mall.gh` ([canvas](../../assets/screenshots/canvas/branching-mall.png)), `cafeteria.gh` ([canvas](../../assets/screenshots/canvas/cafeteria.png)), `care-hub.gh` ([canvas](../../assets/screenshots/canvas/care-hub.png)), `court-cluster.gh` ([canvas](../../assets/screenshots/canvas/court-cluster.png)), `enclosed-court.gh` ([canvas](../../assets/screenshots/canvas/enclosed-court.png)), `end-to-end.gh` ([canvas](../../assets/screenshots/canvas/end-to-end.png)), `foyer-halls.gh` ([canvas](../../assets/screenshots/canvas/foyer-halls.png)), `gallery-bar.gh` ([canvas](../../assets/screenshots/canvas/gallery-bar.png)), `linear-plan.gh` ([canvas](../../assets/screenshots/canvas/linear-plan.png)), `office-plate.gh` ([canvas](../../assets/screenshots/canvas/office-plate.png)), `open-court.gh` ([canvas](../../assets/screenshots/canvas/open-court.png)), `operating-suite.gh` ([canvas](../../assets/screenshots/canvas/operating-suite.png)), `point-plate.gh` ([canvas](../../assets/screenshots/canvas/point-plate.png)), `program-json-office.gh` ([canvas](../../assets/screenshots/canvas/program-json-office.png)), `radial-lobes.gh` ([canvas](../../assets/screenshots/canvas/radial-lobes.png)), `stair-bay-bar.gh` ([canvas](../../assets/screenshots/canvas/stair-bay-bar.png)), `stair-pair.gh` ([canvas](../../assets/screenshots/canvas/stair-pair.png)), `stepped-band.gh` ([canvas](../../assets/screenshots/canvas/stepped-band.png)), `terrace-row.gh` ([canvas](../../assets/screenshots/canvas/terrace-row.png)), `winged-band.gh` ([canvas](../../assets/screenshots/canvas/winged-band.png)).

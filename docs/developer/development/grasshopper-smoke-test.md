@@ -845,3 +845,39 @@ Rerun after the review fixes, on 2026-10-07 at `0e2a343` (same Rhino): all 14 sp
 #### Result (program JSON)
 
 Run headless (D-111) on 2026-10-07 on `feature/program-json`, with the fixes of `608bbdd` and `bcaaa94`, in Rhino 8.25.25314.11001 on .NET 8.0.31: all 16 specs of `scripts/rhino-smoke` ran to the end (DONE True) with no failed check. `program-json` has 16 scenarios and 57 checks: the Medium Office through *Office Plate*, *No Simplification*, *Stack Floors*, *Validate*, *Convert2BEM*, and *Convert2IDF* against hand values (the loads with their end uses and values, the lighting heat fractions, people, hot-water temperatures, setpoints, the calendar 2007, the run period, the IDF lights and water uses); its overrides and errors; *Load*'s end use and heat fractions and their errors; *Program Preset* heated only; and a per-dwelling preset with a default preset with *Cooling On* false through *Convert2BEM*'s appended outputs and the IDF. The `examples` spec reopened 20 of 20 definitions (the 19 earlier ones and `program-json-office.gh`), each with one *Validate* True. The first examples run stalled for about 10 minutes on the *Grasshopper IO* dialog, which Grasshopper opens for every current parameter without a saved chunk, so all 19 definitions saved with 1.1.0 failed to reopen (the appended inputs and outputs); Rhino was ended with `taskkill` under the owner's permission, and `608bbdd` fixed it by setting the appended parameters aside while the saved ones are read; the `examples` spec now reads each archive first and fails, instead of stalling, when Grasshopper reports a message. Two full runs followed. The first had one failed check in `merge-pieces`: definitions saved before infiltration left the programs have trailing *Infiltration* inputs at the positions of the new *Heating On* and *Cooling On* and were read into them; `bcaaa94` fixed it, and the second run had no failed check. `program-json` also ran alone three times while its checks were written. Only `program-json-office.gh` was rebuilt (`BEMGEN_EXAMPLES_WRITE=1` with `BEMGEN_EXAMPLES_ONLY=program-json-office`); the other 19 were reopened, not rebuilt. The items of this checklist for a person (the layout of the example and the icon, a 1.1.0 definition in the editor, and the `.yak` install) are open.
+
+### Simulation-ready IDF checklist — *Convert2IDF* weather and outputs (D-130)
+
+*Convert2IDF* targets EnergyPlus 26.2, gains the appended input *Weather* (`Wthr`), and writes the research outputs, the ground temperatures "indoor minus 2 °C", and the case record ([convert2idf.md](../architecture/convert2idf.md), [the stage note](../plans/2026-10-11-idf-out.md)). The scripted run is `scripts/rhino-smoke/specs/convert-idf.py`, which adds a run with the Chicago weather file (`BEMGEN_EPW`, by default `D:\EnergyPlusV26-2-0\WeatherData\USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw`), one without, and one with a missing file.
+
+1. Wire the linear plan through *No Simplification* and *Stack Floors* into *Convert2IDF*, *Path* a file outside the repository, *Write* true.
+   - [ ] *Convert2IDF* shows *Weather* (`Wthr`) as its ninth input, optional; its GUID is unchanged.
+   - [ ] Without *Weather*: the remark `No weather file was given …`; the IDF says `EnergyPlus 26.2 input file; no weather file was given …`, has no `Site:Location`, and its header holds `Case weather: none`; *Provenance* holds `WEATHER: none given …` and `GROUND: indoor minus 2 C; 20.5, …`.
+   - [ ] With *Weather* the Chicago file: the IDF has `Site:Location` `Chicago Ohare Intl Ap IL USA` at 41.98, −87.92, time zone −6, 201 m, and the header and *Provenance* name the file with its SHA-256.
+   - [ ] With *Weather* a missing file: an error naming the file, no IDF text, nothing written.
+2. Reopen a definition saved with 1.2.0 that holds *Convert2IDF*.
+   - [ ] It opens without the *Grasshopper IO* message, keeps its wires and values, and *Weather* is unset.
+3. Run a written IDF in EnergyPlus 26.2 with the Chicago file.
+   - [ ] It completes with no severe error, no version warning, and no meter warning.
+
+4. Wire the linear plan (multipliers 1, 2, 1) through *No Simplification* and each floor aggregator into *Convert2BEM* and *Convert2IDF*.
+   - [ ] *Convert2BEM* shows *Shading* as its last output. Under *Stacked Floor Zone Multiplier* it holds the outdoor walls of the unmodelled storey L1 at its true height, and *Provenance* holds `SHADING: …`. Under the other aggregators it is empty, with `SHADING: none (every storey is modelled)`.
+   - [ ] The IDF of *Stacked Floor Zone Multiplier* holds the same surfaces as `Shading:Building:Detailed`, and its header holds `Shading: …`.
+   - [ ] In the viewport the *Shading* surfaces fill the gap between the modelled storeys.
+
+#### Result (simulation-ready IDF)
+
+Run headless (D-111) on 2026-10-11 on `feature/idf-out` at `26644d3`, in Rhino 8: all 16 specs of `scripts/rhino-smoke` ran to the end (DONE True), with no exception, no missing component, no expected error missing, and no failed check.
+
+- **Validate counts, all True:** `any-preset-and-previews` 17, `bar-typologies` 128, `convert-idf` 32, `enclosed-court` 49, `examples` 20, `hub-arms` 324, `linear-and-aggregators` 32, `merge-pieces` 16, `non-rectangular` 146, `office-cafeteria` 98, `operating-suite-court-cluster` 162, `program-json` 4, `program-mix` 4, `stepped-band` 83. `orientation` has none, and `enum-inputs` gave 245 ok, 0 failed.
+- **Runtime errors** appear only in the error scenarios.
+- **Weather in `convert-idf`:**
+  - With the Chicago file the IDF has `Site:Location`, and *Provenance* holds `WEATHER: USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw sha256 c7d4efcf…; Chicago Ohare Intl Ap, IL, USA …` and `GROUND: indoor minus 2 C; 20.5, …`.
+  - Without one, the remark `NoWeatherFile` and `Case weather: none`.
+  - A missing file gives the error `InvalidWeatherFile`, and nothing is written.
+- **Shading in `linear-and-aggregators`:** *Convert2BEM*'s *Shading* holds 20 surfaces under *Stacked Floor Zone Multiplier* and none under the other aggregators.
+- **Convex split:** the converted enclosed-court files report non-convex roofs written as convex pieces (`SurfaceSplit`).
+- **IDD check:** the 35 IDFs the spec wrote pass the EnergyPlus 26.2.0 IDD check with 0 problems.
+- **Saved definitions:** all 20 example definitions, saved with 1.2.0, reopen and solve with *Validate* True and no warning or error, so the appended *Weather* input and *Shading* output keep saved definitions readable.
+
+Open for a person (D-058): items 2 and 4 on the canvas and in the viewport, a 1.2.0 definition in the editor, and the toolbar look.

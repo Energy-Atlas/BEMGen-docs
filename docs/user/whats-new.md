@@ -1,6 +1,29 @@
 # What's new
 
-This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.2.0.
+This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.3.0.
+
+## 1.3.0
+
+Version 1.3.0 makes the file of *Convert2IDF* ready to simulate in EnergyPlus 26.2, with the outputs a comparison of levels of detail needs, and lets the storeys a floor multiplier leaves out cast shadows.
+
+### Convert2IDF
+
+- The IDF targets **EnergyPlus 26.2** (it was 25.2).
+- A new input, *Weather* (Wthr, optional), takes the path of an `.epw` weather file. The IDF then holds `Site:Location` from the file's header, and the header and *Provenance* name the file with its SHA-256. Without one, the remark `NoWeatherFile` says that EnergyPlus takes the location from the weather file it runs with. A file that cannot be read stops the conversion with the error `InvalidWeatherFile`. The weather file itself is still given to EnergyPlus when you run it.
+- The file requests **hourly outputs**: the meters behind heating, cooling, and the total load, written only for what the building uses (so no meter warning for gas a building does not have); the zone mean air temperature of every zone; the ideal-loads heating and cooling of every zone; the annual summary tables; and an SQLite file. What each one is for: [Experiment outputs](../developer/research/experiment-outputs.md).
+- **Ground temperatures** are the building's monthly mean indoor setpoint minus 2 °C (18 °C before; 20.5 °C with the built-in presets). The setpoint is the midpoint of heating and cooling, weighted by floor area over the conditioned zones.
+- **Non-convex outdoor surfaces**, such as the roofs of L-, U-, and court-shaped plans, are written as convex pieces with the same area, so that EnergyPlus computes their shadows correctly. The remark `SurfaceSplit` names them.
+- A zone whose infiltration basis is an exterior area it does not have (an interior core under a per-area basis) gets no infiltration object, since its flow is zero; the remark `InfiltrationNotWritten` names it.
+- The header holds a **case record**: lines naming the building, the zoning, the weather file, and the envelope, so that a simulated file can be identified without Grasshopper.
+- *Provenance* gains the lines `WEATHER:`, `GROUND:`, and `SHADING:`, and says `ENERGYPLUS: 26.2`.
+
+### Shading of unmodelled storeys
+
+*Stacked Floor Zone Multiplier* models one storey for a group of identical storeys. The storeys it leaves out now cast shadows: both converters write their outdoor walls, at their true heights, as opaque shading surfaces. In a courtyard plan this keeps the wings shading each other as they do with every storey modelled. *Convert2BEM* has a new output, *Shading* (Shd, output 31); *Convert2IDF* writes the same surfaces as `Shading:Building:Detailed`. Under the other aggregators *Shading* is empty, because every storey is modelled.
+
+### Opening older definitions
+
+Definitions saved with 1.2.0 or 1.1.0 open as they were, with their values and wires; *Weather* is unset. Definitions saved with 1.0.2 or earlier still lose the infiltration values of their presets, as described under [1.1.0](#definitions-saved-with-an-earlier-version). The example definitions in the examples zip have been rebuilt with 1.3.0.
 
 ## 1.2.0
 

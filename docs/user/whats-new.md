@@ -1,6 +1,24 @@
 # What's new
 
-This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.3.0.
+This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.4.0.
+
+## 1.4.0
+
+Version 1.4.0 lets *Convert2IDF* take its constructions from a construction set instead of an envelope preset.
+
+### Construction JSON
+
+A new component in *1 Program*, *Construction JSON* (CJson), reads the text of a whole-building construction set of the Energy Archetype Atlas into a *Construction Set*: one layered construction per envelope role, the window's glazing and any solar multiplier, the internal-mass data, and the infiltration. *Source*, *Roles*, and *Unused* say what it read and what it could not use. A set for a single dwelling is refused, and a detailed set is read but cannot be converted; connect the whole-building set of the same context instead. See the [component reference](components/program.md#construction-json).
+
+### Convert2IDF
+
+- Two inputs are appended: *Construction* (Cons), the set to use instead of *Envelope* (connect one, not both), and *Fill From Example* (Fill, default false). A role the set lacks but the building needs is an error unless *Fill From Example* is true; the ground always takes the Example envelope's construction, with a remark.
+- With a set, the internal masses are balanced against the set's reference heat capacity: the capacity the building's own walls and slabs do not represent is added as furnishing, wall, and floor mass, and the header lists the balance.
+- A slab inside a zone that spans storeys is written as internal mass of twice its area with half its thickness, so its heat capacity counts once (each face exchanges heat with the zone; EnergyPlus internal mass has one face). This changes the IDF of *Single Zone Building* and *Single Zone per Floor Type* buildings, with any envelope.
+
+### Opening older definitions
+
+Definitions saved with 1.3.0 open as they were, with *Construction* unset and *Fill From Example* false. The example definitions in the examples zip have been rebuilt with 1.4.0.
 
 ## 1.3.0
 

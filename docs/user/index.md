@@ -15,7 +15,7 @@ Read the pages in this order the first time.
 
 2.  [What's new](whats-new.md)
 
-    1.3.0: an IDF ready to simulate, with a *Weather* input, hourly outputs, and shading of the storeys a floor multiplier leaves out. 1.2.0: *Program JSON* and richer programs. 1.1.0: *Conditioned Merge* and *Join Pieces*, *Mix Programs*, and infiltration on *Envelope Preset*. And what happens to definitions saved with an earlier version.
+    1.4.0: *Construction JSON* and a *Construction* input on *Convert2IDF*. 1.3.0: an IDF ready to simulate, with a *Weather* input, hourly outputs, and shading of the storeys a floor multiplier leaves out. 1.2.0: *Program JSON* and richer programs. 1.1.0: *Conditioned Merge* and *Join Pieces*, *Mix Programs*, and infiltration on *Envelope Preset*. And what happens to definitions saved with an earlier version.
 
 3.  [Concepts](concepts.md)
 

@@ -1,6 +1,6 @@
 # ADR-019: A simulation-ready IDF and an EnergyPlus runner
 
-Status: Accepted (the owner's decisions of 2026-10-11; the realisation by the controller, provisional pending the owner's reading)
+Status: Accepted (the owner's decisions of 2026-10-11; the realisation by the controller, provisional pending the owner's reading); refined by [ADR-020](ADR-020-test-suites.md) (D-135): "case" is now "site", and the case record the site record
 
 Date: 2026-10-11
 

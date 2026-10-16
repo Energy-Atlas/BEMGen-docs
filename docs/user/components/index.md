@@ -6,8 +6,8 @@ Every component and parameter of the BEMGen tab in Grasshopper, generated from t
 
 | Panel | Components | Parameters |
 | --- | --- | --- |
-| [0 Info](info.md) | 1 | 7 |
-| [1 Program](program.md) | 5 | 1 |
+| [0 Info](info.md) | 1 | 8 |
+| [1 Program](program.md) | 6 | 1 |
 | [1 Program Presets](program-presets.md) | 19 | 0 |
 | [2 Generate](generate.md) | 19 | 0 |
 | [3 Simplify](simplify.md) | 5 | 0 |
@@ -31,6 +31,8 @@ Every component and parameter of the BEMGen tab in Grasshopper, generated from t
 | ![](../../assets/icons/CleanCorridorPresetComponent.png) | [Clean Corridor Preset](program-presets.md#clean-corridor-preset) | `Clean` | Program Presets |
 | ![](../../assets/icons/ClinicalSupportPresetComponent.png) | [Clinical Support Preset](program-presets.md#clinical-support-preset) | `ClinS` | Program Presets |
 | ![](../../assets/icons/ConditionedMergeComponent.png) | [Conditioned Merge](simplify.md#conditioned-merge) | `Z1c` | Simplify |
+| ![](../../assets/icons/ConstructionJsonComponent.png) | [Construction JSON](program.md#construction-json) | `CJson` | Program |
+| ![](../../assets/icons/ConstructionSetParameter.png) | [Construction Set](info.md#construction-set) | `Cons` | Info |
 | ![](../../assets/icons/Convert2BemComponent.png) | [Convert2BEM](convert.md#convert2bem) | `2BEM` | Convert |
 | ![](../../assets/icons/Convert2IdfComponent.png) | [Convert2IDF](convert.md#convert2idf) | `2IDF` | Convert |
 | ![](../../assets/icons/CorePresetComponent.png) | [Core Preset](program-presets.md#core-preset) | `Core` | Program Presets |

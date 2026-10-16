@@ -106,7 +106,7 @@ Chronological record of project decisions made in conversations, meetings, or re
 
 ### D-016 — Pipeline ends at Grasshopper-ready inputs; no simulation in the pipeline
 
-- **Date:** 2026-09-30 · **Decided by:** Cheng Xuan Li · **Status:** Accepted; refined by D-130 (the repository may run EnergyPlus outside the pipeline)
+- **Date:** 2026-09-30 · **Decided by:** Cheng Xuan Li · **Status:** Accepted; refined by D-130 (the repository may run EnergyPlus outside the pipeline) and D-132 (batches and their results in the repository)
 - The pipeline's deliverable is Grasshopper output usable for (1) visualization and (2) wiring into a ClimateStudio definition. Simulation happens only afterwards, outside the pipeline.
 - ClimateStudio does not need to be run for now; the Stage 0 ClimateStudio capability spike is dropped. Refines D-006.
 
@@ -1227,3 +1227,206 @@ Chronological record of project decisions made in conversations, meetings, or re
   - `envelope-presets.md` does not yet say that the F-factor method waits for a sourced F value.
   - `experiment-outputs.md` does not mention the shading of unmodelled storeys.
   - Set aside by the owner: the F-factor method, F1, and the run component.
+
+### D-132 — The batch runner IdfBatchRunner, with a central DuckDB database per run
+
+- **Date:** 2026-10-12 · **Decided by:** Cheng Xuan Li (a C# command-line tool instead of the Grasshopper run component; hourly results by end use and by fuel; a long table in DuckDB; no case run without a reference; a central database of the useful results with the hourly loads by fuel and by end use, the fuel table stored and never a view over the end uses; one folder per run holding its central database, one folder per case inside it; `--root` or `BEMGEN_RESULTS_ROOT`; `--resume`; `eplus-check` keeps its name; no release); the realisation by the controller · **Status:** Accepted; the controller's realisation Provisional, pending the owner's reading
+- **Refines** D-016 and D-130: running batches of cases and storing their results is now in the repository, in a development tool outside `src/` that is built and tested with the solution but not packaged or released. Analysis stays outside the repository. The Grasshopper run component that ADR-019 deferred stays deferred. No research definition changes: [experiment outputs](../research/experiment-outputs.md) §1 to §8 are computed by the existing `ExperimentMetrics`.
+- **Design note:** [2026-10-12-idf-batch-runner.md](../plans/2026-10-12-idf-batch-runner.md). No ADR: no research rule, pipeline type, component, or GUID changes.
+- **Decided:**
+  1. `scripts/IdfBatchRunner` (`net8.0`, assembly `IdfBatchRunner`) runs a set of *Convert2IDF* files. It groups them by the building, envelope, and weather of their case records. Each group's reference is the case with the zoning line `simplifier NoSimplification; aggregator Stack; IWHT=true FHT=true`. References run first, then the variants of each reference that succeeded. A case without a reference is not run, nor is one with an incomplete record, an unresolved or mismatched weather file, a duplicate, or an ambiguous reference.
+  2. Each run gets `<root>/run_<yyyyMMdd-HHmmss>/` holding `central.duckdb`, `results.duckdb`, and `batch.json`, and a folder per case with EnergyPlus's files, `bemgen-run.json`, `bemgen-hourly.csv` (long), and `bemgen-summary.csv`. The root is `--root`, else `BEMGEN_RESULTS_ROOT`, and never inside the repository.
+  3. **The central database** holds, per successful case (completed, verdict passed, end uses closed), the case record split into its parts, both floor areas, the annual energy of every end use by fuel, every fuel, and the total, every metric of experiment outputs §2 to §6 with its flag, and the hourly loads by fuel (EnergyPlus's four facility meters) and by end use (the six end-use meters), in W. `merge` combines the central files of runs; a case is the same when its case ID and EnergyPlus build are. Schema version 1.
+  4. **The batch database** holds every case given, run or not, with its status, and the 17 hourly series of each completed case as a long table: six end uses by fuel, four fuels, the total, the two sensible diagnostics, and the four building temperatures. It and the case files are expected to be discarded later.
+  5. `DuckDB.NET.Data.Full` 1.5.5 (MIT, with the native DuckDB library) is referenced by the tool and its tests only. `Lod.Simulation` stays `netstandard2.0` and BCL-only and gains the end-use-by-fuel catalogue, the hourly closure check, the run period's timestamps, the batch plan, the zoning line's parts, and the input expansion now shared with `eplus-check`.
+- **Size**, measured on 80 real cases of the 1.3.0 end-to-end set: the central database takes 361 kB per case with 7 of its 10 hourly series non-zero, up to about 0.5 MB with all ten; the batch database 1.27 MB per case.
+- **Built** on `feature/idf-batch-runner` (from `main` `9dcc5d5`), as D-111 sets out: the design note, a test-first build, a review by a second agent whose eleven points were fixed or recorded (the build log of the design note), and `scripts/verify.ps1` (629 core, 518 generator, 160 program JSON, 1382 export, 2726 integration, 176 simulation, and 41 batch-runner tests; the 6 opt-in EnergyPlus tests skipped; 0 warnings). The opt-in test passed on EnergyPlus 26.2.0 build `4bd7a1f26f`: the linear plan's reference and two variants ran, and the orphan did not. A run of the tool on the 110 IDFs of the 1.3.0 end-to-end set ran 80 cases, all of which succeeded. It did not run the 30 without a reference: the Medium Office set, written with the default heat-transfer options, and the overhanging stair-bay bar. Python's `duckdb` 1.5.5 reads both databases. No merge, tag, push, or release.
+
+### D-133 — Test suites: sites, test cases, and a generator of IDFs from a test-suite spec
+
+- **Date:** 2026-10-12 · **Decided by:** Cheng Xuan Li · **Status:** Accepted (the terms and the answers below); the design note's realisation Draft, pending the owner's approval
+- **Terms**, replacing "case" everywhere, in code, databases, the IDF header, and the docs:
+  - a **site** is one building in one zoning, one IDF;
+  - **zoning** is the simplifier with its options, the stacker, and the two heat-transfer options;
+  - a **test case** is one reference site plus at least one test site, differing only in zoning;
+  - a **test suite** is the test cases expanded from one YAML test-suite spec, each test case independent of the others.
+
+  The reference stays *No Simplification*, *Stack*, both heat-transfer options on (D-130); it is always added and never a test site. The storey count is part of a test case, not of its zoning.
+- **Refines** D-132: the batch runner adopts these terms before it merges (D-064 waives backward compatibility), reads the suite's manifest, and keeps only `central.duckdb`, `batch.json`, and the IDFs when the suite asks it to discard EnergyPlus results.
+- **Decided:**
+  1. A new C# tool under `scripts/` writes IDFs only, from a versioned, schema-checked spec. It replaces the Grasshopper workflow for suites.
+  2. **Combination rule.** A list is an axis, combined freely; a map in a list is a fixed bundle; `range` and `zip` are allowed. The axes are combined in full factorial, with no sampling, and the plan with its counts is shown before anything is written.
+  3. One plan generator per suite, with the same simplifier on every floor. Buildings with differing floors, *SteppedBand* among them, wait for a separate spec schema.
+  4. **Programs.** Programs come only from program JSON, local or by URL. A slot may take a weighted mix. A program's climate zones will come from its metadata; a documented placeholder in the spec stands in until then.
+  5. **Schedules.** A program setting, a schedule-generator setting, and a seed give a program with generated schedules. Draws are per zone; a draw is part of a test case, shared by all its sites; seeded sampling exists only inside the schedule generator.
+  6. One calendar per suite, default year 2007. Constructions will be envelope-like files; vintage and other labels are tags only. HVAC stays ideal loads.
+  7. Weather files live in a folder with a registry by climate zone and location.
+  8. Test cases and sites are named by short IDs. One table holds every test case as a row, with the generation parameters as structured columns. The scale is 100 000 sites or more, queried by grouping on any parameter.
+- **Design note:** [2026-10-12-test-suite-generator.md](../plans/2026-10-12-test-suite-generator.md); ADR-020 (the per-zone schedule draw as a pipeline step, and the manifest-based test cases) at the build.
+
+### D-134 — Test suites: the owner's second answers; the schedule generator deferred to a recorded requirement
+
+- **Date:** 2026-10-12 · **Decided by:** Cheng Xuan Li · **Status:** Accepted
+- **Refines** D-133, items 5 and 6. Items 5 and 6 of D-133 stand as requirements; the generator is not designed in the test-suite stage. Programs are used with the schedules their program JSON defines, and a test-suite spec has no schedule section or seed.
+- **The schedule generator's requirement** is recorded in [schedule-generator-requirement.md](../research/schedule-generator-requirement.md).
+  - It runs once per test case (first recorded here as "once per site", a misreading of the owner's answer, corrected the same day before the branch merged).
+  - It generates schedules per zone, with shifted seeds across zones, so that units of the same type differ.
+  - It shares its draws across a test case's sites.
+  - Every site of a test case shares the same schedule sources: a merged zone's schedules aggregate its source zones' draws, so loads stay conserved (GLOBAL scientific rules 1 and 4), though a simplified site's actual schedules may differ.
+- **Decided for the test-suite generator** ([design note](../plans/2026-10-12-test-suite-generator.md)):
+  1. The IDF header's `! Case …` lines become `! Site …`.
+  2. The window-to-wall ratio is a suite axis.
+  3. Labels attach to bundles; a label axis is an error.
+  4. Storeys are explicit floor entries or a count N, meaning ground, N − 2 typical, and top.
+  5. Constructions are the built-in example envelope only, until their schema exists.
+  6. `max_sites` defaults to 20 000.
+  7. The tool is `scripts/TestSuiteGenerator`.
+
+### D-135 — The test-suite generator built, the runner on declared test cases, and the case → site rename
+
+- **Date:** 2026-10-12 · **Decided by:** the owner's decisions in D-133 and D-134; the realisation by the controller · **Status:** Accepted; the controller's realisation Provisional, pending the owner's reading
+- **What it builds** ([design note](../plans/2026-10-12-test-suite-generator.md), [ADR-020](ADR-020-test-suites.md)), on `feature/test-suite-generator`, from `feature/idf-batch-runner`; neither branch is merged:
+  1. **The rename.** "Case" becomes "site" and "group" becomes "test case" across `Lod.Simulation`, `Lod.Export` (the IDF header's `! Site …` lines; 6 snapshots), the batch runner and its databases (central schema version 2), the smoke spec, and the current docs. Past records keep their words.
+  2. **`scripts/TestSuiteGenerator`** writes a suite's IDFs from a YAML spec checked by an embedded schema: 17 generators by name, axes in full factorial with bundles, `range`, and `zip`, program JSON by file or pinned URL, mixes, the climate-zone placeholder, and `max_sites`. A suite folder holds `suite.json`, `suite.duckdb` (one row per test case with typed parameter columns, a long parameter table, and the sites), and `idf/<test case>/<site code>.idf`.
+  3. **The runner's `--suite`** takes membership and references from `suite.json` (`BatchPlan.CreateForTestCases`). It refuses a site changed since it was written (`ModifiedSinceWritten`), copies the suite's tables into the central database with the view `site_results`, merges them across runs, and honours `discard_ep_results`.
+- **Realisation choices** (ADR-020):
+  - test case IDs of 16 hexadecimal digits, not the note's 10, and site codes of 8;
+  - labels left out of the test case ID;
+  - the site ID shared by the generator and the runner;
+  - a test case that cannot generate is `GenerationFailed`.
+- **Checks:** scripts/verify.ps1 passed with 0 warnings (629 core, 518 generator, 160 program JSON, 1382 export, 2726 integration, 180 simulation, 89 test-suite generator, and 52 batch-runner tests). Both opt-in EnergyPlus tests passed on 26.2.0 build `4bd7a1f26f`, among them a generated suite of 8 sites run through the runner. A review by a second agent found no blocking bug. Its eight points are fixed, with tests: constructions by content in the ID, duplicate references, one-program mixes, programs fetched and imported before writing, the zoning columns in `site_results`, failed sites kept on discard, the holidays' order, and long ranges.
+- **Open:**
+  - buildings whose floors differ, among them *SteppedBand*;
+  - the schedule generator ([requirement](../research/schedule-generator-requirement.md));
+  - constructions files and HVAC systems;
+  - the leftover worktree `D:\BEMGen\.claude\worktrees\suite-rename` (branch `feature/suite-rename`), whose content is all in this branch. The owner allowed its removal (2026-10-12), and it was already gone.
+- **Not merged** (the owner, 2026-10-12): `feature/test-suite-generator` and `feature/idf-batch-runner` stay unmerged until the owner says otherwise.
+
+### D-136 — The batch runner and test suites merged into main, without a release
+
+- **Date:** 2026-10-12 · **Decided by:** Cheng Xuan Li (asked for the merge; no release; work continues on `feature/test-suite-generator`) · **Status:** Accepted
+- **What it merges.** `feature/test-suite-generator`, fast-forwarded into `main`. It holds `feature/idf-batch-runner` (D-132) and the test-suite stage (D-133 to D-135, [ADR-020](ADR-020-test-suites.md)): 29 commits ahead of `9dcc5d5` (`v1.3.0`), this record included, and none behind. D-132 to D-135 stay as written; this entry supersedes their "not merged" lines.
+- **No release.** The version stays 1.3.0, with no tag, no docs export, and no release files; the public site follows at the next tagged version. Nothing is pushed: a push needs the owner's yes.
+- **Check before the merge:** `scripts/verify.ps1` on the merged commit (see the roadmap's progress log).
+- **What follows:** work continues on `feature/test-suite-generator` (the owner, 2026-10-12), not on a new branch from `main`. The pilot suite and the deferred designs of D-133 and D-134 come next, at the owner's direction.
+
+### D-137 — Constructions from the atlas's construction JSON: scope, ground, mass residual, fixtures
+
+- **Date:** 2026-10-15 · **Decided by:** Cheng Xuan Li · **Status:** Accepted
+- **Scope.** A stage on `feature/construction-json` (from `main` `b64805c`) imports the atlas's construction JSON (unified first, then detailed) and connects it to *Convert2IDF* through a new *Construction JSON* component and an appended *Construction* input. Program JSON v3, test-suite wiring, and *Convert2BEM* are not part of it. Design note: [2026-10-15-construction-json](../plans/2026-10-15-construction-json.md) (Draft).
+- **Ground.** The atlas's constructions have no ground floor; ground surfaces take the Example envelope's ground floor, with no new input, and the ground-temperature rule of D-130 is unchanged.
+- **Mass residual.** When the geometry's explicit capacity exceeds the atlas's reference budget, no mass is added for that family, explicit mass is kept, and a warning records the overshoot.
+- **Fixtures.** The limited packet the atlas prepares (two construction schemas and the pilot detailed/unified pairs, with manifest and notices) may be committed byte for byte. Nothing else from the atlas.
+- **Branch (the controller's choice, Provisional).** This stage has its own branch rather than `feature/test-suite-generator`, which D-136 keeps for the pilot suite.
+
+### D-138 — Roles a construction JSON lacks but the geometry needs take the Example envelope's construction
+
+- **Date:** 2026-10-15 · **Decided by:** Cheng Xuan Li · **Status:** Accepted
+- **Decision.** When the geometry needs a role whose component the construction JSON marks `not_applicable`, the surface takes the Example envelope's construction for that role. This is the same rule as for the ground (D-137). Each such role is recorded in provenance and raised as a warning. The handover's rule, that a role the set lacks blocks conversion, applies only to components marked `blocked`.
+- **Why.** The atlas's residential pair comes from a single-family detached house, so it has no interior walls, interior floors, or exposed floors. Every BEMGen residential plan has walls and slabs between zones, so blocking would make the residential pair unusable.
+- **Note:** [2026-10-15-construction-json](../plans/2026-10-15-construction-json.md), build log "Part A, the packet, and what it changes", item 6.
+
+### D-139 — The construction JSON stage closed on the unified path, not merged
+
+- **Date:** 2026-10-15 · **Decided by:** Cheng Xuan Li (close the stage on the unified path first; Part E later); the realisation by the controller · **Status:** Accepted; the controller's realisation Provisional, pending the owner's reading
+- **What is built.** On `feature/construction-json`, Parts A to D of the [design note](../plans/2026-10-15-construction-json.md):
+  - **Part A:** the pinned atlas packet, `bemgen-construction-7693e08-v1`.
+  - **Part B:** typed opaque layers (massive, massless, air gap) with surface finishes, and windows of simple or layered glazing, in the envelope and the IDF.
+  - **Part C:** `Lod.ConstructionJson`, which imports the unified `building_level_equivalent` 1.1.0, together with construction sets and the mass ledger in `Lod.Core`, and *Convert2IDF* taking a set.
+  - **Part D:** *Construction JSON* (GUID `b2802511-fee7-49ab-bdcb-9329ce293461`), the parameter *Construction Set* (`ef90ede8-f0ff-4495-822b-11c5e61a6fe5`), and *Convert2IDF*'s appended *Construction* input.
+
+  The rationale is in [ADR-021](ADR-021-construction-sets-and-mass-ledger.md).
+- **Checks.**
+  - `scripts/verify.ps1` passed.
+  - All 17 headless Rhino specs passed, the new `construction-json` among them.
+  - The 168 construction IDFs had 0 IDD problems against 26.2 and all completed in EnergyPlus 26.2.
+  - Each part was reviewed by a second agent and its findings fixed.
+  - The fresh-clone gate passed (see the roadmap's progress log).
+- **Controller choices recorded in the note's build log:**
+  - a zero budget is information;
+  - the finish applies to both faces of a layer;
+  - `InteriorCeiling` is unused;
+  - removed slabs count once in the ledger;
+  - the IDD check allows window names in `SurfaceProperty:IncidentSolarMultiplier`, with evidence;
+  - the strict reader and the schema evaluation of `Lod.ProgramJson` are public and shared;
+  - *Construction JSON* sits in panel *1 Program*.
+- **Not done.** Not merged, tagged, pushed, or released, so the public site still describes 1.3.0. Part E (detailed documents) is open. The open findings are listed in ADR-021.
+
+### D-140 — Residential construction sets: packet v2, opt-in Example fill, attic roofs, adiabatic source floors
+
+- **Date:** 2026-10-15 · **Decided by:** Cheng Xuan Li · **Status:** Accepted. The detection rules in the last bullet are the controller's and are Provisional, pending the owner's reading.
+- **Fixtures.** The atlas packet `bemgen-construction-7693e08-v2` (manifest SHA-256 `5b8dd4cf…`) may be committed whole. It replaces v1, whose files it keeps byte for byte, and adds two residential pairs, `residential-multistorey-garage-4A` and `residential-raised-exposed-floor-1A`.
+- **Example fill is opt-in.** Supersedes D-138's default.
+  - A role or window that the construction set lacks but the building needs is an actionable error by default.
+  - *Convert2IDF* gains *Fill From Example*, default false. When true, such roles take the Example envelope's construction with a warning, as D-138 did.
+  - The ground stays the Example's, with a remark (D-137).
+- **Attic roofs.** Where the source's roof sits over a vented attic, the roof of conditioned zones takes the set's `InteriorCeiling` recipe. This is an approximation that leaves out the attic air and the roof deck, recorded in provenance with a warning. A modelled attic zone is not planned.
+- **Adiabatic source floors.** A residential `InteriorFloor` recipe comes from floors that are adiabatic in the source. With floor heat transfer on, it is still written as a conductive slab, with a warning.
+- **Order.** C2 (the unified fixes) and then E1 (reading the detailed documents) run without a stop in between. E2, the detailed assignment, comes later.
+- **Detection (controller, Provisional).** The unified document carries no space types, so:
+  - an attic roof is read from a `whole_dwelling` set whose `InteriorCeiling` is ready;
+  - a residential interior wall is read as a wall to unconditioned space (a garage), and a residential interior floor as one from adiabatic source floors, both from the `whole_dwelling` scope;
+  - each is recorded as such in provenance. An explicit flag from the atlas would replace these rules.
+
+### D-141 — C2 and E1 closed: residential construction sets converted, detailed documents read, not merged
+
+- **Date:** 2026-10-15 · **Decided by:** the owner's decisions in D-140; the realisation by the controller · **Status:** Accepted; the controller's realisation Provisional, pending the owner's reading
+- **What is built on `feature/construction-json`:**
+  - packet v2 pinned (five pairs);
+  - *Fill From Example* opt-in on *Convert2IDF* (input 10, default false), with the actionable error `ConstructionMissing`;
+  - the residential rules: an attic ceiling as the roof (an approximation), the garage-wall caveat, and the warning on interior floors that are adiabatic in the source, given only when a floor is written conductive;
+  - reading detailed `construction_set` documents into `DetailedConstructionDocument`, all rules, conditions, and geometry instructions kept, with unsupported assemblies as warnings, and the set refused with `ConstructionAssignmentUnavailable`.
+
+  The rationale is in [ADR-022](ADR-022-residential-construction-sets.md).
+- **Checks.**
+  - `scripts/verify.ps1` passed.
+  - All 17 headless Rhino specs passed; `construction-json` has 8 scenarios and 22 checks.
+  - The 284 construction IDFs of C2 had 0 IDD problems and passed in EnergyPlus 26.2.
+  - All ten packet documents parse.
+  - C2 and E1 were each reviewed by a second agent and every finding fixed.
+  - The fresh-clone gate passed (roadmap progress log).
+- **Wording.** D-140's "adiabatic source floors" reads as "mostly adiabatic": the 4A interior floor blends an adiabatic floor between storeys (about 92.5%) with the floor to the garage.
+- **Not done.** Not merged, tagged, pushed, or released. E2, binding detailed conditions to zones, needs its own design note. Open: whether EnergyPlus applies the incident solar multiplier with a blank schedule has not been compared numerically; the `AirGap` and `Gas` property names are assumed.
+
+
+### D-142 — Construction JSON scope: unified building-scope sets only; detailed binding (E2) dropped; single-dwelling sets rejected
+
+- **Date:** 2026-10-16 · **Decided by:** Cheng Xuan Li (answers to the E2 note's questions) · **Status:** Accepted. Supersedes the parts of D-140 and D-141 named here.
+- **Unified only.** BEMGen converts only unified (`building_level_equivalent`) sets, which are space-type agnostic: one assembly per semantic for the whole building. Binding detailed rules to zones (E2) is dropped, and its draft note is superseded. Detailed documents stay readable (E1) for evidence and are never converted.
+- **No single-dwelling sets.** Sets with the scope `whole_dwelling` (the ResStock single-family fixtures) are rejected. BEMGen's residential buildings are apartments, which use building-scope apartment sets, not single-dwelling ones. This supersedes D-140's residential rules (the attic ceiling as the roof, the garage-wall caveat, the adiabatic-source floor warning): with whole-dwelling sets rejected, nothing reaches them.
+- **Unconditioned is unconditioned.** No garage or attic category is modelled.
+- **Windows.** BEMGen windows are fixed. A unified set's window is already resolved by its source's window areas: in the packet, it is the fixed recipe at weight 1.0. So operability raises no question on the unified path.
+- **Kept from D-140:** *Fill From Example* stays opt-in, for a role a building-scope set marks not applicable. The ground stays the Example's (D-137). The branch stays `feature/construction-json`.
+
+### D-143 — Construction packet v3, D-142 in code, removed slabs written once per face, and the solar multiplier checked
+
+- **Date:** 2026-10-16 · **Decided by:** Cheng Xuan Li (commit packet v3; "Fix: half-thickness"; an apartment set has the medium office's schema) · **Status:** Accepted. Refines how D-031 is written in an IDF; D-031's rule (merged slabs become internal mass, keeping their storage and exchange area) stands.
+- **Packet v3 pinned.** `bemgen-construction-7693e08-v3`, manifest SHA-256 `57a71b7c675901d8e36201f6301569c0e626cbd8103fa76550de60ceca92b4f0`, seven pairs: v2's five, byte for byte, plus `midrise-apartment-2019-3B` (scope `building`) and `residential-apartment-unit-1990s-4A` (scope `whole_dwelling`).
+- **The apartment set is the residential case.** The midrise apartment's unified set has the medium office's shape: every role BEMGen uses is ready, its `InteriorWindow` is not applicable with `source_reference_zero_exposure` (valid, and not listed as unused), and it has budgets, furnishings, and a floor-distributed mass. It converts the linear plan on every zoning without *Fill From Example*, and the mass ledger holds on every zoning.
+- **D-142 in code.**
+  - A unified set whose scope is not `building` is refused with `ConstructionJsonScopeNotSupported`. The packet's four single-dwelling sets, the apartment unit among them, are refused; their detailed documents are still read as evidence.
+  - The residential rules of D-140 are removed with their codes: the attic ceiling as the roof, the garage-wall caveat, the adiabatic-source floor warning, `ConstructionApproximation`, and `AdiabaticSourceConducted`.
+- **Removed slabs (the fix).**
+  - EnergyPlus `InternalMass` is one-sided, with an adiabatic back. Writing a removed slab as its full construction on slab area × exposed faces gave each face the whole slab's resistance and stored twice the slab's heat capacity. The mass ledger (D-139) counts the slab's capacity once, so the IDF disagreed with the ledger wherever storeys were merged into one zone.
+  - Now each exposed face is a slice of the slab, `Construction.Sliced(faces)`: a two-face slab is written on twice its area with `"{name} Half"`, whose massive layers have half their thickness and whose massless layers and air gaps have half their resistance. The IDF then holds the slab's capacity once, and each face sees the resistance to the slab's mid-plane.
+  - This is exact for a symmetric slab. For an asymmetric one, such as the Example interior floor (gypsum board, concrete, screed), each half keeps every layer in order, so this is an approximation.
+  - A slice whose massless layer would fall below EnergyPlus's minimum resistance (0.001 m²·K/W) is the error `EnvelopeValue`, naming the layer.
+  - Two IDF snapshots changed (single-zone aggregators). *Convert2BEM*'s *Internal Mass* output is unchanged: it is the exposed area, and its construction is the converter's (D-023).
+- **Solar multiplier checked.** The 5A set's IDF on the linear plan (*No Simplification*, *Stack Floors*) was run for a year in EnergyPlus 26.2 in Golden, CO (TMY3), with and without its 40 `SurfaceProperty:IncidentSolarMultiplier` objects. The windows' transmitted solar (`Surface Window Transmitted Solar Radiation Energy`, summed) was in the ratio 0.8276, the multiplier, with a blank schedule. This closes the open question of D-141 and ADR-021. An end-to-end test now checks that every window gets the set's multiplier.
+- **Deferred by the owner:** Program JSON v3, the test-suite generator's construction input, and *Convert2BEM* with construction sets.
+- **Not done.** Not merged, tagged, pushed, or released.
+
+### D-144 — Version 1.4.0: construction sets from the atlas's construction JSON, released with a docs export
+
+- **Date:** 2026-10-16 · **Decided by:** Cheng Xuan Li (tested the branch in Grasshopper and Rhino, then asked for the merge, the push, the tag, the release with the plugin files, and the docs sync on 2026-10-16) · **Status:** Accepted
+- **Version.** 1.4.0, tag `v1.4.0`, a minor version as D-125 reasons: D-064 waives backward compatibility, and the stage changed no GUID. It adds one component and one parameter (*Construction JSON*, *Construction Set*) and two inputs appended to *Convert2IDF* (*Construction*, *Fill From Example*).
+- **What it merges.** `feature/construction-json` (D-137 to D-143, [ADR-021](ADR-021-construction-sets-and-mass-ledger.md), [ADR-022](ADR-022-residential-construction-sets.md)), fast-forwarded into `main` at `8e03abb`. It was 61 commits ahead of `b64805c` and none behind. `main` also carries the batch runner and the test-suite generator (D-132 to D-136); they are tools, not part of the plugin, and are first tagged here.
+- **Checks on `main`:**
+  - **Examples.** All 20 example definitions were rebuilt with the 1.4.0 plugin (`BEMGEN_EXAMPLES_WRITE=1`, `fd32a54`). Every one reopened and solved with one *Validate* True and no warnings, errors, or exceptions, both in the rebuild and in a separate reopen.
+  - **Fresh-clone gate.** A clean clone of `main` at `fd32a54` (`D:\BEMGen-gate\v1.4.0`) passed `scripts/verify.ps1` with 0 warnings. The counts are 681 core, 518 generator, 160 program JSON, 73 construction JSON, 1739 export, 2726 integration, 180 simulation, 52 batch-runner, and 89 test-suite tests; 7 opt-in EnergyPlus tests were skipped.
+- **What follows:**
+  - the release on the docs repository's GitHub Releases (D-118), with the files of `scripts/package-release.ps1` built from the tagged commit: the plugin zip, the `.yak`, the examples zip, and `SHA256SUMS.txt`;
+  - a docs export of `v1.4.0`, imported by the docs repository, which runs its own `sync-docs`. The owner asked for a minimal change to the hand-written pages: the new component and inputs, and the IDF change. The atlas's data and contracts are not described on the public site.
+- **Release notes.**
+  - Definitions saved with 1.3.0 open as they were, with *Construction* unset and *Fill From Example* false.
+  - IDF files of zonings that merge storeys into one zone change: each slab inside the zone is written as twice its area of half its thickness, so its heat capacity counts once.

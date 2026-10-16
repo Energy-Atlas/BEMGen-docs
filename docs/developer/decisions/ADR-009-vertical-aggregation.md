@@ -1,6 +1,6 @@
 # ADR-009: Vertical aggregation geometry
 
-Status: Accepted; superseded in part by [ADR-013](ADR-013-vertical-aggregation-methods.md), by [ADR-012](ADR-012-centred-windows.md) (windows on rebuilt walls), and by [ADR-019](ADR-019-simulation-ready-idf-and-runner.md) (the storeys a multiplied storey stands for cast shadows, D-130: the empty gaps no longer change solar exposure)
+Status: Accepted; superseded in part by [ADR-013](ADR-013-vertical-aggregation-methods.md), by [ADR-012](ADR-012-centred-windows.md) (windows on rebuilt walls), and by [ADR-019](ADR-019-simulation-ready-idf-and-runner.md) (the storeys a multiplied storey stands for cast shadows, D-130: the empty gaps no longer change solar exposure); refined by D-143 (a removed slab is written once per face in an IDF)
 
 Date: 2026-10-01
 
@@ -102,7 +102,7 @@ Partitions between merged zones are discarded; slabs between storeys become inte
 
 ### Resolved later
 
-- **How internal mass reaches the engines,** as one object with twice the slab area or as one two-sided object: decided for EnergyPlus when Convert2IDF is written (S6, ADR-010), and for ClimateStudio when a reference definition exists (D-023). Until then `Convert2BEM` outputs, per zone, the exposed internal-mass area `SlabArea × ExposedFaces` (provisional, see `docs/architecture/convert2bem.md`).
+- **How internal mass reaches the engines,** as one object with twice the slab area or as one two-sided object: decided for EnergyPlus when Convert2IDF is written (S6, ADR-010), and for ClimateStudio when a reference definition exists (D-023). *(Refined by D-143, 2026-10-16: an EnergyPlus `InternalMass` is one-sided with an adiabatic back, so [Convert2IDF](../architecture/convert2idf.md#removed-slabs-as-internal-mass) writes each exposed face as a half slice of the slab, `Construction.Sliced`, on slab area × faces: massive layers at half thickness, massless layers and air gaps at half resistance. The IDF then holds the slab's heat capacity once, which D-031's rule (storage and exchange area kept) requires; the whole slab on twice its area stored the capacity twice. The record, the rule, and *Convert2BEM*'s exposed area are unchanged.)* Until then `Convert2BEM` outputs, per zone, the exposed internal-mass area `SlabArea × ExposedFaces` (provisional, see `docs/architecture/convert2bem.md`).
 - **The slab construction:** the model has no constructions yet. `InternalMass` carries area, exposed faces, elevation, and source surfaces; the construction is assigned once ADR-010 decides where constructions come from (S6).
 - **How a downstream engine applies `Zone.Multiplier`:** S6 for EnergyPlus, D-023 for ClimateStudio.
 - **Window transformations (W1–W5)** are stage S5 (D-039, gated on ADR-012); the roadmap's working assumption places them on floors after the plan simplifier, before aggregation. Both aggregators keep whatever windows their floors carry.

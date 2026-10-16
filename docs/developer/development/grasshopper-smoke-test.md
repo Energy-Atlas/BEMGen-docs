@@ -852,7 +852,7 @@ Run headless (D-111) on 2026-10-07 on `feature/program-json`, with the fixes of 
 
 1. Wire the linear plan through *No Simplification* and *Stack Floors* into *Convert2IDF*, *Path* a file outside the repository, *Write* true.
    - [ ] *Convert2IDF* shows *Weather* (`Wthr`) as its ninth input, optional; its GUID is unchanged.
-   - [ ] Without *Weather*: the remark `No weather file was given …`; the IDF says `EnergyPlus 26.2 input file; no weather file was given …`, has no `Site:Location`, and its header holds `Case weather: none`; *Provenance* holds `WEATHER: none given …` and `GROUND: indoor minus 2 C; 20.5, …`.
+   - [ ] Without *Weather*: the remark `No weather file was given …`; the IDF says `EnergyPlus 26.2 input file; no weather file was given …`, has no `Site:Location`, and its header holds `Site weather: none`; *Provenance* holds `WEATHER: none given …` and `GROUND: indoor minus 2 C; 20.5, …`.
    - [ ] With *Weather* the Chicago file: the IDF has `Site:Location` `Chicago Ohare Intl Ap IL USA` at 41.98, −87.92, time zone −6, 201 m, and the header and *Provenance* name the file with its SHA-256.
    - [ ] With *Weather* a missing file: an error naming the file, no IDF text, nothing written.
 2. Reopen a definition saved with 1.2.0 that holds *Convert2IDF*.
@@ -881,3 +881,64 @@ Run headless (D-111) on 2026-10-11 on `feature/idf-out` at `26644d3`, in Rhino 8
 - **Saved definitions:** all 20 example definitions, saved with 1.2.0, reopen and solve with *Validate* True and no warning or error, so the appended *Weather* input and *Shading* output keep saved definitions readable.
 
 Open for a person (D-058): items 2 and 4 on the canvas and in the viewport, a 1.2.0 definition in the editor, and the toolbar look.
+
+### Construction JSON checklist — construction sets for *Convert2IDF* (D-137, D-138, D-140, D-142, D-143)
+
+*Construction JSON* in *1 Program* and the appended *Construction* input of *Convert2IDF*. The scripted run is `scripts/rhino-smoke/specs/construction-json.py`, and the reopened definitions are in `examples.py`. The documents are the pinned packet's, in `tests/Lod.ConstructionJson.Tests/Fixtures/packet/examples/`.
+
+#### Toolbar and icons
+
+- [ ] *1 Program* shows *Construction JSON* (nickname `CJson`) with its 24 × 24 icon, braces around a wall section, and no other icon has changed.
+- [ ] Its input is *JSON*; its outputs are *Construction*, *Source*, *Roles*, and *Unused*.
+- [ ] *Convert2IDF* has *Construction* after *Weather*, and *Fill From Example* (false) last.
+
+#### In the editor
+
+1. Put `medium-office-2019-3B.unified.json` in a Panel, wire it into *Construction JSON*, and wire *Construction* into *Convert2IDF*'s *Construction*, with a linear plan through *No Simplification* and *Stack Floors*.
+   - [ ] *Roles* lists the seven roles and the window; *GroundFloor* is `NotApplicable`.
+   - [ ] *Unused* lists the doors, skylights, and tubular devices.
+   - [ ] *Convert2IDF* shows a remark for the ground floor, and *Provenance* has `CONSTRUCTION SET:`.
+   - [ ] The IDF header has `Construction set:`, `Construction roles:`, and `Added mass:` with its ledger.
+2. Repeat with `midrise-apartment-2019-3B.unified.json`, *Fill From Example* false.
+   - [ ] *Convert2IDF* converts with no error and no role taken from the Example.
+   - [ ] With *Single Zone Building* instead of *Stack Floors*, the IDF's slab internal masses use the construction ending in ` Half`.
+   - [ ] With `residential-apartment-unit-1990s-4A.unified.json`, *Construction JSON* reports that a single-dwelling set is not converted.
+3. Connect an *Envelope Preset* to *Envelope* as well.
+   - [ ] *Convert2IDF* reports an error asking to connect one.
+4. Replace the Panel's text with `medium-office-2019-3B.detailed.json`, about 1.5 MB.
+   - [ ] The Panel stays responsive.
+   - [ ] *Construction JSON* reads it with a warning, and *Roles* lists each component with its assignments and conditions.
+   - [ ] *Convert2IDF* reports that it converts only unified building-scope documents and names the unified document to use.
+
+#### Old definitions and the package
+
+- [ ] A definition saved before *Construction* existed opens without the *Grasshopper IO* message and keeps its wires (also checked headless by `examples`).
+- [ ] From the `.yak` (`scripts/package-yak.ps1`) installed in Rhino 8: *Construction JSON* loads and reads the Medium Office document (`Lod.ConstructionJson.dll` is next to `BEMGen.gha`).
+
+#### Result (construction JSON)
+
+Run headless (D-111) on 2026-10-15 on `feature/construction-json`, in Rhino 8: all 17 specs of `scripts/rhino-smoke` ran to the end (DONE True), with no exception, no missing component, no expected error missing, and no failed check.
+
+- **`construction-json`:** 6 scenarios and 12 checks.
+  - The Medium Office set through *Convert2IDF* has massless layers, furnishing and floor-distributed masses, and the fixed 0.10922 air changes in every zone. Its header and provenance name the set, and the ground is a remark.
+  - The residential set gives warnings for the Example interior wall and floor, and 20 windows with 20 multipliers of 0.8276. Its VT is left to EnergyPlus.
+  - The three error scenarios end in their expected errors.
+- **`examples`:** reopened 20 of 20 definitions with *Validate* True. All were saved before *Construction* existed.
+- **Results:** `D:\BEMGen-smoke\construction-json-all`.
+
+Rerun on 2026-10-15 after C2 and E1 (D-141): all 17 specs ran to the end with no failed check. `construction-json` has 8 scenarios and 22 checks:
+- the residential set with and without *Fill From Example*;
+- the garage set without fill;
+- the detailed document, read with a warning and refused by *Convert2IDF*.
+
+`examples` reopened 20 of 20. Results: `D:\\BEMGen-smoke\\construction-json-c2e1`.
+
+Rerun on 2026-10-16 after D-142 and the per-face slab mass (D-143): all 17 specs ran to the end (DONE True), with no exception, no missing component, no expected error missing, and no failed check. `construction-json` has 7 scenarios and 19 checks:
+- the Medium Office set (9 checks, as before);
+- the Midrise Apartment set without *Fill From Example* (6 checks): no error, no role from the Example, the header naming the set, furnishing mass, its fixed air changes, and no solar multiplier;
+- the single-dwelling apartment-unit set, refused by *Construction JSON*, with no fallback to the Example in *Convert2IDF*;
+- the Midrise Apartment's detailed document, read with a warning and refused by *Convert2IDF* (4 checks).
+
+`examples` reopened 20 of 20 with *Validate* True. Results: `D:\\BEMGen-smoke\\d143-all`.
+
+Checked by a person on 2026-10-16: the owner tested the construction JSON components in Grasshopper and Rhino 8 after D-142 and D-143 and reported that they look right. The items were not ticked one by one.

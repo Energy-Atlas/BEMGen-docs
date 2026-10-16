@@ -72,14 +72,14 @@ Building to zone geometry, programs, surfaces, and infiltration as data trees (b
 
 Component · nickname `2IDF` · GUID `56dd6611-90b2-4299-b53c-650652843a1a` · exposure primary
 
-Building to an EnergyPlus 26.2 input file (IDF), ready to simulate: constructions from the envelope preset, ideal-loads HVAC for conditioned zones, exact hourly schedules, loads, internal mass, zone multipliers, the research outputs, and the site of the weather file when one is given. EnergyPlus is not run here.
+Building to an EnergyPlus 26.2 input file (IDF), ready to simulate: constructions from the envelope preset or the construction set, ideal-loads HVAC for conditioned zones, exact hourly schedules, loads, internal mass, zone multipliers, the research outputs, and the site of the weather file when one is given. EnergyPlus is not run here.
 
 **Inputs**
 
 | Name | Nickname | Type | Access | Optional | Default | Description |
 | --- | --- | --- | --- | --- | --- | --- |
 | Building | `Bldg` | [Building](info.md#building) | item | no | – | The building. |
-| Envelope | `Env` | [Envelope Preset](info.md#envelope-preset) | item | yes | – | Envelope preset whose constructions the surfaces, windows, and internal masses get; the illustrative Example Envelope when unconnected. |
+| Envelope | `Env` | [Envelope Preset](info.md#envelope-preset) | item | yes | – | Envelope preset whose constructions the surfaces, windows, and internal masses get; the illustrative Example Envelope when neither this nor Construction is connected. Connect this or Construction, not both. |
 | EnableInternalWallHeatTransfer | `IWHT` | Boolean | item | no | `False` | Write walls between two zones paired with their partner in the adjacent zone; when false they are written Adiabatic. |
 | EnableFloorHeatTransfer | `FHT` | Boolean | item | no | `False` | Write floors and ceilings between two zones paired with their partner in the adjacent zone; when false they are written Adiabatic. |
 | Override | `Ovr` | Boolean | item | no | `False` | Convert even if validation fails; the override is recorded in Provenance and in the IDF header. |
@@ -87,13 +87,15 @@ Building to an EnergyPlus 26.2 input file (IDF), ready to simulate: construction
 | Write | `W` | Boolean | item | no | `False` | Write the file to Path; when false nothing is written. |
 | Overwrite | `O` | Boolean | item | no | `False` | Replace an existing file at Path; when false an existing file is kept and an error is shown. |
 | Weather | `Wthr` | Text | item | yes | – | Fully qualified path of the EnergyPlus weather file (.epw) the IDF is written for: its location becomes Site:Location, and its name and checksum are recorded. When empty, the IDF has no Site:Location and EnergyPlus takes the location from the weather file it runs with. |
+| Construction | `Cons` | [Construction Set](info.md#construction-set) | item | yes | – | Construction set from Construction JSON, used instead of Envelope: its constructions, internal masses balanced against its reference capacity budgets, window solar multiplier, and infiltration. A role it lacks but the building needs stops the conversion unless Fill From Example is true, and the ground takes the Example's with a remark; a blocked role the building needs, or a connected set that fails, stops the conversion, and Override does not change that. Connect this or Envelope, not both. |
+| Fill From Example | `Fill` | Boolean | item | no | `False` | When true, an envelope role or the window that the Construction set lacks but the building needs takes the Example envelope's construction, with a warning. When false, such a role stops the conversion with an error naming it. Has no effect on an envelope preset, which has every role. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
 | IDF | `IDF` | Text | item | The IDF text; empty when the conversion is blocked. |
-| Provenance | `P` | Text | item | Building provenance, validation report, heat-transfer options, envelope preset, EnergyPlus version, weather file, ground temperatures, any override, and what happened to the file. |
+| Provenance | `P` | Text | item | Building provenance, validation report, heat-transfer options, envelope preset or construction set, EnergyPlus version, weather file, ground temperatures, any override, and what happened to the file. |
 | Written | `Wr` | Boolean | item | Whether the file was written in this solution. |
 
 **Example definitions:** `branching-mall.gh` ([canvas](../../assets/screenshots/canvas/branching-mall.png)), `cafeteria.gh` ([canvas](../../assets/screenshots/canvas/cafeteria.png)), `care-hub.gh` ([canvas](../../assets/screenshots/canvas/care-hub.png)), `court-cluster.gh` ([canvas](../../assets/screenshots/canvas/court-cluster.png)), `enclosed-court.gh` ([canvas](../../assets/screenshots/canvas/enclosed-court.png)), `end-to-end.gh` ([canvas](../../assets/screenshots/canvas/end-to-end.png)), `foyer-halls.gh` ([canvas](../../assets/screenshots/canvas/foyer-halls.png)), `gallery-bar.gh` ([canvas](../../assets/screenshots/canvas/gallery-bar.png)), `linear-plan.gh` ([canvas](../../assets/screenshots/canvas/linear-plan.png)), `office-plate.gh` ([canvas](../../assets/screenshots/canvas/office-plate.png)), `open-court.gh` ([canvas](../../assets/screenshots/canvas/open-court.png)), `operating-suite.gh` ([canvas](../../assets/screenshots/canvas/operating-suite.png)), `point-plate.gh` ([canvas](../../assets/screenshots/canvas/point-plate.png)), `program-json-office.gh` ([canvas](../../assets/screenshots/canvas/program-json-office.png)), `radial-lobes.gh` ([canvas](../../assets/screenshots/canvas/radial-lobes.png)), `stair-bay-bar.gh` ([canvas](../../assets/screenshots/canvas/stair-bay-bar.png)), `stair-pair.gh` ([canvas](../../assets/screenshots/canvas/stair-pair.png)), `stepped-band.gh` ([canvas](../../assets/screenshots/canvas/stepped-band.png)), `terrace-row.gh` ([canvas](../../assets/screenshots/canvas/terrace-row.png)), `winged-band.gh` ([canvas](../../assets/screenshots/canvas/winged-band.png)).

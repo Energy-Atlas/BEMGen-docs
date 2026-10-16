@@ -1,22 +1,23 @@
 # Experiment outputs
 
-> **Status:** Draft, from the owner's specification "Experiment Output Variables" (2026-10-11), integrated with BEMGen's model and EnergyPlus 26.2. The reference case, both floor areas, the total load, the thresholds, both discrepancy measures, both temperatures, and the place of the metrics were settled with the owner on 2026-10-11. The rest (the meters behind each quantity, the percentile method, the quantile grid, the zero guards, and the case record) is the controller's realisation, provisional pending the owner's reading. · **Decisions:** D-016, D-038, D-112; new: D-130, ADR-019 · **Applies to:** every EnergyPlus case simulated from a *Convert2IDF* file ([convert2idf.md](../architecture/convert2idf.md)) · **Refines:** §14 of the [research brief](../LOD_geometric_zoning_equivalence_research_brief.md#14-simulation-outputs)
+> **Status:** Draft, from the owner's specification "Experiment Output Variables" (2026-10-11), integrated with BEMGen's model and EnergyPlus 26.2. The reference site, both floor areas, the total load, the thresholds, both discrepancy measures, both temperatures, and the place of the metrics were settled with the owner on 2026-10-11. The rest (the meters behind each quantity, the percentile method, the quantile grid, the zero guards, and the site record) is the controller's realisation, provisional pending the owner's reading. · **Decisions:** D-016, D-038, D-112; new: D-130, ADR-019; terms: D-133 · **Applies to:** every EnergyPlus site simulated from a *Convert2IDF* file ([convert2idf.md](../architecture/convert2idf.md)) · **Refines:** §14 of the [research brief](../LOD_geometric_zoning_equivalence_research_brief.md#14-simulation-outputs)
 
-This page defines what every simulated case must yield, so that each zoning and parameter variant can be compared with the others on the same terms.
+This page defines what every simulated site must yield, so that each test site and parameter variant can be compared with the others on the same terms.
 
 - **Raw outputs** come from EnergyPlus, or are rebuilt from what it writes.
-- **Derived metrics** are computed afterwards from the raw outputs only, by one shared implementation, never inside a test-case generator.
+- **Derived metrics** are computed afterwards from the raw outputs only, by one shared implementation, never inside a test-suite generator.
 
-Every definition below is fixed across all cases: the timestep, the units, the floor-area convention, the percentile method, the quantile grid, and the reference model. Changing one is a research change (GLOBAL.md scientific rule 7): it needs a decision-log entry, and every case it touches is recomputed.
+Every definition below is fixed across all sites: the timestep, the units, the floor-area convention, the percentile method, the quantile grid, and the reference model. Changing one is a research change (GLOBAL.md scientific rule 7): it needs a decision-log entry, and every site it touches is recomputed.
 
 ## Terms
 
-- **Case.** One building (a typology, its generator parameters, and its seed) in one zoning configuration, with one envelope, one weather file, and one set of heat-transfer options, simulated once. A case is identified by its configuration (see [Case record](#7-case-record)).
+- **Site.** One building (a typology, its generator parameters, and its seed) in one zoning configuration, with one envelope, one weather file, and one set of heat-transfer options, simulated once and written as one IDF (D-133, which renamed it from "case"). A site is identified by its configuration (see [Site record](#7-site-record)).
+- **Test case.** One reference site and at least one test site that differ only in zoning (D-133); a batch groups its sites by test case.
 - **Zoning configuration.** The plan simplifier with its options (for example *Join Pieces*), the floor aggregator, and the two heat-transfer options (D-069).
-- **Reference case** (the owner, 2026-10-11). The case every variant is compared against: the same building, envelope, and weather, under *No Simplification* and *Stack*, with **both heat-transfer options on**: *EnableInternalWallHeatTransfer* and *EnableFloorHeatTransfer* (D-069). It is the least simplified and most realistic configuration, the ground truth of the brief's §3. Every zone has multiplier 1, so every wall, floor, and ceiling between zones is paired.
-  - The heat-transfer options of a variant are therefore a factor of the experiment, compared against this one fixed reference.
-  - There is no ground option. Floors on the ground always face `Ground` (ADR-010), in every case.
-  - A reference case is its own reference, so every comparison metric is zero there.
+- **Reference site** (the owner, 2026-10-11). The site every test site is compared against: the same building, envelope, and weather, under *No Simplification* and *Stack*, with **both heat-transfer options on**: *EnableInternalWallHeatTransfer* and *EnableFloorHeatTransfer* (D-069). It is the least simplified and most realistic configuration, the ground truth of the brief's §3. Every zone has multiplier 1, so every wall, floor, and ceiling between zones is paired.
+  - The heat-transfer options of a test site are therefore a factor of the experiment, compared against this one fixed reference.
+  - There is no ground option. Floors on the ground always face `Ground` (ADR-010), in every site.
+  - A reference site is its own reference, so every comparison metric is zero there.
 - **Hour.** One of the 8760 hours of the run period: a full non-leap calendar year (ADR-010, ADR-018). EnergyPlus simulates with 6 timesteps per hour and reports hourly. Every series below has exactly 8760 values.
 - **Hourly load.** The energy of an hour divided by 3600 s, so the mean power over the hour, in W. Annual values are in kWh.
 - **Floor areas** (the owner, 2026-10-11). Every normalised value is reported twice:
@@ -34,13 +35,13 @@ HVAC is ideal loads with no capacity limit (D-112). Its delivered energy is ther
 | Heating load | `Heating:DistrictHeatingWater` | Ideal-loads supply-air total heating, sensible plus latent. `DistrictHeatingWater:Facility` is not used, because it also holds hot water. `Heating:EnergyTransfer` is sensible only; it is kept as a diagnostic. |
 | Cooling load | `Cooling:DistrictCooling` | Ideal-loads supply-air total cooling, sensible plus latent (dehumidification). `Cooling:EnergyTransfer` (sensible only) is kept as a diagnostic. |
 | Total load across all modelled end uses | the sum of `Electricity:Facility`, `NaturalGas:Facility`, `DistrictHeatingWater:Facility`, and `DistrictCooling:Facility` | It covers heating, cooling, interior lighting, interior electric equipment, **interior gas equipment** (`InteriorEquipment:NaturalGas` is on `NaturalGas:Facility`, confirmed in a 26.2 run), hot water, and ventilation fans. It adds thermal loads (heating, cooling, hot water as district energy) to site energy (lighting, equipment) (the owner, 2026-10-11). Because BEMGen conserves installed and hourly scheduled internal loads (GLOBAL.md scientific rule 1), the non-HVAC part is the same hour by hour in every variant of a building, so differences in the total come from heating and cooling. |
-| End uses, for checks | `InteriorLights:Electricity`, `InteriorEquipment:Electricity`, `InteriorEquipment:NaturalGas`, `WaterSystems:DistrictHeatingWater` | They let the post-processing check that the end uses sum to the total and that internal loads are equal across variants. |
+| End uses, for checks | `InteriorLights:Electricity`, `InteriorEquipment:Electricity`, `InteriorEquipment:NaturalGas`, `WaterSystems:DistrictHeatingWater` | They let the post-processing check that the end uses sum to the total and that internal loads are equal across test sites. |
 
 A meter is requested only when the building has its source (EnergyPlus warns about a meter with nothing on it). A missing meter reads as zero every hour.
 
 ## 2. Annual loads
 
-For heating, cooling, and total, per case:
+For heating, cooling, and total, per site:
 
 | Metric | Definition |
 | --- | --- |
@@ -50,7 +51,7 @@ For heating, cooling, and total, per case:
 
 ## 3. Peak loads
 
-For heating, cooling, and total, per case, from the hourly load series (W) of all 8760 hours, zero hours included:
+For heating, cooling, and total, per site, from the hourly load series (W) of all 8760 hours, zero hours included:
 
 | Metric | Definition |
 | --- | --- |
@@ -62,13 +63,13 @@ For the total load, peak duration:
 
 | Metric | Definition |
 | --- | --- |
-| Hours above P99, P95, P90 | the number of hours whose total load is strictly above the **reference case's** P99, P95, or P90 of the total load |
+| Hours above P99, P95, P90 | the number of hours whose total load is strictly above the **reference site's** P99, P95, or P90 of the total load |
 
-The thresholds are taken from the reference case (the owner, 2026-10-11). A case's hours above its own P99 are about 1 % of 8760 by construction, whatever the case, so own-percentile thresholds would carry no information. The reference's thresholds are fixed per building, envelope, weather, and heat-transfer options, and reproducible. The thresholds themselves are kept with the metric.
+The thresholds are taken from the reference site (the owner, 2026-10-11). A site's hours above its own P99 are about 1 % of 8760 by construction, whatever the site, so own-percentile thresholds would carry no information. The reference's thresholds are fixed per building, envelope, weather, and heat-transfer options, and reproducible. The thresholds themselves are kept with the metric.
 
 ## 4. Hourly comparison with the reference
 
-For heating, cooling, and total, each variant against its reference case, hour by hour. y is the variant's hourly load, r the reference's, n = 8760, and r̄ the reference's mean:
+For heating, cooling, and total, each test site against its reference site, hour by hour. y is the test site's hourly load, r the reference's, n = 8760, and r̄ the reference's mean:
 
 | Metric | Definition | Zero guard |
 | --- | --- | --- |
@@ -104,14 +105,14 @@ A zone of zero floor area has zero weight, and a building with no floor area can
 
 Runtime is comparable only between runs made one at a time on the same idle machine with the same EnergyPlus build. Runs made in parallel (for example by `scripts/eplus-check`) record their concurrency, and their runtimes are not used as results.
 
-## 7. Case record
+## 7. Site record
 
-Every case carries enough to identify it without opening Grasshopper (brief §18):
+Every site carries enough to identify it without opening Grasshopper (brief §18):
 
-- **Case ID:** deterministic, the SHA-256 of the IDF text and the weather file's bytes.
+- **Site ID:** deterministic, the SHA-256 of the IDF text and the weather file's bytes.
 - **Building ID:** the typology, the generator's typed parameters, and the seed, from the building's provenance.
 - **Zoning configuration ID:** the simplifier and its options, the aggregator, and the heat-transfer options.
-- **Reference case ID.**
+- **Reference site ID.**
 - **Inputs:** the envelope preset's name, and the weather file's name and SHA-256.
 - **Versions:** BEMGen's code version, and the EnergyPlus version and build.
 - **Parameter values:** the experiment's own parameters.
@@ -121,7 +122,7 @@ Every case carries enough to identify it without opening Grasshopper (brief §18
 
 ## 8. Required raw outputs
 
-What every case keeps, or can rebuild from the files EnergyPlus writes. All derived metrics in §2 to §5 are computed from these only:
+What every site keeps, or can rebuild from the files EnergyPlus writes. All derived metrics in §2 to §5 are computed from these only:
 
 | Raw output | Source |
 | --- | --- |
@@ -131,7 +132,7 @@ What every case keeps, or can rebuild from the files EnergyPlus writes. All deri
 | Total and conditioned floor area | `eplustbl.csv` (*Building Area*) |
 | Runtime | `eplusout.err`, and the runner |
 | Run status: completed, warnings, severe errors | `eplusout.err` |
-| Case record | the IDF header and the runner |
+| Site record | the IDF header and the runner |
 
 `Output:SQLite` is also written for tools outside the repository, but the repository's code reads the text files only, which needs no native library.
 
@@ -151,4 +152,6 @@ The per-zone ideal-loads variables are also requested, as diagnostics. They are 
 - **The IDF:** requests the outputs (`Lod.Export`).
 - **The run and reading the raw outputs:** `Lod.Simulation` (ADR-019, written in the build of the [simulation-ready IDF stage](../plans/2026-10-11-idf-out.md)).
 - **The metrics of §2 to §5:** pure functions over the raw outputs in `Lod.Simulation` (the owner, 2026-10-11), the one tested implementation that the tests, the experiment harness, and the later component share, so that no generator or script computes them its own way. D-130 records this as refining D-016.
-- **Running batches of cases, storing results, and analysis:** outside the repository (D-016).
+- **Running batches of sites and storing their results:** in the repository since D-132, in the batch runner `scripts/IdfBatchRunner` (a development tool, not released), which writes DuckDB databases outside the repository: per run, a central database of the useful results and the hourly loads by fuel and by end use, and a full batch database (`scripts/IdfBatchRunner/README.md`). The definitions on this page do not change.
+- **Writing test suites:** test suites, the test cases and sites that the batch runner then simulates, are written by `scripts/TestSuiteGenerator` (D-133), a development tool that writes IDFs from a YAML spec and runs no EnergyPlus (`scripts/TestSuiteGenerator/README.md`). No definition on this page changes.
+- **Analysis:** outside the repository (D-016).

@@ -56,7 +56,7 @@ The pipeline (D-018) produces plans, floors, and buildings whose zones, surfaces
 | South | [135°, 225°) |
 | West | [225°, 315°) |
 
-**Floors and ceilings** are horizontal polygons at an elevation. Every surface has a boundary condition: outdoors, ground, adiabatic, interzone (naming the adjacent zone), or unresolved (the floors and ceilings of a plan or floor before floors are stacked).
+**Floors and ceilings** are horizontal polygons at an elevation; a ceiling may carry skylights, each a plan polygon inside it (DOE geometry note S5, [ADR-012](ADR-012-centred-windows.md#skylights-doe-geometry-p0b)). Every surface has a boundary condition: outdoors, ground, adiabatic, interzone (naming the adjacent zone), or unresolved (the floors and ceilings of a plan or floor before floors are stacked).
 
 **Windows (D-039).** A window is an explicit rectangle in its wall, given by its `Offset` (the distance along the wall from the wall's start point to the window's near edge), its `SillHeight` above the wall's bottom edge, its `Width`, and its `Height`, all in metres. Offsets and sill heights are not negative; widths and heights are positive. A wall carries any number of windows, ordered by offset, and its glazed area is the sum of their areas. The operations that create or re-host windows keep every window within its wall.
 

@@ -1,6 +1,6 @@
 # ADR-004: Numerical tolerances
 
-Status: Accepted; amended by [ADR-018](ADR-018-program-json-and-extended-programs.md) (a sixth setting, `AbsoluteFraction`, for sums of fractions)
+Status: Accepted; amended by [ADR-018](ADR-018-program-json-and-extended-programs.md) (a sixth setting, `AbsoluteFraction`, for sums of fractions), by D-156 (a seventh, `NegligibleLoadIntensity`, for the denominators of simulation metrics), and by the DOE geometry stage P0a (the acceptance tolerances of the [2026-10-25 design note](../plans/2026-10-25-doe-geometry-generators.md) §5, `Acceptance`)
 
 Date: 2026-10-01
 
@@ -41,7 +41,7 @@ Tolerances are defined in one central configuration and nowhere else (GLOBAL.md 
 
 ## Decision
 
-`Lod.Core.Common.ToleranceSettings` is the only place where tolerances are defined: an immutable class with six values (five when this ADR was written; `AbsoluteFraction` was added in ADR-018), each of which must be positive and finite (the constructor rejects zero, negative, NaN, and infinite values).
+`Lod.Core.Common.ToleranceSettings` is the only place where tolerances are defined: an immutable class with seven values (five when this ADR was written; `AbsoluteFraction` was added in ADR-018, `NegligibleLoadIntensity` in D-156), each of which must be positive and finite (the constructor rejects zero, negative, NaN, and infinite values).
 
 | Setting | Default | Unit | Used for |
 | --- | --- | --- | --- |
@@ -51,12 +51,27 @@ Tolerances are defined in one central configuration and nowhere else (GLOBAL.md 
 | `AbsoluteSchedule` | 1e-9 | unit of the schedule | schedule values |
 | `Angle` | 1e-6 | rad | parallelism and collinearity tests |
 | `AbsoluteFraction` | 1e-9 | — | sums of dimensionless fractions, absolute: a load's heat fractions sum to at most 1 (ADR-018) |
+| `NegligibleLoadIntensity` | 0.01 | W/m² | the reference load intensity at or below which a normalised simulation metric is missing (`NearZeroReference`), not a percentage of almost nothing (D-156, experiment outputs §10) |
 
 - `ToleranceSettings.Default` holds these values. Services receive a `ToleranceSettings` through their constructor; nothing reads tolerances from global state.
 - Relative comparisons use a floor of 1: `|a − b| ≤ rel × max(1, |a|, |b|)` (`AreaEquals` with `RelativeArea`, `LoadEquals` with `RelativeLoad`). Schedule values compare absolutely: `|a − b| ≤ AbsoluteSchedule` (`ScheduleEquals`).
 - Overrides: Grasshopper components use `ToleranceSettings.Default` and expose no tolerance input. A non-default instance may be used only in a research test or through a future explicit input, and its values must then be recorded in the provenance of every object it produced. No override path exists in stages S0 to S4.
 - The relative area tolerance proposed in roadmap v1 and v2 (1e-9) is superseded by 1e-6; the other proposed values stand.
 - A default changes only through a new ADR with a decision-log entry, never to make a test pass (AGENTS.md working rule 12).
+
+**Acceptance tolerances (DOE geometry stage P0a).** How closely a generated model must reproduce figures taken from a source is a tolerance too, so
+the stated tolerances of the DOE reference geometry ([design note](../plans/2026-10-25-doe-geometry-generators.md) §5) live in this configuration,
+as `ToleranceSettings.Acceptance`, an immutable `AcceptanceTolerances` (every value positive and finite), `AcceptanceTolerances.Default` unless a
+settings object is given another. They compare with rounded source figures, not with BEMGen's own arithmetic, so they are far looser than the
+values above and never replace them in a conservation check.
+
+| Setting | Default | Unit | Used for | Comparison |
+| --- | --- | --- | --- | --- |
+| `PlanDistance` | 0.01 | m | T1: plate outlines, elevations, floor heights | absolute (`DistanceEquals`) |
+| `ZoneArea` | 0.1 | m² | T2: zone floor areas; T7: perimeter-core areas | absolute (`ZoneAreaEquals`) |
+| `WallLength` | 0.05 | m | T2: shared and outdoor wall lengths | absolute (`WallLengthEquals`) |
+| `RelativeTotalArea` | 1e-3 | — | T3: floor area in total and per program key | relative with a floor of 1 (`TotalAreaEquals`) |
+| `RelativeGlazingArea` | 1e-2 | — | T4: window area per orientation, skylight area | relative with a floor of 1 (`GlazingAreaEquals`) |
 
 ## Consequences
 

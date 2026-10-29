@@ -98,6 +98,57 @@
 
 > **Progress:** 2026-10-16 · Version 1.4.0 (D-144): the construction JSON stage (D-137 to D-143, [ADR-021](../decisions/ADR-021-construction-sets-and-mass-ledger.md)) fast-forwarded into `main` and released as `v1.4.0` at the owner's request, after the owner's check in Rhino. The 20 example definitions were rebuilt with the 1.4.0 plugin and all reopen and solve with *Validate* True; a clean clone of `main` passes the fresh-clone gate. The release files and a docs export of `v1.4.0` go to the docs repository (D-118). Next: simulation experiments with the runner and the experiment metrics, and sourced envelope values (D-023).
 >
+> **Progress:** 2026-10-18 · The construction foundation v7 stage (D-145, D-146, [ADR-023](../decisions/ADR-023-native-ground-methods-and-packet-v7.md), [design note](2026-10-18-construction-foundation-v7.md)) is built, reviewed by a second agent, and verified on `claude/bemgen-construction-v7-update-bd63b1`; it is not merged, tagged, pushed, or released. Packet v7 replaces v3; foundations are instantiated from declared geometry (the handover's R1 to R6, K1 to K6, and I1 to I6 pass on both representations); *Convert2IDF* writes a v7 set's own F-factor or layered ground floors, with the weather file's ground temperatures for F-factor and 18 °C for layered ground, while Kiva and the C-factor wall are written only outside the pipeline. `scripts/verify.ps1` passed, all 17 headless Rhino specs passed, the IDFs have no IDD problem, and EnergyPlus 26.2 passed every case except the small data centre with Example windows (6 severe errors). Next: the owner's reading, then the merge at the owner's direction; the open items are in ADR-023.
+>
+> **Progress:** 2026-10-19 · The v7 stage is fast-forwarded into `main` (D-150), with its follow-ups:
+> - D-147, a *Convert2IDF* warning when Example windows meet a ground floor that absorbs no solar;
+> - D-148 and D-149: turned court plans run in EnergyPlus, and core ground floors now expose exactly 0;
+> - the shared assignment-selection rule.
+>
+> `scripts/verify.ps1`, the opt-in EnergyPlus suites, and all 17 headless Rhino specs passed. Not pushed, tagged, or released.
+>
+> **Progress:** 2026-10-19 · The suite constructions and ground stage (D-151, [design note](2026-10-19-suite-constructions-ground.md)) is built, reviewed by a second agent, and verified on `feature/test-suite-generator`; it is not merged into `main`.
+> - Test suites take unified construction JSON sets, paired only with weather files of their climate zone.
+> - The research outputs gain the hourly building-level ground heat transfer (experiment outputs §9).
+> - A pilot suite of two F-factor sets ran on EnergyPlus 26.2 with the owner's 3B weather file, every site succeeding.
+>
+> Next: Program JSON 3.0.0, with its own note.
+>
+> **Progress:** 2026-10-22 · After a first mock test suite (1,024 sites, results outside the repository), D-151 is fast-forwarded into `main` (not pushed) and the batch runner's results are redesigned on `feature/runner-site-status` (D-152, D-153), not merged.
+> - Progress lines as each site finishes; sites start in plan order.
+> - A status row for every site in `central.duckdb`.
+> - Central schema version 5 without hourly rows; an hourly Parquet file per site; `raw/` and `failure/` folders; incremental resume.
+> - The mock suite ran in 8 min 24 s with a 3.6 MB central database.
+>
+> **Progress:** 2026-10-22 to 2026-10-25 · The runner stages are merged into `main` and pushed (D-154); merged branches and worktrees are cleaned up, and the program JSON popup branches are kept unmerged on `origin` (D-155).
+>
+> **Progress:** 2026-10-26 · The paired evaluation metrics (D-156, D-157, [design note](2026-10-26-evaluation-metrics.md)) are built, reviewed twice by a second agent, verified, and fast-forwarded into `main` (D-158), not pushed or released.
+> - Experiment outputs §10: the ideal sensible heating and cooling summed over the zones (EnergyPlus already multiplies them by the zone multiplier), their annual, peak, P99/P95/P90 and exceedance, CV(RMSE), NMBE (reference minus site), load-duration-curve NRMSE over the full curve and the top 1, 5, 10 %, and KS against the reference; the conditioned temperature's MBE and RMSE over all hours; the cost with processor time and committed memory; a near-zero guard in `ToleranceSettings`.
+> - The batch runner: central schema version 7 with `metric_definitions`, 20 hourly series, and an optional serial timing pass (`site_timing`).
+> - `scripts/verify.ps1`, the opt-in EnergyPlus suites, and all 17 headless Rhino specs passed.
+>
+> **Progress:** 2026-10-25 · DOE reference geometry generators ([design note](2026-10-25-doe-geometry-generators.md), [ADR-025](../decisions/ADR-025-doe-reference-geometry-generators.md)) on `feature/doe-geom`, not merged into `main`. Stage P0a (D-160, D-161) merged: 15 layout records and answer keys extracted from the DOE reference buildings and the openstudio-standards detailed offices, `GridPlanLayout` with the S3 variation rule, sourced program keys, and the comparison harness; T1–T3 pass for every record except the hospital ground storey (P5).
+>
+> **Progress:** 2026-10-25 · DOE geometry stage P0b (D-162) merged into `feature/doe-geom`: WWR per orientation and skylight ratio on program presets, the S6 glazing reference height, skylights through every simplifier, aggregator, *Convert2IDF* and *Convert2BEM*, and T4 on the source's true outdoor walls; all 15 records pass T2 and T4, with the gap and P5 quantities excluded by reason.
+>
+> **Progress:** 2026-10-26 · DOE geometry stage P5a (D-163, [ADR-026](../decisions/ADR-026-multiplied-rooms.md)) merged into `feature/doe-geom`: zone multipliers on planned zones, one plate with a copy space, the `SelfAdjacent` boundary through validation and both converters, equal-multiplier merging, and T4 through the generators' path with per-key glazing; the hospital and large hotel pass T1–T4.
+>
+> **Progress:** 2026-10-26 · DOE geometry stage P1 (D-164) merged into `feature/doe-geom`: the ring offices (small, medium, large) with the ×10 middle floor as a storey multiplier, the *DOE Program Map* and the DOE generator component base, and S3 amended to slack shares (note §2 and ADR-025 amended, the O3 wording corrected).
+>
+> **Progress:** 2026-10-26 · DOE geometry stage P3 (D-165) merged into `feature/doe-geom`: the school generator (primary and secondary) with its wing count, the spine stretched by slack so every wing keeps its links, and two components.
+>
+> **Progress:** 2026-10-26 · DOE geometry stages P5b (D-166) and P6 (D-167) merged into `feature/doe-geom`: the tower hotel (×4 floor, ×19 rooms) and the hospital (17 multiplied rooms on one plate with a copy space) with their components, and the outpatient (59/41/26 zones) with its component; the full Rhino smoke check passes 22 specs.
+>
+> **Progress:** 2026-10-26 · DOE geometry stage P2 (D-168) merged into `feature/doe-geom`: the restaurants, strip mall, stand-alone retail, supermarket and warehouse generators with six components; the full Rhino smoke check passes 23 specs.
+>
+> **Progress:** 2026-10-26 · DOE geometry stage P4 (D-169) merged into `feature/doe-geom`: the corridor hotel generator of the small hotel with one flexible interval per guest-room bay and its component. Every build stage is merged; the full Rhino smoke check passes 24 specs. Next: the close-out C.
+>
+> **Progress:** 2026-10-26 · DOE geometry stage C (D-170) merged into `feature/doe-geom`: icons for the 15 DOE generator components, *DOE Program Map* and its parameter; the sync-docs pass; the design note Done pending the owner's reading. `scripts/verify.ps1` passes and the full Rhino smoke check passes 24 specs. Every DOE stage is built, not merged into `main`, pushed, or released; what remains is the owner's reading (D-160 to D-170), the atlas inputs A1 to A3, and the items for a person in Rhino 8.
+>
+> **Progress:** 2026-10-26 · DOE geometry stage P7 (D-171) merged into `feature/doe-geom`: fifteen *DOE … Programs* presets in *1 Program Presets*, one ready program map per DOE generator (illustrative example loads, the source's glazing per key, shipped in the layout records); `scripts/verify.ps1` passes and the full Rhino smoke check passes 25 specs.
+>
+> **Progress:** 2026-10-29 · Version 1.5.0 prepared on `release/v1.5.0` from `main` at `54f990d` (D-175): the construction foundation v7, suite, runner, and evaluation-metric stages (D-145 to D-159), the DOE reference geometry generators (D-160 to D-171, PR #1), and the atlas release 2.0.0 contracts with no daylight dimming in IDF runs (D-172 to D-174, PR #2); the 20 examples rebuilt, the full Rhino smoke check passes 25 specs, and the fresh-clone gate passes. Next: the geometric LOD study.
+>
 > **Revisions:** v1 (2026-09-30) initial draft · v2 (2026-09-30) pipeline-first restructure after D-015 to D-024: Grasshopper objects instead of JSON, the D-018 pipeline vocabulary, ClimateStudio output without simulation, precedent study moved after the pipeline works · v3 (2026-10-01) plan review: conditioning from presets (D-038), explicit windows and a separate window-transformation stage S5 with later stages renumbered (D-039), multiplier without multiplied ground or roof (D-040), enforced façade coverage (D-041); facts established while writing the S0–S4 plans · v4 (2026-10-01) plan review: representative storeys at their true elevations (D-045), exposed storeys of multiplied floor types split off automatically so floor types may differ in footprint (D-046, supersedes D-040), loads aggregated per load type and basis (D-047) · v5 (2026-10-01) Checkpoint 1 review: revision stage S4.1 before S5 (D-061 to D-064) · v6 (2026-10-01) S4.1 review: revision stage S4.2 before S5 (D-068 to D-077) · v7 (2026-10-01) windows of merged zones: one centred window per rebuilt wall with the wall's glazed area, window levels W1–W5 dropped, S5 renamed "Centred windows on rebuilt walls" (D-079, ADR-012) · v8 (2026-10-02) precedent source *High-Density Housing*, studied in a separate repository, replaces the S7 research (D-082); one plan generator per typology family (D-083); S8 split into S8.1–S8.3 (D-084) · v9 (2026-10-02) four-source precedent set `SYN-TYP-001`–`019` (D-093), non-residential programs in scope (D-094), plans per storey (D-095), `013` set aside (D-096), department zoning (D-097), sub-stages S8.4–S8.7 before S6 (D-098).
 >
 > **For agentic workers:** this is a stage-level roadmap, not an executable task list. Before starting a stage, write its detailed test-first plan as `docs/plans/YYYY-MM-DD-sN-<stage-name>.md` (bite-sized tasks, exact files, test code, commands), using superpowers:writing-plans, then execute it with superpowers:subagent-driven-development or superpowers:executing-plans.

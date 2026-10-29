@@ -1,6 +1,6 @@
 # ADR-015: Plans per storey
 
-Status: Accepted (by the controller under D-098; provisional pending the owner's reading)
+Status: Accepted (by the controller under D-098; provisional pending the owner's reading); storey multipliers added in DOE geometry stage P1 (2026-10-25, Interface)
 
 Date: 2026-10-02
 
@@ -53,18 +53,19 @@ Through S8.7 the generator component raised each storey's preview by the floor h
 
 - `MultiStoreyPlanGenerator<TParameters, TPresets>` (`Lod.Core.Plans`), with the same constructor arguments, `Name`, `Validate`, and `Describe` as `PlanGenerator<TParameters, TPresets>`, and `Layout(TParameters)` returning `IReadOnlyList<PlanLayout>`, one layout per storey, bottom-up, at least one. `Generate(parameters, presets)` checks `FloorHeight`, `OrientationDegrees`, the family's parameters, and every preset slot once, before any storey is laid out, and fails with all of those errors at once; then it builds each storey as `PlanGenerator` builds its plan, and fails if any storey fails.
 - Every storey has the same `FloorHeight` and `OrientationDegrees`, the parameters' values. A storey's plan, like every plan, lies at elevation 0; the floor aggregators place storey `k` at the sum of the floor heights below it (D-068).
-- **Provenance:** the operation is the generator's `Name`; the parameters are the family's (`Describe`), `FloorHeight`, `OrientationDegrees`, `Presets` as for every plan, non-default limits (ADR-011), `Storey`, the storey index from 0 at the bottom, and `StoreyElevation` (S8.8, D-108), the storey's base elevation in metres, the sum of the floor heights below it (`StoreyProvenance.ElevationKey`).
+- **Storey multipliers (DOE geometry stage P1, 2026-10-25).** A plan may stand for several storeys: `StoreyMultiplier(parameters, k)`, public and virtual, is 1 unless the generator overrides it, and never below 1 (a generator that gives less throws). The DOE large office's middle floor stands for ten storeys. The storeys a plan stands for count in the elevations above it, so `StoreyElevation` is the sum of the floor heights times the multipliers of the plans below; a plan that stands for more than one storey records the number as the provenance parameter `StoreyMultiplier`. The multipliers are the floor entries' multipliers that rebuild the generator's building, and the generator's Grasshopper component outputs them ([doe-components.md](../architecture/doe-components.md)). Every generator before P1 keeps 1 on every storey, so its plans and provenance are unchanged.
+- **Provenance:** the operation is the generator's `Name`; the parameters are the family's (`Describe`), `FloorHeight`, `OrientationDegrees`, `Presets` as for every plan, non-default limits (ADR-011), `Storey`, the storey index from 0 at the bottom, and `StoreyElevation` (S8.8, D-108), the storey's base elevation in metres, the sum of the floor heights below it (`StoreyProvenance.ElevationKey`), each times its storey multiplier; and `StoreyMultiplier` when it is not 1.
 - **Diagnostics:** errors of the parameters and presets are reported once. A diagnostic of one storey (`WindowOmitted`, or an error of its surfaces) keeps its code, severity, and subject, the surface or zone ID within that storey's plan, and its message starts with `Storey {k}: `, so the remarks of several storeys can be told apart.
 - `PlanGenerator` is unchanged in behaviour: its plans, diagnostics, and provenance stay identical.
 
 ### Floor aggregators
 
-No aggregator changes; each takes the storeys as floor entries with multiplier 1, bottom to top:
+No aggregator changes; each takes the storeys as floor entries, bottom to top, each with its storey multiplier: 1 unless the generator says a plan stands for several storeys (`StoreyMultiplier`, Interface above), in which case the aggregator treats it as any multiplied floor (ADR-013). The table is the case of multiplier 1 on every storey:
 
 | Method | Storeys that differ |
 | --- | --- |
 | `Stack` | every storey its own, `L{k}/…`; the covered part of a ceiling is `Interzone` with the zone above, its terrace `Outdoors` |
-| `StackedFloorZoneMultiplier` | every entry has multiplier 1, so every storey is its own group and modelled at its elevation; the result equals `Stack` with every piece between storeys `Adiabatic` (D-075); terraces and roofs kept |
+| `StackedFloorZoneMultiplier` | with multiplier 1 on every entry, every storey is its own group and modelled at its elevation (a storey of multiplier N is a group of N storeys represented at the storey D-045 chooses); the result equals `Stack` with every piece between storeys `Adiabatic` (D-075); terraces and roofs kept |
 | `SingleZonePerFloorType` | one zone `E{k}` per storey (one floor entry each), one part per storey outline, walls rebuilt per outline; the covered part of a slab lies between `E{k}` and `E{k+1}` (`Interzone` pairs), its terrace `Outdoors`; no internal mass |
 | `SingleZoneBuilding` | one zone `BUILDING` with one part per storey outline, walls rebuilt per outline; the covered part of every slab is internal mass, its terrace `Outdoors` |
 
@@ -79,8 +80,8 @@ A terrace is the part of storey `k`'s ceiling that storey `k + 1` does not cover
 ## Consequences
 
 - A family whose plan differs per storey is a `MultiStoreyPlanGenerator`; the sixteen families of one plan and their components are unchanged. `SteppedBandGenerator` (`SYN-TYP-012`, S8.7) is the first such generator.
-- A building of storeys that differ is a list of floor entries with multiplier 1; every simplifier and floor aggregator works on it without change, and the terrace designation is that of D-068.
-- Multipliers above 1 on such storeys are allowed and repeat a storey; they give another building than the generator's, and the Grasshopper wiring gives multiplier 1 unless the user connects multipliers.
+- A building of storeys that differ is a list of floor entries, each with its storey multiplier (1 unless the generator gives another, DOE geometry P1); every simplifier and floor aggregator works on it without change, and the terrace designation is that of D-068.
+- Multipliers other than the generator's storey multipliers are allowed and repeat a storey; they give another building than the generator's. The generator's building takes its storey multipliers: 1 on every storey for the families before P1, which the Grasshopper wiring gives with *Multipliers* unconnected; a DOE generator outputs its multipliers for the aggregator's *Multipliers* ([doe-components.md](../architecture/doe-components.md)).
 - The narrowest storey of a stepped band is its top storey, so *Perimeter Core*'s precondition (D-087) is decided by the top storey; a band too narrow there fails that simplifier on the top storey only (`PlanTooNarrow`).
 - The zone IDs of a storey's plan repeat on every storey (`U1` on each); the aggregators prefix them with `L{k}/` (D-068), so they are unique in the building, as for repeated plans.
-- Changing the interface, the provenance keys `Storey` and `StoreyElevation`, the diagnostic prefix, or the multiplier rule needs a decision-log entry and an update of this ADR.
+- Changing the interface, the provenance keys `Storey`, `StoreyElevation`, and `StoreyMultiplier`, the diagnostic prefix, or the multiplier rule needs a decision-log entry and an update of this ADR.

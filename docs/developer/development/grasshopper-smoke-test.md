@@ -882,9 +882,9 @@ Run headless (D-111) on 2026-10-11 on `feature/idf-out` at `26644d3`, in Rhino 8
 
 Open for a person (D-058): items 2 and 4 on the canvas and in the viewport, a 1.2.0 definition in the editor, and the toolbar look.
 
-### Construction JSON checklist — construction sets for *Convert2IDF* (D-137, D-138, D-140, D-142, D-143)
+### Construction JSON checklist — construction sets for *Convert2IDF* (D-137, D-138, D-140, D-142, D-143, D-145)
 
-*Construction JSON* in *1 Program* and the appended *Construction* input of *Convert2IDF*. The scripted run is `scripts/rhino-smoke/specs/construction-json.py`, and the reopened definitions are in `examples.py`. The documents are the pinned packet's, in `tests/Lod.ConstructionJson.Tests/Fixtures/packet/examples/`.
+*Construction JSON* in *1 Program* and the appended *Construction* input of *Convert2IDF*. The scripted run is `scripts/rhino-smoke/specs/construction-json.py`, and the reopened definitions are in `examples.py`. The documents are the pinned packet v7's (D-145), in `tests/Lod.ConstructionJson.Tests/Fixtures/packet/examples/`.
 
 #### Toolbar and icons
 
@@ -894,18 +894,19 @@ Open for a person (D-058): items 2 and 4 on the canvas and in the viewport, a 1.
 
 #### In the editor
 
-1. Put `medium-office-2019-3B.unified.json` in a Panel, wire it into *Construction JSON*, and wire *Construction* into *Convert2IDF*'s *Construction*, with a linear plan through *No Simplification* and *Stack Floors*.
-   - [ ] *Roles* lists the seven roles and the window; *GroundFloor* is `NotApplicable`.
-   - [ ] *Unused* lists the doors, skylights, and tubular devices.
-   - [ ] *Convert2IDF* shows a remark for the ground floor, and *Provenance* has `CONSTRUCTION SET:`.
+1. Put `medium-office-2019-3B.unified.json` in a Panel, wire it into *Construction JSON*, and wire *Construction* into *Convert2IDF*'s *Construction*, with a linear plan through *No Simplification* and *Stack Floors*, and a weather file in *Weather*.
+   - [ ] *Roles* lists the seven roles and the window; *GroundFloor* is the set's F-factor (`GroundFloor: F-factor 1.26343630645112 W/m-K …; Convert2IDF writes it on GroundFCfactorMethod …`), not `NotApplicable`.
+   - [ ] *Unused* lists the doors, skylights, tubular devices, and `InteriorCeiling`, but not *GroundFloor* (D-145).
+   - [ ] *Convert2IDF* shows no remark for the ground floor; the IDF has `Construction:FfactorGroundFloor` objects, ground floors on `GroundFCfactorMethod`, and `Site:GroundTemperature:FCfactorMethod`; *Provenance* has `CONSTRUCTION SET:` and `GROUND: FCfactorMethod, monthly mean dry-bulb of …`.
+   - [ ] With *Weather* empty, *Convert2IDF* reports `GroundTemperatureWeatherMissing` and writes nothing.
    - [ ] The IDF header has `Construction set:`, `Construction roles:`, and `Added mass:` with its ledger.
-2. Repeat with `midrise-apartment-2019-3B.unified.json`, *Fill From Example* false.
+2. Repeat with `retained-midrise-apartment-2019-3B.unified.json`, *Fill From Example* false.
    - [ ] *Convert2IDF* converts with no error and no role taken from the Example.
    - [ ] With *Single Zone Building* instead of *Stack Floors*, the IDF's slab internal masses use the construction ending in ` Half`.
-   - [ ] With `residential-apartment-unit-1990s-4A.unified.json`, *Construction JSON* reports that a single-dwelling set is not converted.
+   - [ ] With `retained-residential-apartment-unit-1990s-4A.unified.json`, *Construction JSON* reports that a single-dwelling set is not converted.
 3. Connect an *Envelope Preset* to *Envelope* as well.
    - [ ] *Convert2IDF* reports an error asking to connect one.
-4. Replace the Panel's text with `medium-office-2019-3B.detailed.json`, about 1.5 MB.
+4. Replace the Panel's text with `medium-office-2019-3B.detailed.json`, about 0.5 MB.
    - [ ] The Panel stays responsive.
    - [ ] *Construction JSON* reads it with a warning, and *Roles* lists each component with its assignments and conditions.
    - [ ] *Convert2IDF* reports that it converts only unified building-scope documents and names the unified document to use.
@@ -942,3 +943,235 @@ Rerun on 2026-10-16 after D-142 and the per-face slab mass (D-143): all 17 specs
 `examples` reopened 20 of 20 with *Validate* True. Results: `D:\\BEMGen-smoke\\d143-all`.
 
 Checked by a person on 2026-10-16: the owner tested the construction JSON components in Grasshopper and Rhino 8 after D-142 and D-143 and reported that they look right. The items were not ticked one by one.
+
+Rerun headless on 2026-10-18 after packet v7 and the native ground (D-145, D-146) on `claude/bemgen-construction-v7-update-bd63b1`: all 17 specs ran to the end and passed. `construction-json` has 23 checks, all ok; they include the office's F-factor ground floors on `GroundFCfactorMethod`, the Chicago ground temperatures, the *Roles* line for the ground floor, and the error for an F-factor set without *Weather*. Results: `D:\BEMGen-smoke\foundation-v7-rhino-2`. Not yet checked by a person in Grasshopper and Rhino 8.
+
+### Glazing per orientation and skylights checklist (DOE geometry P0b)
+
+The appended glazing inputs of the default preset components, *Program Preset*, and *Program JSON*, and skylights in *Convert2BEM*, the previews, and *Convert2IDF* ([design note](../plans/2026-10-25-doe-geometry-generators.md) S5, S6; [ADR-012](../decisions/ADR-012-centred-windows.md#skylights-doe-geometry-p0b)). No component is added or removed and no GUID or icon changes. The scripted run is `scripts/rhino-smoke/specs/glazing.py`; `examples.py` reopens the saved definitions.
+
+- [ ] Every default preset component (*Dwelling Unit Preset* … *Service Preset*), *Program Preset*, and *Program JSON* end with *WWR North*, *WWR East*, *WWR South*, *WWR West* (WWRN … WWRW, optional) and *Skylight Ratio* (SR; 0 on the default presets, unset on the other two); the earlier inputs keep their order and defaults.
+- [ ] *Office Preset* with *WWR North* 0.1 and *Skylight Ratio* 0.05 shows `Preset Example Office (Office, WWR N 0.1, E 0.4, S 0.4, W 0.4, skylight ratio 0.05)`; with nothing connected it shows `(Office, WWR 0.4)` as before.
+- [ ] Through *Office Plate*, *No Simplification*, and *Stack Floors* (multiplier 3), the viewport preview shows one blue skylight on the top roof of the office ring and none on the lower ceilings; *Convert2BEM*'s *Windows* holds it after the zone's wall windows, facing up, with the window construction in *Window Constructions*; *Validate* passes.
+- [ ] *Convert2IDF* writes the skylight as a `FenestrationSurface:Detailed` of type `Window` named `…/Sky1` in a roof piece; EnergyPlus runs the file without a severe error.
+- [ ] *Skylight Ratio* 1 and *WWR East* 1.5 each give an error naming the ratio.
+- [ ] A definition saved before this stage (any example) opens without the *Grasshopper IO* message and keeps its wires and values.
+
+#### Result (glazing and skylights)
+
+Run headless (D-111) on 2026-10-25 on `feature/doe-geom-p0b`: all 18 specs of `scripts/rhino-smoke` ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check, on the working tree of `248ae2f` before the edge-midpoint grid of `dc2c285`; `glazing` ran again alone on `248ae2f` itself with the same result. `glazing` has 6 scenarios and 10 checks: the appended inputs of *Office Preset*, *Program Preset*, and *Program JSON*; the skylit *Office Plate* (ratios and skylight ratio on the preset, *Validate* True, one skylight facing up in *Convert2BEM*'s *Windows* with its window construction, one `Window` in a roof in the IDF); *Program JSON*'s glazing and its provenance; and the two expected errors. `examples` reopened 20 of 20 definitions with *Validate* True. The items for a person (the viewport preview, an EnergyPlus run of a skylit IDF, the editor) are open.
+
+Rerun headless on 2026-10-25 on `9b2b28e`, after review round 1 (equal orientation inputs, court cuts along either axis): all 18 specs ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check; the runtime errors are those of the expected-error scenarios, as before. `glazing` has 7 scenarios and 11 checks, the new one being four orientation inputs at 0.2 beside *WWR* 0.4, which give a preset of WWR 0.2. `examples` reopened 20 of 20 with *Validate* True.
+
+Rerun headless on 2026-10-25 on `5cd2cc5`, after the merge of `feature/doe-geom` (P0a) and the T4 harness: all 18 specs ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check; the runtime errors are those of the expected-error scenarios, the same as on `9b2b28e`. `glazing` 7 scenarios and 11 checks, `program-json` 57 checks, `program-mix` 76, `enum-inputs` 245, all ok; `examples` reopened 20 of 20 with *Validate* True. Review round 2 changed no component, so the run was not repeated.
+
+### DOE offices checklist (DOE geometry P1)
+
+*DOE Program Map* and the three DOE office components, the first DOE generators ([doe-components.md](../architecture/doe-components.md),
+[doe-ring-office.md](../architecture/doe-ring-office.md)). Four components and one parameter are added; no existing GUID, input, or icon changes.
+The scripted run is `scripts/rhino-smoke/specs/doe-offices.py`.
+
+- [ ] *2 Generate* shows a group of its own after the precedent generators with *DOE Small Office*, *DOE Medium Office*, and *DOE Large Office*; *1 Program* shows *DOE Program Map*; each has its own icon.
+- [ ] Each office's inputs, in order: Storeys, Plate Length, Plate Depth, Perimeter Depth, Corridor Width, Floor Height, Orientation (with its record's defaults), Program Map, Preview Location; outputs *Plan* (list), *Multipliers* (list), *Program Keys* (list).
+- [ ] An office without a *Program Map* lists its keys in *Program Keys* (9 small, 11 medium, 13 large) and shows the error asking for a map of that many keys.
+- [ ] An office whose *Plate Length* is wired to a source without data still lists its keys and names *Plate Length* in an error.
+- [ ] *Program Keys* of one office copy into *DOE Program Map*'s *Keys*, with one *Any Program Preset* (an *Office Preset*) in *Presets*, give a map that, on a second copy of the office, gives its plans; the viewport shows the medium office's three storeys and the large office's ground, middle, and top plans at 0, 3.96, and 43.60 m.
+- [ ] *Plan* through *No Simplification* into *Stack Floors*, with *Multipliers* wired into *Multipliers*, gives the whole building (the large office's twelve storeys); *Validate* passes.
+- [ ] *Stacked Floor Zone Multiplier* with the same wiring draws the large office's middle floor once (storey 6, D-045) and its nine other storeys as unmodelled grey.
+- [ ] *Plate Length* 15 on the small office, *Storeys* 2 on the large office, a map without a key the plans need, and a map with a repeated key each give an error naming the cause.
+
+#### Result (DOE offices)
+
+Run headless (D-111) on 2026-10-26 on `36a61d8` of `feature/doe-geom-p1`, after review round 1 and the merge of `feature/doe-geom` (P5a): all 19
+specs of `scripts/rhino-smoke` ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check;
+no *Validate* output was False. `doe-offices` has 16 scenarios, 83 *Validate* outputs True, and 14 checks: the large office's three plans,
+multipliers 1, 10, 1, its 13 keys, storey elevations 0, 3.9632, and 43.5952 m, the 312 zones of *Stack Floors*, the middle plan at 19.816 m on
+storey 5, the zone multiplier's storeys 0, 6, and 11; *Validate* True on all 16 buildings of each of the five simplifier × aggregator matrices
+(small, medium, large, medium at 30°, large with six storeys); and an office whose *Plate Length* is wired to a source without data still listing
+its 9 keys. Its 20 runtime errors are those of the expected-error scenarios and of the first office copy that lists the keys without a map. `examples`
+reopened 20 of 20 definitions with *Validate* True. The items for a person (the toolbar group and icons, the previews in the viewport) are open.
+
+### DOE schools checklist (DOE geometry P3)
+
+*DOE Primary School* and *DOE Secondary School* ([doe-school.md](../architecture/doe-school.md), [doe-components.md](../architecture/doe-components.md)).
+Two components are added; no existing GUID, input, or icon changes. The scripted run is `scripts/rhino-smoke/specs/doe-schools.py`.
+
+- [ ] *2 Generate*'s DOE group shows *DOE Primary School* and *DOE Secondary School* beside the offices; each has its own icon.
+- [ ] Each school's inputs, in order: Wing Count, Length, Corridor Width, Classroom Depth, Floor Height, Orientation (with its record's defaults: 3, 104 or 141, 3 or 5, 9, 4, 0), Program Map, Preview Location; outputs *Plan* (list), *Multipliers* (list), *Program Keys* (list).
+- [ ] A school without a *Program Map* lists its keys in *Program Keys* (9 primary, 12 secondary) and shows the error asking for a map of that many keys.
+- [ ] *Program Keys* of one school copy into *DOE Program Map*'s *Keys*, with one *Any Program Preset* in *Presets*, give a map that, on a second copy, gives its plans; the viewport shows the primary school's three wings west of the spine and the secondary school's first floor over its ground storey at 4 m.
+- [ ] *Wing Count* 6 gives six wings, the main corridor running past every middle wing.
+- [ ] *Plan* through *No Simplification* into *Stack Floors*, with *Multipliers* wired, gives the building; *Validate* passes.
+- [ ] *Wing Count* 1, *Corridor Width* 0.4, and *Classroom Depth* 1.9 each give an error naming the cause; *Perimeter Core* at 4.57 m on the secondary school is `PlanTooNarrow`, at 4 m it passes.
+
+#### Result (DOE schools)
+
+Run headless (D-111) on 2026-10-26 on `6598d84` of `feature/doe-geom-p3`, after the merge of `feature/doe-geom` (P1): all 20 specs of
+`scripts/rhino-smoke` ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check; no
+*Validate* output was False. `doe-schools` has 13 scenarios, 66 *Validate* outputs True, and 18 checks: the primary school's one plan of 25 zones,
+6871 m², multiplier 1, and 9 keys in ordinal order; at six wings 40 zones, the main corridor to 144 m, and five `_Wing5` copies; the secondary
+school's plans of 25 and 21 zones, multipliers 1, 1, 12 keys, storey elevations 0 and 4 m, 46 zones in *Stack Floors*, the gym one 4 m storey
+high, and *Validate* True; *Validate* True on all 16 buildings of each of the four simplifier × aggregator matrices (primary, secondary with
+*Perimeter Core* at 4 m, primary at 30°, secondary with six wings). Its 18 runtime errors are those of the expected-error scenarios (one wing, a
+0.4 m corridor, a 1.9 m classroom row, *Perimeter Core* at 4.57 m on the secondary school) and of the first school copies that list the keys
+without a map. `doe-offices` was unchanged (16 scenarios, 83 *Validate* True, 14 checks ok); `examples` reopened 20 of 20 definitions with
+*Validate* True. The items for a person (the toolbar group and icons, the previews in the viewport) are open.
+
+### DOE multiplied-room checklist (DOE geometry P5b)
+
+*DOE Large Hotel* and *DOE Hospital*, the DOE generators of multiplied rooms ([doe-components.md](../architecture/doe-components.md),
+[doe-tower-hotel.md](../architecture/doe-tower-hotel.md), [doe-hospital.md](../architecture/doe-hospital.md)). Two components are added; no
+existing GUID, input, or icon changes. The scripted run is `scripts/rhino-smoke/specs/doe-multiplied-rooms.py`.
+
+- [ ] *2 Generate*'s DOE group shows *DOE Large Hotel* and *DOE Hospital*, each with its own icon.
+- [ ] *DOE Large Hotel*'s inputs, in order: Storeys, Guest Rooms Per Row, Length, Depth, Floor Height, Orientation, Program Map, Preview Location; *DOE Hospital*'s: Room Multipliers (17 values, the description naming each room by index), Plate Length, Plate Depth, Corridor Width, Floor Height, Orientation, Program Map, Preview Location; outputs Plan, Multipliers, Program Keys.
+- [ ] Without a *Program Map* each lists its keys (15 hotel, 18 hospital) and asks for a map of that many keys.
+- [ ] *Plan* through *No Simplification* into *Stack Floors* with *Multipliers* wired gives the hotel's six storeys (the typical plan four times) and the hospital's five; the repeated rooms' copy space shows as gaps in the plates; *Validate* passes.
+- [ ] *Convert2BEM*'s *Boundaries* list `SelfAdjacent` for the walls toward the copy space, and its *Multipliers* the room multipliers (19 and 9 on *Stack Floors*, 76 on *Stacked Floor Zone Multiplier*).
+- [ ] *Perimeter Core*, *Single Zone per Floor*, *Single Zone per Floor Type*, and *Single Zone Building* end with an error saying they do not support multiplied rooms.
+- [ ] Two values in *Room Multipliers*, *Corridor Width* 0.4, *Storeys* 2 on the hotel, and *Guest Rooms Per Row* 1 each give an error naming the cause.
+
+#### Result (DOE multiplied rooms)
+
+Run headless (D-111) on 2026-10-26 on `37a3d3e` of `feature/doe-geom-p5b`, after the merge of `feature/doe-geom` (P1): all 20 specs of
+`scripts/rhino-smoke` ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check; no
+*Validate* output was False. `doe-multiplied-rooms` has 12 scenarios and 31 checks: the large hotel's three plans, multipliers 1, 4, 1, storey
+elevations 0, 3.048, and 15.24 m, room multipliers 9 and 19, its 9,366.457 m² counted zone × multiplier on *Stack Floors* and *Stacked Floor Zone
+Multiplier*, the ×76 room on storey 3 of the zone multiplier model, `SelfAdjacent` boundaries (87 of 364) and the room multipliers in *Convert2BEM*,
+the same with 38 rooms per row (13,094.590 m², ×152); the hospital's five plans, its 18,682.874 m², `SelfAdjacent` boundaries (214 of 554); and
+*Validate* True on all 10 buildings of each supported simplifier × aggregator matrix. Its 25 runtime errors are those of the expected-error
+scenarios (the four `NotSupported` steps on each generator, the four parameter errors) and of the first generator copy that lists the keys
+without a map. `examples` reopened 20 of 20 definitions with *Validate* True. The items for a person (the toolbar group and icons, the previews in
+the viewport) are open.
+
+### DOE outpatient checklist (DOE geometry P6)
+
+*DOE Outpatient*, the DOE generator of the outpatient health-care building ([doe-outpatient.md](../architecture/doe-outpatient.md),
+[doe-components.md](../architecture/doe-components.md)). One component is added; no existing GUID, input, or icon changes. The scripted run is
+`scripts/rhino-smoke/specs/doe-outpatient.py`.
+
+- [ ] *2 Generate* shows *DOE Outpatient* in the DOE group beside the DOE offices, with its own icon.
+- [ ] Its inputs, in order: Plate Length (51.816), Plate Depth (35.3568), Corridor Width (1.8288), Floor Height (3.048), Orientation (0), Program Map, Preview Location; outputs *Plan* (list), *Multipliers* (list), *Program Keys* (list).
+- [ ] Without a *Program Map* it lists its 32 keys in *Program Keys* and shows the error asking for a map of 32 keys.
+- [ ] With a map built from its keys and one *Any Program Preset*, the viewport shows the three storeys at 0, 3.048, and 6.096 m: the ground storey reaching further north to the north-east stair, and each upper storey with its own copy of the stairs and the lift.
+- [ ] *Plan* through *No Simplification* into *Stack Floors*, with *Multipliers* wired, gives 126 zones; *Validate* passes.
+- [ ] *Perimeter Core* at its 4.57 m default gives `PlanTooNarrow`; at 1 m it passes.
+- [ ] *Plate Length* 30 and *Corridor Width* 0.5 each give an error naming the limit (34.983 m; 0.6 m).
+
+#### Result (DOE outpatient)
+
+Run headless (D-111) on 2026-10-26 on `3adb0de` of `feature/doe-geom-p6` (after the merge of `feature/doe-geom` at `d58c2ff`), with no other Rhino
+running: all 20 specs of `scripts/rhino-smoke` ran to the end (DONE True) with no exception, no missing component, no expected error missing, and
+no failed check; no *Validate* output was False. `doe-outpatient` has 11 scenarios, 49 *Validate* outputs True, and 16 checks: three plans of 59,
+41, and 26 zones with outlines of 18, 14, and 14 vertices, multipliers 1, 1, 1, the 32 keys in ordinal order, storey elevations 0, 3.048, and
+6.096 m, the 126 zones of *Stack Floors* with 3,914.7483 m², the top storey's `NE_Stair` copy at 6.096 m, *Validate* True; *Validate* True on all
+16 buildings of each of the three simplifier × aggregator matrices (canonical and at 30° with *Perimeter Core* at 1 m, the shortest plate
+34.9832 × 26.3736 m with *Perimeter Core* at 0.8 m); the shortest plate 34.9832 m long on every storey with all its zones; and an input without
+data that still lists the 32 keys. Its 14 runtime errors are those of the expected-error scenarios (*Perimeter Core* at 4.57 m, `PlanTooNarrow`;
+*Plate Length* 30, shorter than 34.983 m; *Corridor Width* 0.5, the IT hall 0.417 m wide; a map with only `Stair`, `MissingPreset`; an unread
+*Plate Length*) and of the first copy that lists the keys without a map. `doe-offices` and `examples` (20 of 20, *Validate* True) passed as before.
+The items for a person (the toolbar, the icon, the viewport previews) are open.
+
+### DOE single-storey checklist (DOE geometry P2)
+
+The six components of the single-storey DOE generators ([doe-single-storey.md](../architecture/doe-single-storey.md)), on the DOE component
+support of P1 ([doe-components.md](../architecture/doe-components.md)). Six components are added; no existing GUID, input, or icon changes. The
+scripted run is `scripts/rhino-smoke/specs/doe-single-storey.py`.
+
+- [ ] *2 Generate*'s DOE group shows *DOE Full-Service Restaurant*, *DOE Quick-Service Restaurant*, *DOE Strip Mall*, *DOE Stand-alone Retail*, *DOE Supermarket*, and *DOE Warehouse*; each has its own icon.
+- [ ] Each component's inputs are in the DOE order with its record's defaults (the strip mall's *Store Counts*, *Store Sizes*, and *Store Tenancies* first, as lists), then *Floor Height*, *Orientation*, *Program Map*, *Preview Location*; outputs *Plan*, *Multipliers*, *Program Keys*.
+- [ ] Without a *Program Map* each lists its keys (2, 2, 3, 4, 6, 3) and shows the error asking for a map of that many keys.
+- [ ] With a map built from its *Program Keys*, each previews its plan in the viewport: the restaurants' dining room south of the kitchen, the strip mall's ten stores, the stand-alone retail's core reaching the entry, the supermarket's back of house along the north and east, the warehouse's office in the south-west corner.
+- [ ] The strip mall with *Store Counts* 2, 1, *Store Sizes* Large, Small, and *Store Tenancies* 3, 1 previews two large stores and one small store.
+- [ ] *Kitchen Depth* 0.4, a stand-alone retail *Length* of 5, a warehouse *Fine Storage Depth* of 9.5, store lists of different lengths, and a store size Medium each give an error naming the cause.
+
+#### Result (DOE single-storey)
+
+Run headless (D-111) on 2026-10-26 on `378fd5a` of `feature/doe-geom-p2`, after the merge of `feature/doe-geom` at `d58c2ff` (P1): all 20 specs
+of `scripts/rhino-smoke` ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check; no
+*Validate* output was False. `doe-single-storey` has 27 scenarios, 134 *Validate* outputs True, and 41 checks: each of the six records at its
+defaults gives one plan with *Multipliers* 1, its program keys in ordinal order, its zones, the source's floor area within 0.1 %, zone parts on the
+ground one floor height high, and *Validate* True; strip-mall runs given as lists give `LGstore1`, `LGstore2`, `SMstore1` with their tenancies'
+keys on a 38.1 m by 22.86 m plate; and *Validate* True on all 16 buildings of each of the eight simplifier × aggregator matrices (the six
+records, the supermarket at 30°, and a strip mall of twelve stores in three runs). Its 37 runtime errors are those of the expected-error
+scenarios and of the first copies that list the keys without a map. `doe-offices` 14 checks, `enum-inputs` 245, `glazing` 11, `program-json` 57,
+`program-mix` 76, all ok; `examples` reopened 20 of 20 definitions with *Validate* True. The items for a person (the toolbar group and icons, the
+previews in the viewport) are open.
+
+Rerun headless on 2026-10-26 on `c06d5a3`, after the review's low items (a band past its maximum named, store sizes read in any case): all 20
+specs ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check; no *Validate* output was
+False. `doe-single-storey` has 28 scenarios (the new one a supermarket *Storage Depth* past its maximum, `StorageDepth 51 m exceeds its maximum
+50.7944 m`), 134 *Validate* outputs True, and 41 checks, the strip-mall runs now given as `large` and `SMALL`; its 39 runtime errors are those of
+the expected-error scenarios and of the first copies without a map. `examples` reopened 20 of 20 with *Validate* True.
+
+### DOE small hotel checklist (DOE geometry P4)
+
+*DOE Small Hotel*, the corridor hotel generator's component ([doe-corridor-hotel.md](../architecture/doe-corridor-hotel.md)). One component is
+added; no existing GUID, input, or icon changes. The scripted run is `scripts/rhino-smoke/specs/doe-hotel.py`.
+
+- [ ] *2 Generate* shows *DOE Small Hotel* in the DOE group with the offices; it has its own icon.
+- [ ] Its inputs, in order: Storeys, Guest Room Bays, Length, Room Depth, Corridor Width, Floor Height, Orientation (with the record's defaults), Program Map, Preview Location; outputs *Plan* (list), *Multipliers* (list), *Program Keys* (list).
+- [ ] Without a *Program Map* it lists its 14 keys in *Program Keys* and shows the error asking for a map of 14 keys.
+- [ ] Its *Program Keys*, copied into *DOE Program Map* with one *Any Program Preset* in *Presets*, give a map that, on a second copy, gives four plans; the viewport shows the four storeys at 0, 2.74, 5.49, and 8.23 m, the ground storey with its own zones.
+- [ ] *Plan* through *No Simplification* into *Stack Floors*, with *Multipliers* wired, gives the four-storey hotel; *Validate* passes.
+- [ ] *Guest Room Bays* 22 narrows every guest room to 1.98 m and widens the run west of the lift lobby; *Storeys* 6 adds two storeys like the top one.
+- [ ] *Length* 20, *Storeys* 1, *Guest Room Bays* 8, and *Corridor Width* 0.4 each give an error naming the cause.
+
+#### Result (DOE small hotel)
+
+Run headless (D-111) on 2026-10-26 on `266c674` of `feature/doe-geom-p4`, after the merge of `feature/doe-geom` (P1, P5a): all 20 specs of
+`scripts/rhino-smoke` ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check; no
+*Validate* output was False. `doe-hotel` has 11 scenarios, 49 *Validate* outputs True, and 19 checks: four plans of 19, 16, 16, and 16 zones,
+multipliers 1, 1, 1, 1, the 14 keys in ordinal order, storey elevations 0, 2.7432, 5.4864, and 8.2296 m and every storey 2.7432 m high (G5), the
+source's 3.9624 m bay, the 67 zones and 4,013.587 m² of *Stack Floors*; at six storeys and 22 bays, `Corridor_Flr5` and `GuestRoom401_Flr5` on
+floor 5, every bay 1.9812 m, `GuestRoom220_223` 15 bays, and the front stairs 2.4384 m; *Validate* True on all 16 buildings of each of the three
+simplifier × aggregator matrices (canonical, at 30°, eight storeys and 22 bays); and the hotel with *Length* wired to a source without data still
+listing its 14 keys. Its 15 runtime errors are those of the five expected-error scenarios, of the two scenarios without a map, and of the eight
+first hotel copies that list the keys without a map; its one warning is the empty *DOE Program Map* of the unread-input scenario. `doe-offices`
+(83 *Validate* True, 14 checks) is unchanged, and `examples` reopened 20 of 20 definitions with *Validate* True. Results:
+`D:\BEMGen-smoke\p4-all-1`. The items for a person (the toolbar group and the icon, the previews in the viewport) are open.
+
+### DOE program presets checklist (DOE geometry P7)
+
+The fifteen *DOE … Programs* components ([doe-components.md](../architecture/doe-components.md#doe-program-presets)), one per DOE
+generator, in their own group of panel *1 Program Presets*. Fifteen components and icons are added; no existing GUID, input, or icon changes. The
+scripted run is `scripts/rhino-smoke/specs/doe-presets.py`.
+
+- [ ] *1 Program Presets* shows the fifteen *DOE … Programs* components in a group after the built-in presets; each icon is its generator's motif in orange, smaller, with a preset tag in the bottom-left corner.
+- [ ] Each has no input and the outputs *Program Map*, *Keys*, *Presets*; it shows the remark that the loads are illustrative and the glazing is the DOE reference's for each key's zones, and, where keys take the Service fallback or are under a gap, a remark naming them.
+- [ ] *Program Map* wired into the matching DOE generator's *Program Map* gives its plans at the defaults; the viewport shows the windows on the façades.
+- [ ] *Keys* and *Presets* wired into *DOE Program Map*, one preset replaced by another, give a map the generator takes.
+
+#### Result (DOE program presets)
+
+Run headless (D-111) on 2026-10-26 on `8e0c491` of `feature/doe-geom-p7` (the plugin sources are those of the final commit; the commits after it change documents only), with no other Rhino running at its start: all 25 specs of `scripts/rhino-smoke` ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check; no *Validate* output was False. `doe-presets` has 17 scenarios, 16 *Validate* outputs True, no runtime error or warning, and 75 checks, five per record: *Keys* equal to the generator's *Program Keys*, one preset per key named by it, the keys that take the Service fallback with their remark, *Validate* True, and the stacked window area per orientation and skylight area equal to the figures `DoeProgramPresetsTests` pins; the supermarket's presets rebuilt by *DOE Program Map* validate. The fifteen components register in *1 Program Presets* (secondary exposure), each with a 24 × 24 icon. The items for a person (the toolbar group and icons as drawn, the windows in the viewport) are open.
+Rerun headless on 2026-10-26 on `305e4dd`, after the review's fixes (the keys under a gap keep the source's glazing and are named in a third remark, the edited-preset scenario moved into the checks): all 25 specs ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check; no *Validate* output was False. `doe-presets` has 16 scenarios, 15 *Validate* outputs True, no runtime error or warning, and 93 checks: six per record (the five above and the keys under a gap with their remark: the warehouse's `Fine` and `Office`, the secondary school's `Auditorium`, `Gym`, and `Gym - audience`, the outpatient's `Stair`), and three on the supermarket's *Sales* preset replaced by the *Office Preset* as an any-program preset and rebuilt with *DOE Program Map* (the map's *Sales* preset is the replacement, every other key keeps its shipped preset, and *Validate* is True).
+Rerun headless on 2026-10-26 on `f74e867`, after the re-review's fixes (each record's gap change described in its own terms in the remark and the provenance, the record's glazing compared exactly, the loader checking that every zone of a `gap_source_wall` key is under a gap), with no other Rhino running: all 25 specs ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check; no *Validate* output was False. `doe-presets` passed its 93 checks, and the warehouse's remark names its keys under a gap with the office drawn to the 8.534 m storey height.
+
+### DOE close-out checklist (DOE geometry stage C)
+
+The icons of the 15 DOE generator components, *DOE Program Map*, and the parameter *Program Map* ([doe-components.md](../architecture/doe-components.md#icons)),
+and the one message change of the close-out: a length shorter than the shortest valid one on an axis without a fixed interval no longer names "the 0 m of
+fixed intervals". No component, input, output, or GUID changes.
+
+- [ ] *2 Generate*'s DOE group shows 15 generators, each with its own 24 × 24 icon in the green accent, distinct from one another and from the six precedent non-residential generators: the three offices (a ring plan on one plate, on three, on a tall stack with a cross), the two restaurants (a square split by one line, a plate; a smaller square split in half, a cup), the strip mall (a bar of wide and narrow cells), the stand-alone retail (a box with a notch in its front), the supermarket (an L-shaped band), the warehouse (a tall box with a corner office), the two schools (wings joined by a spine, the second with a second storey outline), the small hotel (a bar with a corridor and a stack mark), the large hotel (a tower on a podium, dashed copies), the hospital (a plate with a cross of corridors, dashed copies), and the outpatient (a stepped block with a stair shaft and a cross).
+- [ ] *1 Program* shows *DOE Program Map* with its orange icon (a key list with arrows to swatches); a *Program Map* parameter shows its hexagon with a key tag joined to a swatch.
+- [ ] The icons stay legible at the toolbar size on the light and the dark canvas.
+- [ ] *DOE Warehouse* with *Length* 1.99 gives an error ending "shortest valid 2 m: every flexible interval at 1 m, or at its own length under 1 m (S3)."
+
+#### Result (DOE close-out)
+
+Run headless (D-111) on 2026-10-26 on `4f4be06` of `feature/doe-geom-c` (the plugin sources are those of the final commit; the commits after it change documents only), with no other Rhino running: all 24 specs of `scripts/rhino-smoke` ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check; no *Validate* output was False, and no registered component reported another icon size than 24 × 24. The metadata dump (`scripts/docs-export/component-metadata.py`, run headless alone) lists 85 objects, the 15 DOE generators, *DOE Program Map*, and *Program Map* each with its own icon file, and no `Gap:` line. The items for a person (the toolbar group and icons as drawn, the previews in the viewport) are open.
+
+Rerun headless on 2026-10-26 on `6d4e331`, after the close-out review's three fixes (the *DOE Program Map* row of the pipeline document, the decision number dropped from the DOE generators' description text, the medium and large office icons redrawn as offset square plates): all 24 specs ran to the end (DONE True) with no exception, no missing component, no expected error missing, and no failed check; no *Validate* output was False, and no registered component reported another icon size than 24 × 24. The metadata dump again lists 85 objects and no `Gap:` line, and none of its descriptions cites a decision or an ADR number.
+
+### Atlas release 2.0.0 checklist — program JSON 5.4.0, constructions 4.3.0 / 3.1.0 (D-172)
+
+*Program JSON* reads program JSON 5.4.0 (versions `filled` and `source`) and *Construction JSON* the release 2.0.0 constructions. The scripted runs are `program-json.py`, `glazing.py`, and `construction-json.py` on the fixtures in `tests/Lod.ProgramJson.Tests/Fixtures/atlas/` and `tests/Lod.ConstructionJson.Tests/Fixtures/atlas-2.0.0/examples/`; [the design note](../plans/2026-10-28-atlas-release-2-0-0.md) has the rest.
+
+- [ ] *Program JSON* shows *Climate Zone* (CZ) and *Context* (Ctx) after *Skylight Ratio*; *WWR* has no default value on a newly placed component; the description names program JSON 5.4.0. A definition saved before D-172 opens with the two new inputs unset and its saved *WWR* kept.
+- [x] `examples/program-json-office.gh` is rebuilt with `medium-office-90-1-2019.filled.json` in its panel (headless, D-175) and solves with *Validate* True; *Assumptions* lists 3 resolutions and *Source* shows `Json.Version program JSON 5.4.0, filled` and the `Daylighting` line.
+- [ ] `small-office-iecc-2021.source.json` with *Climate Zone* `1B` gives lighting 6.77084 W/m² and no climate warning; without it, 6.093756 W/m² and the warning `ProgramJsonClimateZoneNotGiven`; the source version's unrecorded people fractions warn.
+- [ ] `multifamily-iecc-2021.source.json` without *Context* is the error naming `foundation`; with `foundation=slab` it solves, and *Left Out* lists the exterior lights, the shared services, and the loads of the other foundations.
+- [ ] *Convert2IDF* of the medium office preset writes one `Site:WaterMainsTemperature` and no daylighting object; its header says `Daylighting: never written (D-174)` with the number of zones whose programs have controls.
+- [ ] *Construction JSON* on `medium-office-2019-5B.detailed.json` lists the two *Alternates* lines in *Roles*; the unified document of the same context converts as before; `medium-office-iecc-2021-5B.unified.json` is read with only the warning `ConstructionJsonInfiltrationMethodNotSupported` (no schema error, D-173), and *Convert2IDF* does not convert its set because of the source design-flow infiltration.

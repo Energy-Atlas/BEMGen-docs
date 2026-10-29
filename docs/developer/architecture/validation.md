@@ -29,6 +29,7 @@ If the stacked reference cannot be built, `BuildingValidator` adds the failed ch
 | Exterior wall area | Σ multiplier × gross area of walls with boundary `Outdoors`, windows included, m² |
 | Glazing | Σ multiplier × glazed area of those walls (all their windows), m² |
 | Glazing per orientation | the same per bin North [315°, 45°), East [45°, 135°), South [135°, 225°), West [225°, 315°) of the wall's true azimuth (plan azimuth + orientation) |
+| Skylights | Σ multiplier × glazed area of the skylights of every ceiling, m² (DOE geometry note S5): of a plan's and a floor's ceilings, of a building's roofs |
 | Ground area | Σ multiplier × area of horizontal surfaces with boundary `Ground`, m² |
 | Roof area | Σ multiplier × area of ceilings with boundary `Outdoors`, m² |
 | Exposed floor area | Σ multiplier × area of floors with boundary `Outdoors` (overhangs, floors not covered by the storey below), m² |
@@ -52,6 +53,7 @@ Relative comparisons are `|a − b| ≤ tol × max(1, |a|, |b|)` (ADR-004).
 | `ExteriorWallArea` | exterior wall area | `RelativeArea` | yes |
 | `Glazing` | total glazed area | `RelativeArea` | yes |
 | `Glazing.<Bin>` | glazed area per orientation bin; one check per bin present in either total | `RelativeArea` | yes |
+| `Skylights` (DOE geometry note S5) | skylight area; only when either total has skylights, so a report without them is unchanged | `RelativeArea` | yes |
 | `Installed.<LoadType>` | installed magnitude; one check per load type present in either total, all bases of the type together (D-047) | `RelativeLoad` | yes |
 | `Scheduled.<LoadType>` | scheduled magnitude at each of the 8760 hours; the detail names the worst hour | `RelativeLoad` at every hour | yes |
 | `Installed.<Component>` (D-126) | installed magnitude of one load component, `Type.EndUse.Basis`, such as `Installed.Lighting.lighting.PerFloorArea` or `Installed.ElectricEquipment.electric_equipment.PerDwellingUnit`; one check per component present in either total | `RelativeLoad` | yes |
@@ -68,17 +70,22 @@ Relative comparisons are `|a − b| ≤ tol × max(1, |a|, |b|)` (ADR-004).
 | `Building.RoofArea` | roof area vs the stacked reference | `RelativeArea` | yes (D-046) |
 | `Building.ExposedFloorArea` | exposed floor area vs the stacked reference: a floor aggregator must not multiply overhanging floors | `RelativeArea` | yes (D-046) |
 | `Building.Height` | building height vs the stacked reference: representative storeys must sit at their true elevations | `Distance`, absolute | yes (D-045) |
+| `Building.SkylightsOnRoofs` (DOE geometry note S5) | every skylight lies on a ceiling facing outdoors; only when the building or its reference has skylights | exact | yes |
 | `Building.PerDwellingLoads`, `Building.Calendar` (D-126) | the same two checks on the building's own zones | exact | yes |
+| `MultiplierPairing` (floor), `Building.MultiplierPairing` (DOE geometry stage P5a, S8, ADR-026) | every interzone surface lies between zones of one multiplier; only when a source plan has multiplied rooms (a zone with a multiplier above 1), so the reports of every other plan are unchanged | exact | yes |
 
 The floor and building checks `Installed.<Component>`, `Scheduled.<Component>`, and `DwellingUnits` compare the zones with the source, the building with the stacked reference. Occupancy and air volume flow are not separate checks: occupancy is the load type `Occupancy` (people), and air-change loads are compared as m³/h magnitudes (ADR-007, D-019).
 
 A zone of several pieces (D-123) is measured over all its parts: its floor area, volume, and exterior wall area are sums over the parts, so every total and check above counts all its pieces, and so does the exterior area its infiltration is applied to at conversion (D-124). Two pieces of one zone that share an edge are not validated but rejected when surfaces are built (`TouchingPieces`), because they would be one piece; two target zones with one ID are rejected before that (`DuplicateZoneId`).
+
+A multiplied room (S8) counts its multiplier in every total, as `Zone.Multiplier` always did: its floor area, volume, outdoor walls, glazing, skylights, ground, roof, and loads count once per room it stands for, and a room multiplier times a floor entry's multiplier on a *Stacked Floor Zone Multiplier* storey. Its self-adjacent surfaces are neither exterior walls nor ground, roof, or exposed area. A plan with multiplied rooms is the DOE drawing, not the building, so its drawn zone area is below its multiplied area: the footprint holds the copy space as well, and the checks that compare areas compare zone area times multiplier with the same on the reference; no tolerance changes.
 
 Not compared:
 
 - Setpoints. Floor-area weighting over the sources that have the side is a prescribed control rule, not a conservation invariant (D-038, D-126); only that the merged heating setpoint does not exceed the merged cooling setpoint is required, and a merge that breaks it fails earlier (`SetpointsCross`).
 - The installed power of each heat path of a load, the heat the occupants give off, and the water heat of hot water. The aggregation conserves them (the rules are in [domain-model.md](domain-model.md#62-rules) and the research brief, §7), and the invariant tests of the aggregator prove it for random sources, hour by hour (`InstalledHeatPowerIsConservedPerComponent`, `PeopleHeatIsConservedEveryHour`, `WaterHeatIsConservedEveryHour`); a floor or building has no source values of these to compare, so they are not validation checks.
 - Window positions and sizes. Where walls are rebuilt, each outdoor wall gets one window centred on it with the glazed area of the source windows it covers (D-079, [ADR-012](../decisions/ADR-012-centred-windows.md)), so individual windows are not conserved by design; the rule is covered by the unit tests of `CentredWindows` and the integration tests `CentredWindowTests`. Validation compares the glazed areas in total and per orientation, which the rule conserves per wall. The reference glazing is the plan's: a generator's wall or window below the ADR-011 minimum has no window (`WindowOmitted`), and validation compares with the glazing the generator placed, not with WWR × wall area. Every window is checked per wall when it is built, not by validation: a source window must lie on one target wall (`WindowNotHosted`) and a wall's glazed area must be smaller than its area (`GlazingExceedsWall`); both hold by construction once the façades are covered (D-041) and are kept as guards.
+- Skylight positions and sizes. Each rebuilt ceiling or roof piece carries one skylight centred in its largest grid rectangle with the skylight area of the detailed zones under it ([ADR-012](../decisions/ADR-012-centred-windows.md#skylights-doe-geometry-p0b)), so individual skylights are not conserved; the areas are. A skylight that does not fit its piece fails the step that places it (`SkylightDoesNotFit`), and the area handed on is guarded when it is placed (`SkylightNotHosted`). A floor's skylight area is compared with its plan's; a building's with `Stack` of the same entries, whose roofs take the skylight ratio of each detailed zone under them × their area, so a covered ceiling has none and a terrace has its share.
 - Floor and ceiling boundaries of a floor. They stay `Unresolved` until a floor aggregator stacks the floors.
 
 The conditioned floor area is reported because merging conditioned and unconditioned sources makes the merged zone conditioned ("any conditioned wins", D-038). With the example presets, Z2 and Z3 turn the 72 m² stair into conditioned area: `note ConditionedFloorArea: reference 360.000000, actual 432.000000`.

@@ -1,6 +1,6 @@
 # ADR-012: Centred windows on rebuilt walls
 
-Status: Accepted (by the controller under D-080; provisional pending the owner's reading)
+Status: Accepted (by the controller under D-080; provisional pending the owner's reading); skylights added in DOE geometry stage P0b (D-162)
 
 Date: 2026-10-01
 
@@ -45,3 +45,21 @@ D-079 settles that window level of detail is not a separate axis: a rebuilt wall
 - A merged wall carries one wide window where its source walls carried several; window positions within a façade are not a variable of the study.
 - The research brief §10 drops W1–W5 and describes this rule; the roadmap drops the window levels and names S5 "Centred windows on rebuilt walls".
 - Changing the rule (window shape, where it applies, an option to keep windows in place) needs a decision-log entry, an update of this ADR, and an update of the research brief (GLOBAL.md scientific rule 7).
+
+## Skylights (DOE geometry P0b)
+
+Added by the DOE geometry stage P0b ([design note](../plans/2026-10-25-doe-geometry-generators.md), S5, S6, O3); provisional, pending the owner's reading.
+
+**Context.** The DOE reference buildings glaze roofs as well as walls, and the atlas gives a skylight ratio per program (O3). A skylight lies on a roof, a ceiling facing outdoors, but whether a ceiling is a roof is known only once the storeys are stacked (D-068): a plan's and a floor's ceilings are `Unresolved`, and a storey's ceiling may be covered in part by the storey above (a terrace, [ADR-015](ADR-015-plans-per-storey.md)). The question was where a ceiling becomes a roof and gets its skylight.
+
+**Options.** (1) Only the generator places skylights, and every later step re-hosts them like windows: a skylight on a ceiling covered by the storey above would have to be dropped, and one straddling a perimeter/core cut split or refused. (2) Only the floor aggregator places them, from a ratio carried per zone: a merged zone has no single ratio, so a terrace over part of it would take the mixed one. (3) **Both, with the detailed zones' ratio (chosen).** The generator places one skylight on every zone ceiling, as on a roof; every later step that rebuilds ceilings or designates roofs gives each piece the skylight area of the detailed ceilings under it.
+
+**Rule.**
+
+1. **Placement.** A ceiling or roof piece with skylight area \(A_s > 0\) gets exactly one skylight, centred in its largest grid rectangle (`Skylights.LargestGridRectangle`: of the axis-aligned rectangles, in the polygon's frame, whose edges lie on the polygon's own vertex coordinates and which lie inside it, the one of largest area, ties to the first in grid order), the rectangle scaled about its centre by \(k = \sqrt{A_s / A_\text{rect}}\), like `Window.Centered`. The frame is the plan's when every edge is parallel to a plan axis, otherwise that of the polygon's longest outer edge, so a rotated rectilinear roof keeps its grid. A polygon that is not rectilinear in its frame also takes its edges' midpoints into the grid, so a triangle, such as the corner piece of a *Perimeter Core* zone under a terrace, holds the rectangle of half its legs; a sweep of the 18 families with skylights through every simplifier and aggregator, upright and at two placements, found no roof piece without one (`SkylightFamilyTests`). \(A_s \ge A_\text{rect}\), or a piece without a grid rectangle, is the error `SkylightDoesNotFit`; nothing is capped. An area within the area tolerance of zero gives no skylight.
+2. **Generator.** Every zone ceiling gets \(A_s = r \times A_\text{ceiling}\), \(r\) the zone preset's skylight ratio (`LayoutMeasures.PlaceSkylightsByRatio`); floors never carry skylights.
+3. **Rebuilt ceilings and roofs** (`CentredSkylights.Place`). A piece gets \(A_s = \sum_c r_c A(c \cap \text{piece})\) over the detailed plan's ceilings \(c\), \(r_c\) the ceiling's skylight area over its area. The plan simplifiers (*Semantic Merge*, *Conditioned Merge*, *Perimeter Core*, *Single Zone per Floor*) apply it to every target ceiling: skylight area is conserved per floor, and each target zone has that of the detailed zones under it. `Storeys.Assemble`, where every floor aggregator designates its roofs, applies it to each storey's ceiling pieces facing outdoors against the floor's source plan, and gives every other piece none: a covered ceiling has no skylight, a terrace or the top roof has the ratio of each detailed zone under it × its area. *Stack* and *Stacked Floor Zone Multiplier* keep those pieces, and *Single Zone per Floor Type* and *Single Zone Building* keep them on their merged zones, so every method conserves skylight area per zone as it conserves window area, and the roofs' skylight area does not depend on the simplifier.
+4. **Guard.** The target pieces tile the detailed ceilings, so together they receive the detailed skylight area; otherwise the error `SkylightNotHosted` (a guard, like `WindowNotHosted`).
+5. **Validation.** `Skylights` compares a floor with its plan and a building with `Stack` of the same entries; `Building.SkylightsOnRoofs` checks that every skylight lies on a roof. Both appear only when skylights exist, so every report without them is unchanged.
+
+**Consequences.** Without skylight ratios nothing changes: every snapshot, report, and IDF is byte-identical. Skylight positions are not conserved, only their areas. The window rule per orientation (S5) conserves glazed area per wall, so per orientation, unchanged by this section.

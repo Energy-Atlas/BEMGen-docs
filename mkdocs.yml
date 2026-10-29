@@ -125,6 +125,15 @@ nav:
           - developer/architecture/construction-json.md
           - developer/architecture/convert2bem.md
           - developer/architecture/convert2idf.md
+          - developer/architecture/doe-components.md
+          - developer/architecture/doe-corridor-hotel.md
+          - developer/architecture/doe-hospital.md
+          - developer/architecture/doe-layouts.md
+          - developer/architecture/doe-outpatient.md
+          - developer/architecture/doe-ring-office.md
+          - developer/architecture/doe-school.md
+          - developer/architecture/doe-single-storey.md
+          - developer/architecture/doe-tower-hotel.md
           - developer/architecture/domain-model.md
           - developer/architecture/energyplus-runner.md
           - developer/architecture/pipeline.md
@@ -153,6 +162,10 @@ nav:
           - developer/decisions/ADR-020-test-suites.md
           - developer/decisions/ADR-021-construction-sets-and-mass-ledger.md
           - developer/decisions/ADR-022-residential-construction-sets.md
+          - developer/decisions/ADR-023-native-ground-methods-and-packet-v7.md
+          - developer/decisions/ADR-025-doe-reference-geometry-generators.md
+          - developer/decisions/ADR-026-multiplied-rooms.md
+          - developer/decisions/ADR-027-atlas-release-2-0-0-contracts.md
       - Plans:
           - developer/plans/2026-09-30-implementation-roadmap.md
           - developer/plans/2026-10-01-s0-foundation.md
@@ -187,6 +200,13 @@ nav:
           - developer/plans/2026-10-12-test-suite-generator.md
           - developer/plans/2026-10-15-construction-json.md
           - developer/plans/2026-10-16-construction-binding.md
+          - developer/plans/2026-10-18-construction-foundation-v7.md
+          - developer/plans/2026-10-19-suite-constructions-ground.md
+          - developer/plans/2026-10-21-runner-progress-and-site-status.md
+          - developer/plans/2026-10-22-results-folder-redesign.md
+          - developer/plans/2026-10-25-doe-geometry-generators.md
+          - developer/plans/2026-10-26-evaluation-metrics.md
+          - developer/plans/2026-10-28-atlas-release-2-0-0.md
       - Research:
           - developer/research/envelope-presets.md
           - developer/research/experiment-outputs.md

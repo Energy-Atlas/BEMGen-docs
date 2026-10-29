@@ -6,10 +6,10 @@ Every component and parameter of the BEMGen tab in Grasshopper, generated from t
 
 | Panel | Components | Parameters |
 | --- | --- | --- |
-| [0 Info](info.md) | 1 | 8 |
-| [1 Program](program.md) | 6 | 1 |
-| [1 Program Presets](program-presets.md) | 19 | 0 |
-| [2 Generate](generate.md) | 19 | 0 |
+| [0 Info](info.md) | 1 | 9 |
+| [1 Program](program.md) | 7 | 1 |
+| [1 Program Presets](program-presets.md) | 34 | 0 |
+| [2 Generate](generate.md) | 34 | 0 |
 | [3 Simplify](simplify.md) | 5 | 0 |
 | [4 Aggregate](aggregate.md) | 4 | 0 |
 | [5 Convert](convert.md) | 2 | 0 |
@@ -40,6 +40,37 @@ Every component and parameter of the BEMGen tab in Grasshopper, generated from t
 | ![](../../assets/icons/CourtClusterComponent.png) | [Court Cluster](generate.md#court-cluster) | `CCluster` | Generate |
 | ![](../../assets/icons/DiningPresetComponent.png) | [Dining Preset](program-presets.md#dining-preset) | `Dine` | Program Presets |
 | ![](../../assets/icons/DirtyCorridorPresetComponent.png) | [Dirty Corridor Preset](program-presets.md#dirty-corridor-preset) | `Dirty` | Program Presets |
+| ![](../../assets/icons/FullServiceRestaurantComponent.png) | [DOE Full-Service Restaurant](generate.md#doe-full-service-restaurant) | `DoeFSR` | Generate |
+| ![](../../assets/icons/FullServiceRestaurantProgramsComponent.png) | [DOE Full-Service Restaurant Programs](program-presets.md#doe-full-service-restaurant-programs) | `DoeFSRP` | Program Presets |
+| ![](../../assets/icons/HospitalComponent.png) | [DOE Hospital](generate.md#doe-hospital) | `DoeHosp` | Generate |
+| ![](../../assets/icons/HospitalProgramsComponent.png) | [DOE Hospital Programs](program-presets.md#doe-hospital-programs) | `DoeHospP` | Program Presets |
+| ![](../../assets/icons/LargeHotelComponent.png) | [DOE Large Hotel](generate.md#doe-large-hotel) | `DoeLHtl` | Generate |
+| ![](../../assets/icons/LargeHotelProgramsComponent.png) | [DOE Large Hotel Programs](program-presets.md#doe-large-hotel-programs) | `DoeLHtlP` | Program Presets |
+| ![](../../assets/icons/LargeOfficeComponent.png) | [DOE Large Office](generate.md#doe-large-office) | `DoeLOff` | Generate |
+| ![](../../assets/icons/LargeOfficeProgramsComponent.png) | [DOE Large Office Programs](program-presets.md#doe-large-office-programs) | `DoeLOffP` | Program Presets |
+| ![](../../assets/icons/MediumOfficeComponent.png) | [DOE Medium Office](generate.md#doe-medium-office) | `DoeMOff` | Generate |
+| ![](../../assets/icons/MediumOfficeProgramsComponent.png) | [DOE Medium Office Programs](program-presets.md#doe-medium-office-programs) | `DoeMOffP` | Program Presets |
+| ![](../../assets/icons/OutpatientComponent.png) | [DOE Outpatient](generate.md#doe-outpatient) | `DoeOutP` | Generate |
+| ![](../../assets/icons/OutpatientProgramsComponent.png) | [DOE Outpatient Programs](program-presets.md#doe-outpatient-programs) | `DoeOutPP` | Program Presets |
+| ![](../../assets/icons/PrimarySchoolComponent.png) | [DOE Primary School](generate.md#doe-primary-school) | `DoePSch` | Generate |
+| ![](../../assets/icons/PrimarySchoolProgramsComponent.png) | [DOE Primary School Programs](program-presets.md#doe-primary-school-programs) | `DoePSchP` | Program Presets |
+| ![](../../assets/icons/DoeProgramMapComponent.png) | [DOE Program Map](program.md#doe-program-map) | `DoeMap` | Program |
+| ![](../../assets/icons/QuickServiceRestaurantComponent.png) | [DOE Quick-Service Restaurant](generate.md#doe-quick-service-restaurant) | `DoeQSR` | Generate |
+| ![](../../assets/icons/QuickServiceRestaurantProgramsComponent.png) | [DOE Quick-Service Restaurant Programs](program-presets.md#doe-quick-service-restaurant-programs) | `DoeQSRP` | Program Presets |
+| ![](../../assets/icons/SecondarySchoolComponent.png) | [DOE Secondary School](generate.md#doe-secondary-school) | `DoeSSch` | Generate |
+| ![](../../assets/icons/SecondarySchoolProgramsComponent.png) | [DOE Secondary School Programs](program-presets.md#doe-secondary-school-programs) | `DoeSSchP` | Program Presets |
+| ![](../../assets/icons/SmallHotelComponent.png) | [DOE Small Hotel](generate.md#doe-small-hotel) | `DoeSHot` | Generate |
+| ![](../../assets/icons/SmallHotelProgramsComponent.png) | [DOE Small Hotel Programs](program-presets.md#doe-small-hotel-programs) | `DoeSHotP` | Program Presets |
+| ![](../../assets/icons/SmallOfficeComponent.png) | [DOE Small Office](generate.md#doe-small-office) | `DoeSOff` | Generate |
+| ![](../../assets/icons/SmallOfficeProgramsComponent.png) | [DOE Small Office Programs](program-presets.md#doe-small-office-programs) | `DoeSOffP` | Program Presets |
+| ![](../../assets/icons/StandAloneRetailComponent.png) | [DOE Stand-alone Retail](generate.md#doe-stand-alone-retail) | `DoeRet` | Generate |
+| ![](../../assets/icons/StandAloneRetailProgramsComponent.png) | [DOE Stand-alone Retail Programs](program-presets.md#doe-stand-alone-retail-programs) | `DoeRetP` | Program Presets |
+| ![](../../assets/icons/StripMallComponent.png) | [DOE Strip Mall](generate.md#doe-strip-mall) | `DoeSMall` | Generate |
+| ![](../../assets/icons/StripMallProgramsComponent.png) | [DOE Strip Mall Programs](program-presets.md#doe-strip-mall-programs) | `DoeSMallP` | Program Presets |
+| ![](../../assets/icons/SupermarketComponent.png) | [DOE Supermarket](generate.md#doe-supermarket) | `DoeSMkt` | Generate |
+| ![](../../assets/icons/SupermarketProgramsComponent.png) | [DOE Supermarket Programs](program-presets.md#doe-supermarket-programs) | `DoeSMktP` | Program Presets |
+| ![](../../assets/icons/WarehouseComponent.png) | [DOE Warehouse](generate.md#doe-warehouse) | `DoeWare` | Generate |
+| ![](../../assets/icons/WarehouseProgramsComponent.png) | [DOE Warehouse Programs](program-presets.md#doe-warehouse-programs) | `DoeWareP` | Program Presets |
 | ![](../../assets/icons/DwellingUnitPresetComponent.png) | [Dwelling Unit Preset](program-presets.md#dwelling-unit-preset) | `Unit` | Program Presets |
 | ![](../../assets/icons/EnclosedCourtComponent.png) | [Enclosed Court](generate.md#enclosed-court) | `ECourt` | Generate |
 | ![](../../assets/icons/EnvelopePresetComponent.png) | [Envelope Preset](program-presets.md#envelope-preset) | `Env` | Program Presets |
@@ -66,6 +97,7 @@ Every component and parameter of the BEMGen tab in Grasshopper, generated from t
 | ![](../../assets/icons/PlanParameter.png) | [Plan](info.md#plan) | `Plan` | Info |
 | ![](../../assets/icons/PointPlateComponent.png) | [Point Plate](generate.md#point-plate) | `PPlate` | Generate |
 | ![](../../assets/icons/ProgramJsonComponent.png) | [Program JSON](program.md#program-json) | `PJson` | Program |
+| ![](../../assets/icons/ProgramMapParameter.png) | [Program Map](info.md#program-map) | `Map` | Info |
 | ![](../../assets/icons/ProgramPresetParameter.png) | [Program Preset](info.md#program-preset) | `P` | Info |
 | ![](../../assets/icons/ProgramPresetComponent.png) | [Program Preset](program.md#program-preset) | `Preset` | Program |
 | ![](../../assets/icons/RadialLobesComponent.png) | [Radial Lobes](generate.md#radial-lobes) | `RLobes` | Generate |

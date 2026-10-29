@@ -1,6 +1,6 @@
 # ADR-014: Program types and department zoning
 
-Status: Accepted (by the controller under D-098; provisional pending the owner's reading); the example presets' infiltration values are dropped by [ADR-017](ADR-017-program-mix-and-building-infiltration.md) (D-124)
+Status: Accepted (by the controller under D-098; provisional pending the owner's reading); the example presets' infiltration values are dropped by [ADR-017](ADR-017-program-mix-and-building-infiltration.md) (D-124); department zoning is relaxed for the DOE generators, whose most detailed level is the DOE zone (the owner's decision O4 of the DOE geometry note; D-097 is relaxed for them), by [ADR-025](ADR-025-doe-reference-geometry-generators.md)
 
 Date: 2026-10-02
 

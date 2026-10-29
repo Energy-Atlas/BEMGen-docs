@@ -1,6 +1,38 @@
 # What's new
 
-This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.5.0.
+This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.6.0.
+
+## 1.6.0
+
+Version 1.6.0 adds *Schedule Draw*, which draws stochastic schedules with the atlas's schedule generator, and reads release 2.1.0 of the Energy Archetype Atlas.
+
+### Schedule Draw
+
+A new component in *1 Program*, *Schedule Draw* (SDraw), draws stochastic 8,760-hour schedules for a program JSON with the atlas's schedule generator, as an optional add-on to the program's own schedules. From the *Program JSON* text, the *Generator JSON* of the program's release folder (`generator.json`), a *Setting*, and a *Seed*, it gives a *Drawn JSON* whose occupancy, lighting, equipment, hot-water, activity, and setpoint schedules are drawn; connect it to *Program JSON*. The same inputs and seed always give the same text, and *Provenance* records the generator, the seed, and the checksums. See the [component reference](components/program.md#schedule-draw).
+
+- **It needs Python and the generator.** Install Python 3.11 or later, download `atlas_schedules-3.0.0-py3-none-any.whl` from the atlas release [atlas-schedules-v3.0.0](https://github.com/Energy-Atlas/archetype-atlas/releases/tag/atlas-schedules-v3.0.0), and install it in a virtual environment: `python -m venv <folder>`, then `<folder>\Scripts\python -m pip install atlas_schedules-3.0.0-py3-none-any.whl`.
+- **It runs the generator as an external command**, only while *Run* is true. Set *Command* to `<folder>\Scripts\atlas-schedules.exe` and leave *Folder* unset. BEMGen passes it files and opens no network connection.
+- **Calendar 2007.** Drawn schedules are for 2007, so keep *Program JSON*'s *Year* at 2007.
+- Apartment-unit and composition recipes are not supported yet.
+- The new example `schedule-draw.gh` opens with *Run* false and the program's own schedules; set *Command* and *Run* to draw.
+
+### DOE Reference Program
+
+A new component in *1 Program*, *DOE Reference Program* (DOEProg), gives source programs of the DOE MidriseApartment reference building (Chicago, 5A) by original zone name. A preset needs an explicit *WWR* and two separate acceptances: that the generated geometry is not the DOE geometry, and that the source's daylight-saving shift is left out. See the [component reference](components/program.md#doe-reference-program).
+
+### Atlas release 2.1.0
+
+*Program JSON* and *Construction JSON* read the exports of atlas release 2.1.0, the release to download now. Its contracts are those of 2.0.0, so exports of release 2.0.0 remain valid.
+
+### Convert2IDF
+
+- A zone's coplanar floors, ceilings, and roofs, and its walls without windows that run in a straight line, are merged into one surface where the result is a simple polygon. IDF files have fewer surfaces, the header lists the merges, and EnergyPlus no longer warns about incomplete view factors in large merged zones. Annual loads change slightly, by up to about 2 % for zonings that put many rooms in one zone.
+- An input is appended: *Require Floor Research Eligibility* (FloorCheck, default false), an opt-in check for research comparisons of floor zonings.
+- Floors made of two rectangles that meet at one corner now convert, and tiny internal masses from rounding are no longer written.
+
+### Opening older definitions
+
+Definitions saved with 1.5.0 open with their saved values, with *Require Floor Research Eligibility* false. The example definitions in the examples zip have been rebuilt with 1.6.0, and `schedule-draw.gh` is new.
 
 ## 1.5.0
 

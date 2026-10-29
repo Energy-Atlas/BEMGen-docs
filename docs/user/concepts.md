@@ -30,7 +30,7 @@ Program preset
     - **Built-in presets**, one component per space type in panel *1 Program Presets* (*Dwelling Unit Preset*, *Office Preset*, …). Every input has a default, so each works with nothing connected; you can change any value.
     - **General presets**, built in panel *1 Program* from *Schedule*, *Load*, and *Program Preset* for any space type and any set of loads.
     - **Mixed presets**, made by *Mix Programs* (panel *1 Program*) from several presets and a floor-area share for each ([What's new](whats-new.md#mix-programs)).
-    - **Program JSON presets**, made by *Program JSON* (panel *1 Program*) from the text of a program JSON 5.4.0 export of Energy Archetype Atlas release 2.0.0 ([What's new](whats-new.md#program-json)).
+    - **Program JSON presets**, made by *Program JSON* (panel *1 Program*) from the text of a program JSON 5.4.0 export of Energy Archetype Atlas release 2.1.0 or 2.0.0 ([What's new](whats-new.md#program-json)); *Schedule Draw* can first replace its schedules with drawn ones ([What's new](whats-new.md#schedule-draw)).
     - **Any-program presets**: wire any preset into the parameter *Any Program Preset* (AnyP, panel *1 Program*) and it comes out without a space type. Every preset input of every generator accepts it. The zones keep the space type of the input and take the preset's program, and the plan records the substitution in its provenance (`AnyProgramPreset.<Input>=<preset name>`).
 
 Load

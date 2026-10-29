@@ -1,6 +1,43 @@
 # What's new
 
-This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.4.0.
+This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.5.0.
+
+## 1.5.0
+
+Version 1.5.0 adds generators for the DOE commercial reference buildings and reads release 2.0.0 of the Energy Archetype Atlas.
+
+### DOE reference buildings
+
+Fifteen new generators in *2 Generate* draw the DOE commercial reference buildings, from *DOE Small Office* to *DOE Hospital*, with the DOE zones on every storey. See [Typologies](typologies.md#doe-reference-buildings).
+- A DOE generator's zones take their presets from a *Program Map*, one preset per program key.
+- Each generator has a matching *Programs* component in *1 Program Presets* that gives the map. *DOE Program Map* in *1 Program* builds a map from edited presets.
+- The generator's *Multipliers* output goes into the floor aggregator beside its floors.
+
+### Program JSON
+
+*Program JSON* reads program JSON 5.4.0 as atlas release 2.0.0 exports it, in the filled or the source version. Program JSON 2.0.0 is no longer read.
+- Two inputs are appended: *Climate Zone* (CZ), which selects the values that differ by climate, and *Context* (Ctx), which selects the loads that apply only with a construction context.
+- *WWR* no longer has a default. Without it, the JSON's window ratios per orientation give the glazing, or 0.4 when the JSON has none.
+- A filled program's hot water takes the weather file's water mains temperature.
+- Programs may carry daylighting controls. *Convert2IDF* never writes them: daylight dimming stays part of the lighting load, and the IDF header names the zones that have controls.
+
+### Construction JSON
+
+*Construction JSON* reads the unified 3.1.0 and detailed 4.3.0 construction sets of atlas release 2.0.0. The older unified 2.0.0 and detailed 3.0.0 sets are no longer read.
+- With a set, ground floors take the set's own F-factor or layered ground construction instead of the Example envelope's. An F-factor floor needs *Convert2IDF*'s *Weather* file.
+- IECC construction sets are read but not converted: their infiltration is given per zone.
+
+### Glazing per orientation
+
+The preset components and *Program JSON* gain *WWR North*, *WWR East*, *WWR South*, *WWR West*, and *Skylight Ratio*, all unset by default.
+
+### Convert2IDF
+
+Every IDF with ground floors also requests the hourly inside-face conduction of each ground surface and `Output:Surfaces:List, Details`.
+
+### Opening older definitions
+
+Definitions saved with 1.4.0 open with their saved values; the new inputs are unset. A *Program JSON* or *Construction JSON* that holds an older atlas text now gives an error asking for an export from atlas release 2.0.0: give it the new text. The example definitions in the examples zip have been rebuilt with 1.5.0, and `program-json-office.gh` holds a program JSON 5.4.0 export.
 
 ## 1.4.0
 

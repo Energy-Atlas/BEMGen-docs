@@ -8,11 +8,11 @@
 
 ## Install the plugin
 
-Download the files of the latest version from the [Releases page](https://github.com/energy-atlas/BEMGen-docs/releases). This guide describes version 1.4.0, which has:
+Download the files of the latest version from the [Releases page](https://github.com/energy-atlas/BEMGen-docs/releases). This guide describes version 1.5.0, which has:
 
-- `bemgen-1.4.0-rh8_19-win.yak`, the Rhino package (`rh8_19` means Rhino 8.19 or later, `win` means Windows);
-- `bemgen-1.4.0-rh8-win.zip`, the same plugin as a folder;
-- `bemgen-1.4.0-examples.zip`, the example definitions;
+- `bemgen-1.5.0-rh8_19-win.yak`, the Rhino package (`rh8_19` means Rhino 8.19 or later, `win` means Windows);
+- `bemgen-1.5.0-rh8-win.zip`, the same plugin as a folder;
+- `bemgen-1.5.0-examples.zip`, the example definitions;
 - `SHA256SUMS.txt`, the checksums of the three files.
 
 Later versions have the same files with their own version number. If you are updating from an earlier version, read [What's new](whats-new.md) first: definitions saved with 1.1.0 or 1.2.0 open as they were, but those saved with 1.0.2 or earlier lose the infiltration values of their presets.

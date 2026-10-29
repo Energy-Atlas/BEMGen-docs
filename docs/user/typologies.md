@@ -1,6 +1,6 @@
 # Typologies
 
-BEMGen has one plan generator for each family of its precedent set, eighteen in all, housing and non-residential, all in panel *2 Generate*. The families come from four books on housing and building planning; they fix only which parts a plan has and how they connect, so every dimension and count below is a design input with a default chosen for BEMGen. The family `SYN-TYP-013` (an incremental row with reserved expansion bays) has no generator. Family rules and sources: [four-source typology families](../developer/research/precedents/syn-typologies.md).
+BEMGen has one plan generator for each family of its precedent set, eighteen in all, housing and non-residential, all in panel *2 Generate*, and fifteen generators for the [DOE reference buildings](#doe-reference-buildings). The families come from four books on housing and building planning; they fix only which parts a plan has and how they connect, so every dimension and count below is a design input with a default chosen for BEMGen. The family `SYN-TYP-013` (an incremental row with reserved expansion bays) has no generator. Family rules and sources: [four-source typology families](../developer/research/precedents/syn-typologies.md).
 
 The images show each family's example definition in the viewport: the default plan (left) and the building after its simplifier and floor aggregator (right), as listed under [Example definitions](#example-definitions).
 
@@ -198,6 +198,32 @@ Support rooms `SUP` across the west end, then bands from south to north: a dirty
 ![Building of the Operating Suite example](../assets/screenshots/operating-suite-building.png){ width="49%" }
 
 Example: `operating-suite.gh` ([canvas](../assets/screenshots/canvas/operating-suite.png)); reference: [Operating Suite](components/generate.md#operating-suite).
+
+## DOE reference buildings
+
+Fifteen more generators in *2 Generate* draw the DOE commercial reference buildings. These are not precedent families: each draws one reference building with its DOE zones, and every dimension is an input whose default is the reference building's.
+- **Presets:** instead of one preset input per space type, a DOE generator has a *Program Map* that gives a preset to each program key. Its *Program Keys* output lists the keys, and its matching *Programs* component in *1 Program Presets* gives a map of illustrative presets with the reference building's window ratios. *DOE Program Map* in *1 Program* builds a map from edited presets.
+- **Outputs:** a DOE generator gives a *Plan* for every storey, bottom-up. Its *Multipliers* output says how many storeys each plan stands for; wire it into the floor aggregator's *Multipliers*.
+
+| Generator (nickname) | Programs component (nickname) |
+| --- | --- |
+| [*DOE Small Office*](components/generate.md#doe-small-office) (DoeSOff) | *DOE Small Office Programs* (DoeSOffP) |
+| [*DOE Medium Office*](components/generate.md#doe-medium-office) (DoeMOff) | *DOE Medium Office Programs* (DoeMOffP) |
+| [*DOE Large Office*](components/generate.md#doe-large-office) (DoeLOff) | *DOE Large Office Programs* (DoeLOffP) |
+| [*DOE Stand-alone Retail*](components/generate.md#doe-stand-alone-retail) (DoeRet) | *DOE Stand-alone Retail Programs* (DoeRetP) |
+| [*DOE Strip Mall*](components/generate.md#doe-strip-mall) (DoeSMall) | *DOE Strip Mall Programs* (DoeSMallP) |
+| [*DOE Supermarket*](components/generate.md#doe-supermarket) (DoeSMkt) | *DOE Supermarket Programs* (DoeSMktP) |
+| [*DOE Warehouse*](components/generate.md#doe-warehouse) (DoeWare) | *DOE Warehouse Programs* (DoeWareP) |
+| [*DOE Primary School*](components/generate.md#doe-primary-school) (DoePSch) | *DOE Primary School Programs* (DoePSchP) |
+| [*DOE Secondary School*](components/generate.md#doe-secondary-school) (DoeSSch) | *DOE Secondary School Programs* (DoeSSchP) |
+| [*DOE Small Hotel*](components/generate.md#doe-small-hotel) (DoeSHot) | *DOE Small Hotel Programs* (DoeSHotP) |
+| [*DOE Large Hotel*](components/generate.md#doe-large-hotel) (DoeLHtl) | *DOE Large Hotel Programs* (DoeLHtlP) |
+| [*DOE Quick-Service Restaurant*](components/generate.md#doe-quick-service-restaurant) (DoeQSR) | *DOE Quick-Service Restaurant Programs* (DoeQSRP) |
+| [*DOE Full-Service Restaurant*](components/generate.md#doe-full-service-restaurant) (DoeFSR) | *DOE Full-Service Restaurant Programs* (DoeFSRP) |
+| [*DOE Outpatient*](components/generate.md#doe-outpatient) (DoeOutP) | *DOE Outpatient Programs* (DoeOutPP) |
+| [*DOE Hospital*](components/generate.md#doe-hospital) (DoeHosp) | *DOE Hospital Programs* (DoeHospP) |
+
+The programs components' loads are illustrative, like the other built-in presets; only their window ratios are the reference building's. For a program's own values, give *Program JSON*'s presets to *DOE Program Map*.
 
 ## Example definitions
 

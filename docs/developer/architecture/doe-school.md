@@ -1,6 +1,6 @@
 # DOE school generator
 
-> **Status:** Provisional (stage P3 of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md), pending the owner's reading) · **Code:** `src/Lod.Generators/Doe/School/` · **Tests:** `tests/Lod.Generators.Tests/Doe/School/` · **Components:** `src/Lod.Grasshopper/Components/DoeSchoolComponents.cs` · **Smoke spec:** `scripts/rhino-smoke/specs/doe-schools.py` · **Records:** `primary-school`, `secondary-school` ([DOE layout records](doe-layouts.md))
+> **Status:** Accepted (stage P3 of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md); the owner, with PR #1, D-176) · **Code:** `src/Lod.Generators/Doe/School/` · **Tests:** `tests/Lod.Generators.Tests/Doe/School/` · **Components:** `src/Lod.Grasshopper/Components/DoeSchoolComponents.cs` · **Smoke spec:** `scripts/rhino-smoke/specs/doe-schools.py` · **Records:** `primary-school`, `secondary-school` ([DOE layout records](doe-layouts.md))
 
 `SchoolGenerator` builds the DOE primary school (one storey of 25 zones) and secondary school (two storeys of 25 and 21 zones) from their layout
 records, one plan per storey through `MultiStoreyPlanGenerator` ([ADR-015](../decisions/ADR-015-plans-per-storey.md)) and `GridPlanLayout`

@@ -1,6 +1,6 @@
 # The DOE tower hotel generator (`TowerHotel`)
 
-> **Status:** Provisional (stage P5b of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md), pending the owner's reading) · **Code:** `src/Lod.Generators/Doe/TowerHotel/`, shared with the hospital in `src/Lod.Generators/Doe/MultipliedRooms/` · **Tests:** `tests/Lod.Generators.Tests/Doe/TowerHotel/`, `tests/Lod.Integration.Tests/MultipliedRoomTypologyTests.cs` · **Decisions:** [ADR-025](../decisions/ADR-025-doe-reference-geometry-generators.md), [ADR-026](../decisions/ADR-026-multiplied-rooms.md), [ADR-015](../decisions/ADR-015-plans-per-storey.md)
+> **Status:** Accepted (stage P5b of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md); the owner, with PR #1, D-176) · **Code:** `src/Lod.Generators/Doe/TowerHotel/`, shared with the hospital in `src/Lod.Generators/Doe/MultipliedRooms/` · **Tests:** `tests/Lod.Generators.Tests/Doe/TowerHotel/`, `tests/Lod.Integration.Tests/MultipliedRoomTypologyTests.cs` · **Decisions:** [ADR-025](../decisions/ADR-025-doe-reference-geometry-generators.md), [ADR-026](../decisions/ADR-026-multiplied-rooms.md), [ADR-015](../decisions/ADR-015-plans-per-storey.md)
 
 `TowerHotelGenerator` builds the DOE large hotel (record `large-hotel`, [doe-layouts.md](doe-layouts.md)): a podium storey under a
 double-loaded guest-room tower. It returns one plan per record storey, bottom-up (ADR-015): the ground storey (7 zones), the typical floor

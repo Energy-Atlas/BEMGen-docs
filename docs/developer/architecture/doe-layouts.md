@@ -1,6 +1,6 @@
 # DOE layout records and the grid plan layout
 
-> **Status:** Provisional (stages P0a and P5a of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md), pending the owner's reading) · **Code:** `src/Lod.Generators/Doe/`, `scripts/doe-geometry/`, the harness in `tests/Lod.Generators.Tests/Doe/Harness/` · **Data:** `src/Lod.Generators/Doe/Layouts/*.json`, `tests/fixtures/doe/*.answer.json`
+> **Status:** Accepted (stages P0a and P5a of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md); the owner, with PR #1, D-176) · **Code:** `src/Lod.Generators/Doe/`, `scripts/doe-geometry/`, the harness in `tests/Lod.Generators.Tests/Doe/Harness/` · **Data:** `src/Lod.Generators/Doe/Layouts/*.json`, `tests/fixtures/doe/*.answer.json`
 
 Stage P0a lays the foundation the DOE generator families (P1 to P6) build on: the layout of every non-apartment DOE type as data, a shared
 layout block that turns a storey of that data into a plan, the S3 size rule, program keys with the program map, and a harness that compares a

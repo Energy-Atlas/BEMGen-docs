@@ -1,6 +1,6 @@
 # The ring office generator (DOE geometry P1)
 
-> **Status:** Provisional (stage P1 of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md), pending the owner's reading) · **Code:** `src/Lod.Generators/Doe/RingOffice/` · **Data:** the `small-office`, `medium-office`, and `large-office` layout records ([doe-layouts.md](doe-layouts.md)) · **Tests:** `tests/Lod.Generators.Tests/Doe/RingOffice/`, `tests/Lod.Integration.Tests/RingOfficeTypologyTests.cs`
+> **Status:** Accepted (stage P1 of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md); the owner, with PR #1, D-176) · **Code:** `src/Lod.Generators/Doe/RingOffice/` · **Data:** the `small-office`, `medium-office`, and `large-office` layout records ([doe-layouts.md](doe-layouts.md)) · **Tests:** `tests/Lod.Generators.Tests/Doe/RingOffice/`, `tests/Lod.Integration.Tests/RingOfficeTypologyTests.cs`
 
 `RingOfficeGenerator` builds the three DOE offices: the openstudio-standards detailed office rooms on the DOE reference plates and elevations
 (O6, O8). Each office is a ring of perimeter rooms around a corridor ring and a core. The generator lays out every record storey through

@@ -1,5 +1,9 @@
 # Validation
 
+The additive default-off registered-floor exact identity screen is documented in [ADR-031](../decisions/ADR-031-exact-composition-identity-preflight.md) and [research usage](../research/reference-program-contract.md). It reports Preserved/Failed/Unavailable separately from production validation and does not alter the production checks below. Geometry/program preservation is not full exact-composition eligibility: missing ownership/construction stays unavailable.
+
+The additive [reference research contract](../research/reference-program-contract.md#research-preflight) describes `FloorResearchEligibilityValidator` and the opt-in `IdfOptions.RequireFloorResearchEligibility` writer gate. Its spatial conditioning/control checks supplement the production rules below without changing them or certifying whole-building thermal equivalence.
+
 Applies from v0.3.0 (S3). Code: `src/Lod.Core/Validation/Totals.cs` and `src/Lod.Core/Validation/Validators.cs`. Rules: GLOBAL.md scientific rules 1, 2, and 6; research brief §17; D-038 (conditioning), D-041 (façade coverage), D-045 (building height), D-046 (ground, roof, and exposed floor area); D-124 (infiltration is not a program load, [ADR-017](../decisions/ADR-017-program-mix-and-building-infiltration.md)); D-126 (load components by end use, per-dwelling loads, the calendar; [ADR-018](../decisions/ADR-018-program-json-and-extended-programs.md)); roadmap S3 slice `feature/validation-invariants`.
 
 ## Purpose

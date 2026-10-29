@@ -1,6 +1,6 @@
 # DOE outpatient generator
 
-> **Status:** Provisional (stage P6 of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md), pending the owner's reading) · **Code:** `src/Lod.Generators/Doe/Outpatient/` · **Tests:** `tests/Lod.Generators.Tests/Doe/Outpatient/`, `tests/Lod.Integration.Tests/OutpatientTypologyTests.cs` · **Record:** `outpatient` ([DOE layout records](doe-layouts.md))
+> **Status:** Accepted (stage P6 of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md); the owner, with PR #1, D-176) · **Code:** `src/Lod.Generators/Doe/Outpatient/` · **Tests:** `tests/Lod.Generators.Tests/Doe/Outpatient/`, `tests/Lod.Integration.Tests/OutpatientTypologyTests.cs` · **Record:** `outpatient` ([DOE layout records](doe-layouts.md))
 
 `OutpatientGenerator` builds the DOE outpatient health-care building, three storeys of 59, 41, and 26 zones, from its layout record, one plan per
 storey through `MultiStoreyPlanGenerator` ([ADR-015](../decisions/ADR-015-plans-per-storey.md)) because the storeys differ, and `GridPlanLayout`

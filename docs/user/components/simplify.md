@@ -55,7 +55,7 @@ Keeps the detailed plan's zones and surfaces (Z0).
 | --- | --- | --- | --- | --- |
 | Floor | `Floor` | [Floor](info.md#floor) | item | The floor. |
 
-**Example definitions:** `cafeteria.gh` ([canvas](../../assets/screenshots/canvas/cafeteria.png)), `care-hub.gh` ([canvas](../../assets/screenshots/canvas/care-hub.png)), `linear-plan.gh` ([canvas](../../assets/screenshots/canvas/linear-plan.png)), `open-court.gh` ([canvas](../../assets/screenshots/canvas/open-court.png)).
+**Example definitions:** `cafeteria.gh` ([canvas](../../assets/screenshots/canvas/cafeteria.png)), `care-hub.gh` ([canvas](../../assets/screenshots/canvas/care-hub.png)), `linear-plan.gh` ([canvas](../../assets/screenshots/canvas/linear-plan.png)), `open-court.gh` ([canvas](../../assets/screenshots/canvas/open-court.png)), `schedule-draw.gh` ([canvas](../../assets/screenshots/canvas/schedule-draw.png)).
 
 ## Perimeter Core
 

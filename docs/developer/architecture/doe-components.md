@@ -1,6 +1,6 @@
 # DOE generator components and the program map
 
-> **Status:** Provisional (stages P1 to P7 and the close-out of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md), pending the owner's reading) · **Code:** `src/Lod.Grasshopper/Components/DoeComponentSupport.cs`, `DoeProgramMapComponent.cs`, `Doe<Family>Components.cs`, `src/Lod.Grasshopper/Goo/DoeGoo.cs`, `src/Lod.Grasshopper/Parameters/DoeParameters.cs`; `DoeProgramMap.Create` in `src/Lod.Generators/Doe/DoeProgramMap.cs`; `DoeProgramPresetsComponents.cs` and `src/Lod.Generators/Doe/DoeProgramPresets.cs` (P7) · **Smoke specs:** `scripts/rhino-smoke/specs/doe-offices.py` and one spec per family ([below](#all-doe-generator-components))
+> **Status:** Accepted (stages P1 to P7 and the close-out of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md); the owner, with PR #1, D-176) · **Code:** `src/Lod.Grasshopper/Components/DoeComponentSupport.cs`, `DoeProgramMapComponent.cs`, `Doe<Family>Components.cs`, `src/Lod.Grasshopper/Goo/DoeGoo.cs`, `src/Lod.Grasshopper/Parameters/DoeParameters.cs`; `DoeProgramMap.Create` in `src/Lod.Generators/Doe/DoeProgramMap.cs`; `DoeProgramPresetsComponents.cs` and `src/Lod.Generators/Doe/DoeProgramPresets.cs` (P7) · **Smoke specs:** `scripts/rhino-smoke/specs/doe-offices.py` and one spec per family ([below](#all-doe-generator-components))
 
 Stage P1 builds the Grasshopper support that every DOE generator component uses (P1 to P6): how a definition gives a DOE generator its
 presets, one per program key (S4), and the outputs every DOE generator has. The DOE generators are a set of their own in panel *2 Generate*
@@ -224,4 +224,3 @@ motif of a precedent generator (*Office Plate*, *Cafeteria*, *Branching Mall*, *
 | *DOE Hospital* | a square plate crossed by two dark corridors, one room solid and its copies dashed along a wing |
 | *DOE Outpatient* | a three-storey block, the ground storey longer to the north, a dark stair shaft through all three, a cross on the upper storey |
 | *DOE … Programs* (each of the 15) | its generator's motif at two-thirds size in the top right, in the orange accent, and a preset tag with its hole in the bottom left over the motif's corner (`programs` in the script) |
-

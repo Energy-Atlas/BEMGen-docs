@@ -267,7 +267,7 @@ Program preset of an office service core: lifts, stairs, toilets, risers; space 
 | --- | --- | --- | --- | --- |
 | Preset | `P` | [Program Preset](info.md#program-preset) | item | The program preset. |
 
-**Example definitions:** `office-plate.gh` ([canvas](../../assets/screenshots/canvas/office-plate.png)), `program-json-office.gh` ([canvas](../../assets/screenshots/canvas/program-json-office.png)).
+**Example definitions:** `office-plate.gh` ([canvas](../../assets/screenshots/canvas/office-plate.png)), `program-json-office.gh` ([canvas](../../assets/screenshots/canvas/program-json-office.png)), `schedule-draw.gh` ([canvas](../../assets/screenshots/canvas/schedule-draw.png)).
 
 ## Corridor Preset
 

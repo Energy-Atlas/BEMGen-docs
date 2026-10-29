@@ -81,7 +81,7 @@ All storeys explicit: each floor is repeated by its multiplier and stacked; inte
 | --- | --- | --- | --- | --- |
 | Building | `Bldg` | [Building](info.md#building) | item | The building. |
 
-**Example definitions:** `branching-mall.gh` ([canvas](../../assets/screenshots/canvas/branching-mall.png)), `enclosed-court.gh` ([canvas](../../assets/screenshots/canvas/enclosed-court.png)), `end-to-end.gh` ([canvas](../../assets/screenshots/canvas/end-to-end.png)), `linear-plan.gh` ([canvas](../../assets/screenshots/canvas/linear-plan.png)), `stepped-band.gh` ([canvas](../../assets/screenshots/canvas/stepped-band.png)), `terrace-row.gh` ([canvas](../../assets/screenshots/canvas/terrace-row.png)).
+**Example definitions:** `branching-mall.gh` ([canvas](../../assets/screenshots/canvas/branching-mall.png)), `enclosed-court.gh` ([canvas](../../assets/screenshots/canvas/enclosed-court.png)), `end-to-end.gh` ([canvas](../../assets/screenshots/canvas/end-to-end.png)), `linear-plan.gh` ([canvas](../../assets/screenshots/canvas/linear-plan.png)), `schedule-draw.gh` ([canvas](../../assets/screenshots/canvas/schedule-draw.png)), `stepped-band.gh` ([canvas](../../assets/screenshots/canvas/stepped-band.png)), `terrace-row.gh` ([canvas](../../assets/screenshots/canvas/terrace-row.png)).
 
 ## Stacked Floor Zone Multiplier
 

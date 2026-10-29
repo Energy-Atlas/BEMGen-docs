@@ -1,8 +1,8 @@
 # Schedule generator: requirement
 
-> **Status:** Requirement only, not designed (the owner, 2026-10-12) · **Decisions:** D-133, D-134 · **Applies to:** test suites ([design note](../plans/2026-10-12-test-suite-generator.md)) · **Related:** [experiment outputs](experiment-outputs.md), [program presets](program-presets.md)
+> **Status:** Designed and implemented (stage B2, D-194 to D-196, [ADR-033](../decisions/ADR-033-schedule-draw-external-generator.md)); the requirement below is the owner's of 2026-10-12 · **Decisions:** D-133, D-134 · **Applies to:** test suites ([design note](../plans/2026-10-12-test-suite-generator.md)), *Schedule Draw* ([architecture](../architecture/schedule-draw.md)) · **Related:** [experiment outputs](experiment-outputs.md), [program presets](program-presets.md)
 
-This page records what the owner asked of a schedule generator, so that its design can start from it. Until then, every program is used with the schedules its program JSON defines, and a test-suite spec has no schedule section.
+This page records what the owner asked of a schedule generator. The design is [ADR-033](../decisions/ADR-033-schedule-draw-external-generator.md): the atlas generator `atlas_schedules` 3.0.0 called as an external command, *Schedule Draw* in Grasshopper, and the test-suite spec's optional `schedules:` section. Without a draw, every program is used with the schedules its program JSON defines.
 
 ## What the owner asked (2026-10-12)
 
@@ -33,9 +33,9 @@ The generator runs once per test case, on the zones of the generated plan: the r
 - Installed loads, hourly scheduled loads, and occupancy are therefore conserved between a test case's reference and each test site (requirement 4; scientific rules 1 and 4).
 - Each zone's provenance records its seed, and each merged zone's records the sources it aggregates (rule 2).
 
-## Also to settle at the design
+## Also to settle at the design (settled by ADR-033)
 
-- **Which schedules are drawn:** occupancy, lighting, equipment, hot water, setpoints, ventilation.
-- **Where the generator runs:** in C#, or as an external command (Python, for ResStock/ComStock tooling) with files in and out.
-- **The calendar.** Draws use the suite's calendar (D-133), year 2007 by default.
-- **Seeds.** How zones' seeds are derived from the test case's seed: from the zone ID, the suite seed, and the sample index.
+- **Which schedules are drawn:** occupancy, lighting, equipment, hot water, setpoints, ventilation. *Settled:* occupancy, lighting, electric and gas equipment, hot water (flow and target temperature), activity, and the heating and cooling setpoints, all by default, narrowed by the setting's `draw`; ventilation is not a schedule the generator draws (ADR-033 decision 3).
+- **Where the generator runs:** in C#, or as an external command (Python, for ResStock/ComStock tooling) with files in and out. *Settled:* an external command, `python -m atlas_schedules` by default, files in and out, a timeout, captured standard error, pinned versions (decisions 1, 2).
+- **The calendar.** Draws use the suite's calendar (D-133), year 2007 by default. *Settled:* the generator's 2007; a suite with schedules must use 2007, and its holidays apply to the schedules not drawn (decision 5).
+- **Seeds.** How zones' seeds are derived from the test case's seed: from the zone ID, the suite seed, and the sample index. *Settled:* the test case's seed is the master seed; each zone is its own operating group keyed `<plan index>.<zone ID>`, whose seed the generator derives from the master seed and the key (`atlas_conditional_seeded_v1`), recorded per zone; the sample index is the seed's place in the spec's list (decision 6).

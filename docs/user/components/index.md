@@ -7,7 +7,7 @@ Every component and parameter of the BEMGen tab in Grasshopper, generated from t
 | Panel | Components | Parameters |
 | --- | --- | --- |
 | [0 Info](info.md) | 1 | 9 |
-| [1 Program](program.md) | 7 | 1 |
+| [1 Program](program.md) | 9 | 1 |
 | [1 Program Presets](program-presets.md) | 34 | 0 |
 | [2 Generate](generate.md) | 34 | 0 |
 | [3 Simplify](simplify.md) | 5 | 0 |
@@ -57,6 +57,7 @@ Every component and parameter of the BEMGen tab in Grasshopper, generated from t
 | ![](../../assets/icons/DoeProgramMapComponent.png) | [DOE Program Map](program.md#doe-program-map) | `DoeMap` | Program |
 | ![](../../assets/icons/QuickServiceRestaurantComponent.png) | [DOE Quick-Service Restaurant](generate.md#doe-quick-service-restaurant) | `DoeQSR` | Generate |
 | ![](../../assets/icons/QuickServiceRestaurantProgramsComponent.png) | [DOE Quick-Service Restaurant Programs](program-presets.md#doe-quick-service-restaurant-programs) | `DoeQSRP` | Program Presets |
+| ![](../../assets/icons/DoeReferenceProgramComponent.png) | [DOE Reference Program](program.md#doe-reference-program) | `DOEProg` | Program |
 | ![](../../assets/icons/SecondarySchoolComponent.png) | [DOE Secondary School](generate.md#doe-secondary-school) | `DoeSSch` | Generate |
 | ![](../../assets/icons/SecondarySchoolProgramsComponent.png) | [DOE Secondary School Programs](program-presets.md#doe-secondary-school-programs) | `DoeSSchP` | Program Presets |
 | ![](../../assets/icons/SmallHotelComponent.png) | [DOE Small Hotel](generate.md#doe-small-hotel) | `DoeSHot` | Generate |
@@ -104,6 +105,7 @@ Every component and parameter of the BEMGen tab in Grasshopper, generated from t
 | ![](../../assets/icons/RetailPresetComponent.png) | [Retail Preset](program-presets.md#retail-preset) | `Retail` | Program Presets |
 | ![](../../assets/icons/ScheduleComponent.png) | [Schedule](program.md#schedule) | `Sch` | Program |
 | ![](../../assets/icons/ScheduleParameter.png) | [Schedule](info.md#schedule) | `Sch` | Info |
+| ![](../../assets/icons/ScheduleDrawComponent.png) | [Schedule Draw](program.md#schedule-draw) | `SDraw` | Program |
 | ![](../../assets/icons/SemanticMergeComponent.png) | [Semantic Merge](simplify.md#semantic-merge) | `Z1` | Simplify |
 | ![](../../assets/icons/ServicePresetComponent.png) | [Service Preset](program-presets.md#service-preset) | `Serv` | Program Presets |
 | ![](../../assets/icons/SingleZoneBuildingComponent.png) | [Single Zone Building](aggregate.md#single-zone-building) | `1ZBldg` | Aggregate |
@@ -139,6 +141,7 @@ The definitions in the examples zip of each release, checked in Rhino before the
 - `point-plate.gh` ([canvas](../../assets/screenshots/canvas/point-plate.png))
 - `program-json-office.gh` ([canvas](../../assets/screenshots/canvas/program-json-office.png))
 - `radial-lobes.gh` ([canvas](../../assets/screenshots/canvas/radial-lobes.png))
+- `schedule-draw.gh` ([canvas](../../assets/screenshots/canvas/schedule-draw.png))
 - `stair-bay-bar.gh` ([canvas](../../assets/screenshots/canvas/stair-bay-bar.png))
 - `stair-pair.gh` ([canvas](../../assets/screenshots/canvas/stair-pair.png))
 - `stepped-band.gh` ([canvas](../../assets/screenshots/canvas/stepped-band.png))

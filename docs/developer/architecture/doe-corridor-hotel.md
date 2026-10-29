@@ -1,6 +1,6 @@
 # DOE corridor hotel generator
 
-> **Status:** Provisional (stage P4 of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md), pending the owner's reading) · **Code:** `src/Lod.Generators/Doe/CorridorHotel/` · **Tests:** `tests/Lod.Generators.Tests/Doe/CorridorHotel/`, `tests/Lod.Integration.Tests/CorridorHotelTypologyTests.cs` · **Record:** `small-hotel` ([DOE layout records](doe-layouts.md))
+> **Status:** Accepted (stage P4 of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md); the owner, with PR #1, D-176) · **Code:** `src/Lod.Generators/Doe/CorridorHotel/` · **Tests:** `tests/Lod.Generators.Tests/Doe/CorridorHotel/`, `tests/Lod.Integration.Tests/CorridorHotelTypologyTests.cs` · **Record:** `small-hotel` ([DOE layout records](doe-layouts.md))
 
 `CorridorHotelGenerator` builds the DOE small hotel, four storeys of 19, 16, 16, and 16 zones, from its layout record, one plan per storey
 through `MultiStoreyPlanGenerator` ([ADR-015](../decisions/ADR-015-plans-per-storey.md)) because the ground storey differs, and `GridPlanLayout`

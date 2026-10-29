@@ -1,6 +1,6 @@
 # The DOE hospital generator (`Hospital`)
 
-> **Status:** Provisional (stage P5b of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md), pending the owner's reading) · **Code:** `src/Lod.Generators/Doe/Hospital/`, shared with the tower hotel in `src/Lod.Generators/Doe/MultipliedRooms/` · **Tests:** `tests/Lod.Generators.Tests/Doe/Hospital/`, `tests/Lod.Integration.Tests/MultipliedRoomTypologyTests.cs` · **Decisions:** [ADR-025](../decisions/ADR-025-doe-reference-geometry-generators.md), [ADR-026](../decisions/ADR-026-multiplied-rooms.md), [ADR-015](../decisions/ADR-015-plans-per-storey.md), D-163
+> **Status:** Accepted (stage P5b of the [DOE geometry design note](../plans/2026-10-25-doe-geometry-generators.md); the owner, with PR #1, D-176) · **Code:** `src/Lod.Generators/Doe/Hospital/`, shared with the tower hotel in `src/Lod.Generators/Doe/MultipliedRooms/` · **Tests:** `tests/Lod.Generators.Tests/Doe/Hospital/`, `tests/Lod.Integration.Tests/MultipliedRoomTypologyTests.cs` · **Decisions:** [ADR-025](../decisions/ADR-025-doe-reference-geometry-generators.md), [ADR-026](../decisions/ADR-026-multiplied-rooms.md), [ADR-015](../decisions/ADR-015-plans-per-storey.md), D-163
 
 `HospitalGenerator` builds the DOE hospital (record `hospital`, [doe-layouts.md](doe-layouts.md)): five storeys of 9, 11, 13, 13, and 8 zones,
 one plan per storey, bottom-up (ADR-015), every storey 4.2683 m high, so G5 does not apply. Every zone has its standards space type as program

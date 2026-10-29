@@ -1,6 +1,6 @@
 # ADR-025: DOE reference geometry generators
 
-Status: Accepted (by the controller under D-098; provisional pending the owner's reading); the owner's decisions O1 to O8 of 2026-10-25 are cited here, not made here; S8 is detailed in [ADR-026](ADR-026-multiplied-rooms.md)
+Status: Accepted (by the controller under D-098; by the owner with PR #1, D-176); the owner's decisions O1 to O8 of 2026-10-25 are cited here, not made here; S8 is detailed in [ADR-026](ADR-026-multiplied-rooms.md)
 
 Date: 2026-10-25
 
@@ -169,4 +169,4 @@ G1 to G5 themselves (only their conventions, S7); apartments; window shape (stri
 - The comparison against an answer key excludes exactly the quantities of the gaps that apply to a generator, so a gap is a documented difference and not a hidden one.
 - A plan with room multipliers cannot yet go through *Perimeter Core*, *Single Zone per Floor*, or the single-zone aggregators (`NotSupported`, S8); ADR-026 settles the mechanism.
 - A DOE zone's program comes from the program map, so the atlas inputs A1 to A3 must land before the programs are real; until then tests use fixture programs, and P1's T4 is pending. Since stage P7 (design note §9) every generator also has a ready map, `DoeProgramPresets`, with the illustrative example preset of each key's space type (the example Service preset as an any-program preset where the space type has none) and the source's own glazing per key, shipped in the layout records; its loads are not sourced programs and are replaced when A1 and A2 land ([doe-components.md](../architecture/doe-components.md#doe-program-presets)).
-- S1 to S10 are provisional, as are the details each stage settles within them. If the owner overrules one, a new decision-log entry supersedes it and this ADR is updated.
+- S1 to S10 were provisional, as were the details each stage settled within them, until the owner accepted them with PR #1 (D-176). If the owner overrules one, a new decision-log entry supersedes it and this ADR is updated.

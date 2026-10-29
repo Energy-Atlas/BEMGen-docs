@@ -1,6 +1,6 @@
 # ADR-026: Multiplied rooms
 
-Status: Accepted (by the controller under D-098; provisional pending the owner's reading); the owner's decision O5 of 2026-10-25 is cited here, not made here
+Status: Accepted (by the controller under D-098; by the owner with PR #1, D-176); the owner's decision O5 of 2026-10-25 is cited here, not made here
 
 Date: 2026-10-25
 
@@ -155,4 +155,4 @@ Drawing the copies; merging zones of different multipliers with weights; fractio
 - A building with room multipliers counts each zone times its multiplier in every total; *Semantic Merge* and *Conditioned Merge* never merge zones of different multipliers; the `NotSupported` cases are tested (ADR-025, phase P5).
 - A plan with room multipliers cannot yet go through *Perimeter Core*, *Single Zone per Floor*, or the single-zone aggregators.
 - The thermal differences of the four kinds above stay documented for every comparison with the source.
-- S8 and the details P5a settled are provisional. If the owner overrules one, a new decision-log entry supersedes it and this ADR is updated.
+- S8 and the details P5a settled were provisional until the owner accepted them with PR #1 (D-176). If the owner overrules one, a new decision-log entry supersedes it and this ADR is updated.

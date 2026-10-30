@@ -1,6 +1,35 @@
 # What's new
 
-This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.7.0.
+This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.8.0.
+
+## 1.8.0
+
+Version 1.8.0 takes programs from the [Energy Archetype Atlas site](https://energy-atlas.github.io/archetype-atlas/). The network is used only after you click in one of the windows below; every solve reads only the definition, so stored programs solve offline. The windows need Windows, where they use WebView2.
+
+### Get from Atlas on Program JSON
+
+*Program JSON* has two strips at its bottom; double-click one to open its window. See the [component reference](components/program.md#program-json).
+
+- ***Get from Atlas…*** shows the atlas site. Open a program's page in the catalogue, choose *Filled* (the default) or *Source*, and click *Use this program*. The program JSON is downloaded, checked against the site's index, and stored as the *JSON* input's value, with one undo step. Programs that the atlas publishes only as source, such as the IECC programs, select *Source* and say why.
+- ***Edit JSON…*** shows the stored text to paste or edit; *OK* checks it before it is stored.
+- A wire into *JSON* still takes precedence over the stored text.
+
+### Atlas program maps on the DOE Programs components
+
+Each *DOE … Programs* component in *1 Program Presets* has the strip *Get from Atlas…*. Its window lists five atlas families, DOE Ref pre-1980, DOE Ref 1980–2004, 90.1-2007, 90.1-2013, and 90.1-2019, each with how many of the prototype's program keys it covers, such as `90.1-2019: 3 of 4 keys; Retail has no program.`. See the [component reference](components/program-presets.md).
+
+- ***OK*** downloads every key's program of the chosen family (filled by default, or source), checks each, and stores them in the component with one undo step. Each key takes the atlas program of its own space type in the prototype's folder; the window-to-wall ratios stay the DOE reference building's, so the presets fit the generator's geometry. *Clear* returns to the illustrative presets.
+- **New inputs** *Climate Zone*, *Year*, *Holidays*, and *Context* apply to a stored map, as on *Program JSON*. **A new output**, *JSON*, gives each key's program text, for example for *Schedule Draw*.
+- **Keys without a program.** The 90.1 families split or rename a few space types: 90.1-2007 the secondary school's `Gym - audience` and the small hotel's `GuestRoom`, 90.1-2013 and 90.1-2019 also the hospital's `Office` and the stand-alone retail's `Retail`. Such a key is named in an error, *Program Map* is not output, and *Presets* leaves its position empty, so you can give it a preset and rebuild the map with *DOE Program Map*.
+- The new example `doe-atlas-map.gh` is the DOE medium office with the atlas's 90.1-2007 programs stored in *DOE Medium Office Programs*.
+
+### Generator JSON from the atlas site
+
+*Schedule Draw* has the strip *Get from Atlas…* too. Its window finds the atlas folder of the program in *Program JSON* and stores that folder's `generation.json` as *Generator JSON*. The atlas has no `generation.json` for its detailed office folders, so programs of the DOE small, medium, and large office cannot be drawn yet; the window says so.
+
+### Opening older definitions
+
+Definitions saved with 1.7.0 open with their saved values; the DOE *Programs* components get the new inputs unset and solve as before. The checksum in *Program JSON*'s *Source* is now that of the text with LF line endings, so a definition whose stored text had CR LF line endings shows a new checksum once. The example definitions in the examples zip have been rebuilt with 1.8.0.
 
 ## 1.7.0
 

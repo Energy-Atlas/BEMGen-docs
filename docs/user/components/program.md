@@ -153,13 +153,13 @@ Mixes program presets into one by weight. Weights are floor-area shares, normali
 
 Component · nickname `PJson` · GUID `abb0aeb9-5a9f-40ff-b3a1-bb125cfb675c` · exposure primary
 
-A program preset from program JSON 5.4.0 text, as atlas releases 2.0.0 and 2.1.0 export it (version filled or source): its loads, end uses, heat fractions, people, heating and cooling, hot-water temperatures, daylighting controls, window ratios, and every schedule, expanded hour by hour on the calendar of Year and Holidays. Values that differ by climate take the Climate Zone's, and loads that apply only with a construction context need Context. The source version's unrecorded values are left out or take BEMGen's defaults, with warnings. The text is checked against the program JSON schema and the contract's rules before anything is made; the retired program JSON 2.0.0 is rejected. No file or network is read: connect the JSON text itself, for example from a Panel. Shared services, building services, exterior lighting, and what else the program cannot hold are listed in Left Out. The inputs after JSON complete or override the JSON; the result's Source records the JSON, the calendar, and every override.
+A program preset from program JSON 5.4.0 text, as atlas releases 2.0.0 to 2.2.0 export it (version filled or source): its loads, end uses, heat fractions, people, heating and cooling, hot-water temperatures, daylighting controls, window ratios, and every schedule, expanded hour by hour on the calendar of Year and Holidays. Values that differ by climate take the Climate Zone's, and loads that apply only with a construction context need Context. The source version's unrecorded values are left out or take BEMGen's defaults, with warnings. The text is checked against the program JSON schema and the contract's rules before anything is made; the retired program JSON 2.0.0 is rejected. No file or network is read: connect the JSON text itself, for example from a Panel. Shared services, building services, exterior lighting, and what else the program cannot hold are listed in Left Out. The inputs after JSON complete or override the JSON; the result's Source records the JSON, the calendar, and every override.
 
 **Inputs**
 
 | Name | Nickname | Type | Access | Optional | Default | Description |
 | --- | --- | --- | --- | --- | --- | --- |
-| JSON | `J` | Text | item | no | – | The program JSON 5.4.0 text (atlas release 2.1.0 or 2.0.0, version filled or source), as one text item. |
+| JSON | `J` | Text | item | no | – | The program JSON 5.4.0 text (atlas release 2.2.0, 2.1.0, or 2.0.0, version filled or source), as one text item. |
 | Name | `N` | Text | item | yes | – | Preset name; descriptive only, never used for matching. Unset: the JSON's name. |
 | Space Type | `ST` | Text | item | yes | – | The space type the preset applies to: DwellingUnit, Corridor, Stair, Core, Lobby, Service, Mechanical, Other, Mixed, Office, Retail, Mall, Kitchen, Dining, OperatingTheatre, CleanCorridor, DirtyCorridor, ClinicalSupport, CareBedroom, CareCommunal, ActivityHall. Unset: an any-program preset, which fits every preset input of a plan generator. Right-click the input to choose one, or extract it as a dropdown. |
 | WWR | `WWR` | Number | item | yes | – | Window-to-wall ratio in [0, 1) used by the plan generator for every exterior wall. Unset: the JSON's fenestration (per orientation and the roof's skylight ratio), or an illustrative 0.4 when the JSON has none. |
@@ -259,18 +259,18 @@ An 8760-hour schedule from a 24-hour weekday and weekend profile (holidays not m
 
 Component · nickname `SDraw` · GUID `740cafea-7afe-47f4-8723-b24b6ec3c836` · exposure primary
 
-Draws stochastic 8,760-hour schedules for a program JSON 5.4.0 with the atlas schedule generator (atlas_schedules 3.0.0, an external command), as an optional add-on to the program's own ruleset schedules. The program JSON, its release folder's generator.json (the program setting), a schedule-generator setting, and a seed give one program JSON whose drawn schedules (occupancy, lighting, equipment, hot water, activity, setpoints, as the setting says) are annual series of 2007, with the generator, setting, seed, and the request's and bundle's checksums recorded in metadata.schedule_draw. The loads keep their magnitudes, which the generator binds to its schedules. The same inputs and seed always give the same text. Connect Drawn JSON to Program JSON. The command runs only while Run is true; it gets files and opens no network connection of BEMGen's.
+Draws stochastic 8,760-hour schedules for a program JSON 5.4.0 with the atlas schedule generator (atlas_schedules 4.0.0 reading atlas release 2.2.0, an external command), as an optional add-on to the program's own ruleset schedules. The program JSON, the generation.json of its folder in atlas release 2.2.0 (the program setting), a schedule-generator setting, and a seed give one program JSON whose drawn schedules (occupancy, lighting, equipment, hot water, activity, setpoints, as the setting says) are annual series of 2007, with the generator, the data release, the setting, the seed, and the request's and bundle's checksums recorded in metadata.schedule_draw. The program's own version (filled or source) chooses the values the generator draws from. The loads keep their magnitudes, which the generator binds to its schedules. The same inputs and seed always give the same text. Connect Drawn JSON to Program JSON. The command runs only while Run is true; it gets files and opens no network connection of BEMGen's.
 
 **Inputs**
 
 | Name | Nickname | Type | Access | Optional | Default | Description |
 | --- | --- | --- | --- | --- | --- | --- |
-| Program JSON | `J` | Text | item | no | – | The program JSON 5.4.0 text (atlas release 2.1.0 or 2.0.0), as one text item. |
-| Generator JSON | `G` | Text | item | no | – | The text of the generator.json of the program's release folder (the program setting): the recipes the generator draws from, keyed by release program ID. |
-| Setting | `S` | Text | item | no | – | The schedule-generator setting JSON (schedule_draw_setting 1.0.0): the generator atlas_schedules, its pinned version 3.0.0 and bundle schema 3.0.0, and optionally the view, the roles drawn, how operating hours are shared, the occupancy option, and the timeout. |
+| Program JSON | `J` | Text | item | no | – | The program JSON 5.4.0 text (atlas release 2.2.0, 2.1.0, or 2.0.0), as one text item. |
+| Generator JSON | `G` | Text | item | no | – | The text of the generation.json of the program's folder in atlas release 2.2.0 (the program setting; atlas-release-2.2.0.zip, v2.2.0/&lt;family&gt;/&lt;template&gt;/&lt;type&gt;/generation.json): the generation method and ComStock configuration of each release program and the configurations of its shared services. A generator.json of an earlier release is refused. |
+| Setting | `S` | Text | item | no | – | The schedule-generator setting JSON (schedule_draw_setting 2.0.0): the generator atlas_schedules, its pinned version 4.0.0 and bundle schema 4.0.0, and optionally the roles drawn, how operating hours are shared, the occupancy option, and the timeout. |
 | Seed | `Sd` | Integer | item | no | `0` | The master seed, 0 or more. The program's own seed is derived from it by the generator. |
 | Floor Area | `A` | Number | item | no | `100` | The floor area the program represents, m², positive; recorded, and the extent of the generator's shared services. |
-| Command | `Cmd` | Text | item | no | `python -m atlas_schedules` | The generator's command line, to which the request and bundle paths are added. Default: python -m atlas_schedules; once the atlas package is installed, atlas-schedules. |
+| Command | `Cmd` | Text | item | no | `python -m atlas_schedules` | The generator's command line, to which the request and bundle paths are added. Default: python -m atlas_schedules; with the atlas-schedules 4.0.0 wheel installed in a virtual environment, its Scripts\\atlas-schedules.exe. |
 | Folder | `F` | Text | item | yes | – | The folder the command runs in: the atlas checkout for python -m atlas_schedules. Unset: a temporary folder, which suits an installed atlas-schedules. |
 | Run | `R` | Boolean | item | no | `False` | Runs the generator when true. False: nothing runs and nothing is output. |
 
@@ -279,7 +279,7 @@ Draws stochastic 8,760-hour schedules for a program JSON 5.4.0 with the atlas sc
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
 | Drawn JSON | `DJ` | Text | item | The drawn program JSON 5.4.0 text, for Program JSON. |
-| Provenance | `P` | Text | item | The draw's provenance: generator and version, setting and program settings by SHA-256, the seed and the program's own, the request and bundle SHA-256, and each schedule replaced. |
+| Provenance | `P` | Text | item | The draw's provenance: generator and version, the atlas data release and its manifest SHA-256, setting and program settings by SHA-256, the values drawn from, the seed and the program's own, the request and bundle SHA-256, and each schedule replaced. |
 | Diagnostics | `D` | Text | list | Every error, warning, and note of the draw, one per item, including the slots not drawn. |
 
 **Example definitions:** `schedule-draw.gh` ([canvas](../../assets/screenshots/canvas/schedule-draw.png)).

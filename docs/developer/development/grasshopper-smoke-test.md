@@ -1178,12 +1178,12 @@ Rerun headless on 2026-10-26 on `6d4e331`, after the close-out review's three fi
 
 ### Schedule Draw checklist (stage B2, D-196)
 
-*Schedule Draw* (`SDraw`, ADR-033) runs the atlas generator as an external command. It needs the generator `atlas-schedules` 3.0.0, the wheel of the atlas release `atlas-schedules-v3.0.0` installed in a virtual environment (Python 3.11 or later; D-198, [the architecture page](../architecture/schedule-draw.md#the-generator)); the files are in `tests/Lod.ProgramJson.Tests/Fixtures/` ([the architecture page](../architecture/schedule-draw.md)).
+*Schedule Draw* (`SDraw`, ADR-033) runs the atlas generator as an external command. It needs the generator `atlas-schedules` 4.0.0 since 1.7.0 (3.0.0 in 1.6.0), the wheel of the atlas release `atlas-schedules-v4.0.0` installed in a virtual environment (Python 3.11 or later; D-198, D-205, [the architecture page](../architecture/schedule-draw.md#the-generator)); the files are in `tests/Lod.ProgramJson.Tests/Fixtures/` ([the architecture page](../architecture/schedule-draw.md)). The items below name the files and versions of 1.7.0 (ADR-035).
 
 - [ ] *Schedule Draw* is in *1 Program* with its icon (schedule bars and a die), inputs *Program JSON*, *Generator JSON*, *Setting*, *Seed*, *Floor Area*, *Command*, *Folder*, *Run*, and outputs *Drawn JSON*, *Provenance*, *Diagnostics*; with *Run* false it shows the remark and runs nothing.
-- [ ] With `atlas/medium-office-doe-ref-1980-2004.filled.json`, `draw/generator.doe-ref-1980-2004.medium-office.json`, and `draw/setting.json` in panels, *Seed* 42, *Command* the environment's `Scripts\atlas-schedules.exe`, *Folder* unset, and *Run* true, it solves in a few seconds with no warning (generator 3.0.0, no `ScheduleDrawPreRelease`; D-198) and the `ScheduleDrawNotDrawn` notes of the water-use fractions; *Provenance* names the seed and the request's and bundle's SHA-256.
+- [ ] With `atlas/medium-office-doe-ref-1980-2004.filled.json`, `draw/generation.doe-ref-1980-2004.medium-office.json`, and `draw/setting.json` (setting 2.0.0) in panels, *Seed* 42, *Command* the environment's `Scripts\atlas-schedules.exe`, *Folder* unset, and *Run* true, it solves in a few seconds with no warning (generator 4.0.0, no `ScheduleDrawPreRelease`; D-205), the `ScheduleDrawValuesSource` notes (a filled DOE Ref export drawn with its source values), and the `ScheduleDrawNotDrawn` notes of the water-use fractions; *Provenance* names the seed, atlas release 2.2.0 with its manifest SHA-256, and the request's and bundle's SHA-256.
 - [ ] *Drawn JSON* into *Program JSON* gives a preset whose lighting schedule is `BLDG_LIGHT_SCH (drawn lighting)`; the same inputs solved again give the same text; another *Seed* gives other schedules.
-- [ ] A wrong *Command* (such as `pythonx`) gives `ScheduleDrawCommandFailed`, and the 90.1-2019 medium office with this `generator.json` gives `ScheduleDrawRecipeNotFound`.
+- [ ] A wrong *Command* (such as `pythonx`) gives `ScheduleDrawCommandFailed`, and the 90.1-2019 medium office with this `generation.json` gives `ScheduleDrawRecipeNotFound`.
 
 ### Release 1.6.0 checklist (stage B3, D-197)
 
@@ -1196,3 +1196,15 @@ For a person in Rhino 8, with the files of the GitHub release `v1.6.0` (the zip 
 - [ ] *Convert2IDF* shows *Require Floor Research Eligibility* (FloorCheck) last, false; a definition saved with 1.5.0 opens with it false and its saved values kept.
 - [ ] A *Program JSON* given an export of atlas release 2.1.0 (`python -m scripts.atlas_exports --program <ID> --version filled` in an atlas checkout at `v2.1.0`) solves as the release 2.0.0 export does, its *Source* naming `atlas-release-2.1.0`.
 - [ ] The viewport previews of a few examples (the end-to-end and the office plate) look as in 1.5.0; the IDF of *Single Zone per Floor* on the office plate lists the merged surfaces in its header.
+
+### Release 1.7.0 checklist (D-204)
+
+For a person in Rhino 8, with the files of the GitHub release `v1.7.0` (the zip or the Yak package, installed one way only) and, for the drawing items, the generator `atlas-schedules` 4.0.0 installed from the wheel of the atlas release `atlas-schedules-v4.0.0` in a virtual environment, checked first with its `SHA256SUMS.txt` ([schedule-draw.md](../architecture/schedule-draw.md#the-generator)). The headless part is done (D-204): every spec of `scripts/rhino-smoke` on the release candidate, the 21 example definitions rebuilt, the 21 saved with 1.6.0 reopened; these items need a person.
+
+- [ ] Installing from the release: `bemgen-1.7.0-rh8_19-win.yak` dragged onto Rhino 8.19 or later, or the unblocked zip in `%APPDATA%\Grasshopper\Libraries\BEMGen\` replacing the 1.6.0 folder; Grasshopper shows the BEMGen tab and *About* or the component tooltip names 1.7.0; no duplicate-library dialog.
+- [ ] The icons look as in 1.6.0 (none changed); *Schedule Draw*'s tooltip and input descriptions name `atlas_schedules` 4.0.0, the `generation.json` of atlas release 2.2.0, and setting 2.0.0.
+- [ ] `examples/schedule-draw.gh` opens with *Run* false and solves with *Validate* True and the program's own schedules; with *Command* set to the environment's `atlas-schedules.exe` and *Run* set true it solves in a few seconds with no warning on *Schedule Draw*, its *Provenance* names atlas release 2.2.0, *Program JSON* takes the drawn JSON, and the viewport preview looks as with *Run* false.
+- [ ] The Schedule Draw checklist above (stage B2, with the files and versions of 1.7.0): no `ScheduleDrawPreRelease` warning; the `ScheduleDrawValuesSource` notes on the DOE Ref medium office.
+- [ ] A `schedule-draw.gh` saved with 1.6.0 (its panels hold the 1.6.0 `generator.json` and setting 1.0.0) opens with its saved values; with *Run* true it stops with `ScheduleDrawSettingInvalid` saying what to change, and with the 1.7.0 panels (the release 2.2.0 `generation.json`, setting 2.0.0) it draws.
+- [ ] A *Program JSON* given an export of atlas release 2.2.0 (`python -m scripts.atlas_exports --program <ID> --version filled` in an atlas checkout at `v2.2.0`) solves as the release 2.1.0 export does, its *Source* naming `atlas-release-2.2.0`.
+- [ ] The viewport previews of a few examples (the end-to-end and the office plate) look as in 1.6.0.

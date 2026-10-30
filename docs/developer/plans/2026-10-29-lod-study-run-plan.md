@@ -1,6 +1,6 @@
 # Geometric LOD study: run plan
 
-> **Status:** In progress: the tooling of §3 and the coplanar merge (D-185 to D-192) released in `v1.6.0` (D-197); §3 built on `claude/lod-study-scripts` (D-185), R1 smoke run (§4); the proposals the build changed are in §7 for the owner (D-186); the R1 warnings' causes in §8 (D-187, accepted with its runner policy, D-189); publication on the atlas site in §9 (D-188); R2 pilot run, its gate not met for the small hotel (§4, D-190); the IDF writer merges coplanar surfaces (D-191), R1 and R2 run again, R2's gate met (§4, D-192) · **Date:** 2026-10-29 · **Study:** "How Much Thermal Zoning Detail Is Enough?"
+> **Status:** In progress: the tooling of §3 and the coplanar merge (D-185 to D-192) released in `v1.6.0` (D-197); §3 built on `claude/lod-study-scripts` (D-185), R1 smoke run (§4); the proposals the build changed are in §7 for the owner (D-186); the R1 warnings' causes in §8 (D-187, accepted with its runner policy, D-189); publication on the atlas site in §9 (D-188); R2 pilot run, its gate not met for the small hotel (§4, D-190); the IDF writer merges coplanar surfaces (D-191), R1 and R2 run again, R2's gate met (§4, D-192); R3 and R4 run, R4's small-hotel failures for the owner (§4, D-193); R5 serial timing pass run, its gate not met (§4, D-200); the owner-delegated decisions on R4 and R5 (D-201, D-202); R6 report, consolidated recommendations, and methodology written (§4, §9, D-203) · **Date:** 2026-10-29 · **Study:** "How Much Thermal Zoning Detail Is Enough?"
 > **Basis:** methodology handover `D:/decks/20261026-geo-lod-probe/methodology-handover-findings.md` §9–§10,
 > BEMGen origin/main `0b687e7` (v1.5.0 + D-176), atlas release `v2.0.0`.
 > **Owner decision (2026-10-29):** no stochastic schedules; the study uses the prototypes' deterministic values.
@@ -68,10 +68,10 @@ generator.
 | R0 Freeze | §3 changes merged, `verify.ps1` green, BEMGen `v1.6.0` tagged, weather pinned | clean build; pins match |
 | R1 Smoke | 1 prototype (medium office) × 3C × 0° × all zonings | references pass; internal loads equal reference hour by hour; Sterling/NY 4A diagnosed. **Run 2026-10-29**, below. |
 | R2 Pilot | 11 prototypes × {3C, 5A} × 0° × main zonings | ≥ 99 % sites complete; failure triage logged; dedup rule fixed. **Run 2026-10-29**, below: 392 of 440 written sites succeed (89 %), gate not met (the small hotel's references); **run again with the coplanar merge (D-191, D-192)**: 440 of 440 succeed, gate met |
-| R3 Main | 11 × 6 climates × 2 vintages (90.1-2004, 90.1-2019) × 2 orientations × main zonings | complete; dedup applied |
-| R4 IWHT/FHT | R2's matrix × the 4 heat-transfer settings | complete |
-| R5 Timing | 12 cases, serial, 3 repeats | coefficient of variation per site < 5 % |
-| R6 Report | metric tables and figures for the methodology section | owner review |
+| R3 Main | 11 × 6 climates × 2 vintages (90.1-2004, 90.1-2019) × 2 orientations × main zonings | complete; dedup applied. **Run 2026-10-29** (90.1-2007 and 90.1-2019, D-186), below: 5 280 of 5 280 written sites succeed, dedup applied; a zoning meets the threshold in 218 of 264 cells (D-193) |
+| R4 IWHT/FHT | R2's matrix × the 4 heat-transfer settings | complete. **Run 2026-10-29**, below: 1 736 of 1 760 written sites succeed (98.6 %); the 24 failures are the small hotel's unconditioned elevator and mechanical rooms with interior walls adiabatic, for the owner (D-193) |
+| R5 Timing | 12 cases, serial, 3 repeats | coefficient of variation per site < 5 %. **Run 2026-10-29**, below: 12 test cases, 218 sites × 3 repeats; 192 of 218 sites pass, **gate not met** (26 miss, at most 12.9 %); for the owner (D-200) |
+| R6 Report | metric tables and figures for the methodology section | owner review. **Written 2026-10-29**, below: the study report (`research/lod-study/report/2026-10-29-lod-study-report.md`), the methodology (`research/lod-study/report/2026-10-29-lod-study-methodology.md`), and the consolidated `research/lod-study/results/` (D-203); the repeat timing check of D-202 run |
 
 The stop rule: if the same kind of failure recurs after about three attempts, stop and report.
 
@@ -145,6 +145,124 @@ writer merges a zone's coplanar pieces, and `MergedZoneViewFactors` is no longer
 - **Recommendations:** a zoning meets the default threshold in 18 of the 22 cells: the 16 of before and both small-hotel cells (*Semantic
   Merge* + *Stack* in 3C, *Conditioned Merge* + *Stack* or *Stacked Floor Zone Multiplier* in 5A); still none in the full-service restaurant 3C,
   the supermarket 5A, and the warehouse 3C and 5A.
+
+**R3, 2026-10-29** (`run.ps1 -Stage main -Parallel 20`, 90.1-2007 and 90.1-2019, the six climates, 0° and 45°, the 24 main zonings, floor gate in
+`report` mode, the writer of D-191 (BEMGen `2ed856c`, before `v1.6.0`; atlas inputs 2.0.0); suite `lod-main-20261029-051941`, run `run_20261029-052718`; D-193):
+
+- **Suite.** 264 test cases, 6 336 sites planned: 5 280 written, 1 056 `Invalid` by the documented limits: multiplied rooms (ADR-026) leave the
+  large hotel and the hospital 6 of 24 zonings each (864 sites), and the outpatient's wings are narrower than twice either perimeter depth
+  (`PlanTooNarrow`, 192 sites).
+- **Run.** 5 280 of 5 280 succeed (100 %); the gate is met. All 5 016 test sites pair (largest internal-load deviation 5.5 × 10⁻¹⁰ W). No
+  `FixViewFactors` and no unexpected warning in any `eplusout.err`; the warnings are the expected floor-area one (384 sites) and
+  `OutdoorWetBulbIteration` (2 640 sites, all within its limit). No failure to triage. The run took 1 h 47 min.
+- **Deduplication** (the rule of §3.5): 925 groups, 3 323 of 5 016 succeeded test sites dropped (66 %); 1 693 in the metric table.
+- **Recommendations** (`lod-recommendations.json`, the default threshold of §9): a zoning meets it in 218 of the 264 cells: all 24 of the
+  hospital, large hotel, medium office, outpatient, small hotel, stand-alone retail, and strip mall; 20 of the primary school (none in 4A);
+  16 of the supermarket (none in 4A, 5A); 12 of the full-service restaurant (none in 2A, 2B, 3C); 2 of the warehouse (7A, 90.1-2019). The
+  recommended (coarsest) zonings most often: *Conditioned Merge* + *Single Zone Building* 84 times (the single-storey prototypes, the primary school,
+  and the outpatient), *Semantic Merge* + *Stack* 57, *Conditioned Merge* + *Stacked Floor Zone Multiplier* 40 (the hospital, large and small
+  hotels), *Perimeter Core* at 4.57 m or 3 m with *Stack* or *Stacked Floor Zone Multiplier* for the medium office in every cell.
+- **EnergyPlus time per site** (20 at a time on a shared machine, so not runtime results; test-site median, longest, reference mean, s; processor
+  time test-site median, reference mean): full-service restaurant 4.2, 15.5, 3.9; 3.3, 3.6 · hospital 85.5, 136.7, 104.6; 70.0, 89.8 · large
+  hotel 39.0, 112.9, 93.5; 26.9, 77.0 · medium office 7.9, 131.6, 103.0; 6.0, 90.3 · outpatient 14.9, 326.2, 262.4; 10.8, 227.9 · primary school
+  7.5, 49.6, 34.3; 5.6, 28.1 · small hotel 9.4, 189.5, 133.2; 7.3, 115.2 · stand-alone retail 4.0, 13.5, 7.1; 2.9, 6.0 · strip mall 3.6, 20.8,
+  11.9; 2.9, 10.0 · supermarket 3.9, 13.5, 6.9; 2.9, 6.1 · warehouse 4.1, 11.6, 5.0; 3.0, 4.2. R5 (the serial timing pass) is not run here.
+
+**R4, 2026-10-29** (`run.ps1 -Stage ht -Parallel 20`, R2's matrix × IWHT and FHT each on and off, 96 zonings; suite `lod-ht-20261029-071714`,
+run `run_20261029-071919`; D-193):
+
+- **Suite.** 22 test cases, 2 112 sites planned: 1 760 written, 352 `Invalid` by the same documented limits (multiplied rooms 288, the
+  outpatient's narrow wings 64).
+- **Run.** 1 736 of 1 760 succeed (98.6 %); every reference succeeds, and all 1 714 succeeded test sites pair (largest deviation
+  2.9 × 10⁻¹⁰ W). No `FixViewFactors` anywhere; the only warning is the expected floor-area one. The run took 33 min.
+- **The 24 failures** are all the small hotel's, 12 in each climate: every zoning that keeps an unconditioned elevator core or mechanical room as
+  its own zone (*No Simplification*, *Semantic Merge*, *Conditioned Merge*, each with *Stack* or *Stacked Floor Zone Multiplier*) with IWHT
+  off, FHT on or off. EnergyPlus stops in warm-up with `CalcHeatBalanceInsideSurf: The temperature of … C … is very far out of bounds` in
+  `L0/ElevatorCoreFlr1`, `L0/Mechanical-1`, or `L0/Unconditioned-1`. The elevator core's program carries the source's elevator equipment,
+  2 133 W/m² (32 kW in 15 m²), all of it a heat gain to the zone; with its interior walls adiabatic it loses heat only through one 1.8 m
+  exterior wall and the ground, and its heat balance diverges. With IWHT on the same zone runs (R2, R3). This is not a defect of the writer: the
+  program's load and the option are written as given (GLOBAL.md scientific rule 3). Whether the IWHT-off setting should exclude such zonings,
+  or the study should use another treatment for an unconditioned zone with a large gain, is for the owner; nothing was relaxed or changed.
+- **Deduplication:** 213 groups, 1 433 of 1 714 succeeded test sites dropped (84 %); 281 in the metric table.
+- **Recommendations:** a zoning meets the default threshold in 18 of the 22 cells, the same cells as R2 (none in the full-service restaurant 3C,
+  the supermarket 5A, and the warehouse 3C and 5A); in 15 of them a recommended zoning has IWHT or FHT off.
+- **EnergyPlus time per site** (test-site median, longest, reference mean, s; shared machine): full-service restaurant 4.3, 10.7, 4.1; hospital
+  94.4, 115.6, 68.7; large hotel 33.7, 89.7, 63.0; medium office 7.2, 122.9, 70.2; outpatient 10.4, 345.3, 124.2; primary school 6.1, 35.2,
+  26.9; small hotel 7.5, 126.2, 85.4; stand-alone retail 2.8, 8.3, 6.4; strip mall 3.0, 12.8, 11.3; supermarket 4.4, 16.5, 6.9; warehouse 3.8,
+  15.0, 4.6.
+
+**R5, 2026-10-29** (`run.ps1 -Stage timing`, which runs the batch runner with `--parallel 1 --timing-repeats 3 --timing-test-cases 12`; BEMGen
+`b29931c` (main after `v1.6.0`), atlas inputs 2.0.0 (`96a2e928`, the R3/R4 export reused, every file checked by its pinned SHA-256), EnergyPlus
+26.2.0; suite `lod-timing-20261029-080232`, run `run_20261029-083427`; D-200):
+
+- **Suite and main phase.** 22 test cases, 528 sites planned, 440 written, 88 `Invalid` (the limits of R2). The main phase ran one site at a time,
+  08:34 to 09:29: 440 of 440 succeed, 418 of 418 test sites pair (largest deviation 2.9 × 10⁻¹⁰ W). Deduplication and recommendations match R2
+  (79 groups, 275 of 418 dropped; 18 of 22 cells). **The machine was not idle in the main phase:** an unrelated calibration job
+  (`D:\smart-meter-calibration`, `county_calibrate.py stage1 --workers 14`) started at 08:35, and the machine's total load was mostly 25 to 60 % (a 2-worker job of the same project ran before it). The serial times
+  in `sites` are therefore loaded measurements: processor time a median 45 % above the timing pass's (up to 185 %). They are not results.
+- **Timing pass on an idle machine.** A guard stopped the runner (and only it) at 09:29:51, as the first timing run began, before any timing row
+  was written. The machine was idle from 13:33 (5-minute average 4.2 %, maximum 6.0 %), and `run.ps1 -Resume` ran the pass from 13:38 to 14:31:
+  12 test cases (the first in the order of the SHA-256 of their IDs), 218 sites, 654 of 654 runs completed. Total processor load during it
+  averaged 5.1 % in 30-s samples (one EnergyPlus is 3.6 % of 28 logical processors), at most 11.9 % (13:39–13:41, two short foreign scripts).
+  The medium office and the primary school are not among the 12 test cases.
+- **Gate: not met.** Processor-time coefficient of variation over the 3 repeats (sample standard deviation over mean): median 2.2 %, P90 5.3 %,
+  largest 12.9 %; **192 of 218 sites are below 5 %, 26 are not.** Peak committed memory varies by at most 0.55 % (median 0.20 %). The misses
+  have two causes, neither a cold start: without repeat 1 the misses rise to 31, since repeat 1 is not the slow one.
+  - 16 misses are the 34 sites of at least 4 s (outpatient 3C, hospital 3C, small hotel 5A, both references among them): from about 14:21, late
+    in repeat 3, every run took 13 to 24 % more processor time than in repeats 1 and 2, with no foreign process and no change in total load. The
+    cause is not established; one candidate is the i7-14700F's 8 performance and 12 efficiency cores (the scheduler moving the single EnergyPlus
+    thread). Over repeats 1 and 2 alone, only 2 of these sites miss.
+  - 10 misses are among the 184 sites under 4 s (0.8 to 3.3 s): the processor time is counted in 15.6 ms ticks, about 2 % of 0.8 s.
+- **Medians relative to the reference** (test sites; processor time, wall clock, peak committed memory; `timing-analysis/timing-summary.md` has
+  the full tables and EnergyPlus elapsed time). EnergyPlus's floor of about 185 MiB committed dominates the memory of small models.
+
+  | Prototype | Test sites | Reference CPU s | CPU ratio | Wall ratio | Peak commit ratio |
+  |---|---|---|---|---|---|
+  | Outpatient (3C, 5A) | 30 | 48.9, 49.8 | 0.064 | 0.066 | 0.694 |
+  | Small hotel (5A) | 23 | 29.8 | 0.073 | 0.073 | 0.810 |
+  | Strip mall (3C) | 23 | 3.3 | 0.256 | 0.260 | 0.969 |
+  | Supermarket (5A) | 23 | 2.1 | 0.425 | 0.420 | 0.979 |
+  | Large hotel (3C, 5A) | 10 | 19.0, 19.0 | 0.429 | 0.435 | 0.920 |
+  | Stand-alone retail (3C) | 23 | 1.9 | 0.439 | 0.426 | 0.986 |
+  | Warehouse (3C, 5A) | 46 | 1.4, 1.5 | 0.622 | 0.642 | 0.993 |
+  | Full-service restaurant (3C) | 23 | 1.2 | 0.800 | 0.819 | 0.996 |
+  | Hospital (3C) | 5 | 21.2 | 0.862 | 0.863 | 0.994 |
+
+  | Zoning (simplifier + stacker) | Test sites | CPU ratio | Wall ratio | Peak commit ratio |
+  |---|---|---|---|---|
+  | Conditioned Merge + Stacked Floor Zone Multiplier | 12 | 0.331 | 0.338 | 0.965 |
+  | Conditioned Merge + Stack | 12 | 0.410 | 0.412 | 0.973 |
+  | the 14 zonings with *Single Zone Per Floor Type* or *Single Zone Building*, or over *Single Zone Per Floor* | 7 to 9 each | 0.410 to 0.439 | 0.415 to 0.440 | 0.977 to 0.984 |
+  | Semantic Merge + Stacked Floor Zone Multiplier | 12 | 0.839 | 0.837 | 0.999 |
+  | Perimeter Core (3 m, 4.57 m) + Stack or Stacked Floor Zone Multiplier | 7 each | 0.894 to 0.902 | 0.881 to 0.928 | 0.998 to 1.003 |
+  | Semantic Merge + Stack | 12 | 0.913 | 0.898 | 0.998 |
+  | No Simplification + Stacked Floor Zone Multiplier | 12 | 0.988 | 0.980 | 0.995 |
+
+  The single-zone stackers' sites are the single-storey and small prototypes (the hospital and the large hotel have none, ADR-026), so their
+  0.42 is mostly the floor of a 1 to 3 s run. *Single Zone Building* against the reference, per prototype: outpatient 0.064 CPU (0.69 memory),
+  small hotel 0.057 (0.80), strip mall 0.256, supermarket 0.418, stand-alone retail 0.435, warehouse 0.620, full-service restaurant 0.787; over
+  all 50 such sites 0.424 CPU, 0.422 wall, 0.980 memory. Across all 206 timed test sites: 0.504 CPU, 0.521 wall, 0.985 memory.
+- **Files:** `D:/bemgen-results/lod-study/timing/` (`merged/central.duckdb` with `site_timing` and `site_timing_summary`, `report/`, and
+  `timing-analysis/`: `timing-sites.csv`, `timing-summary.md`, and the script that wrote them, `timing_analysis.py`).
+
+**R4 and R5 decided, 2026-10-29** (the controller under the owner's blanket authority): R4's 24 failures need no BEMGen change; such zonings are
+not applicable in their cells, whose recommendations come from the zonings that ran (D-201). R5's costs are reported as medians of site ratios with
+the CV distribution and the misses stated; the gate is unchanged (D-202). The repeat check D-202 allowed ran once: the 34 sites of at least 4 s,
+timed again three times on the idle machine (run `run_20261029-144634` in `D:/bgdiag/r6-retime`), have no CV at or above 5 % (largest 4.8 %), R5's
+late slowdown did not recur, but their absolute times are 15 % above R5's and their ratios to the reference moved by −17 % to +5 % (median −4.5 %).
+
+**R6, 2026-10-29** (`python -P scripts/lod-study/study_tables.py --write`; D-203):
+
+- **Report** (`research/lod-study/report/2026-10-29-lod-study-report.md`): purpose,
+  method, the R3 results per prototype × climate zone × vintage × orientation (recommended zonings, errors, benchmark loads; 11 tables of 24 rows),
+  the R4 sub-study and its 24 failures, the R5 costs by prototype, zoning, and recommended zoning, the repeat check, deduplication, and the limits.
+  Every table is generated from the stage results; `--check` verifies them.
+- **Methodology** (`…/2026-10-29-lod-study-methodology.md` (`research/lod-study/report/2026-10-29-lod-study-methodology.md`)), §M1 to §M10:
+  question and design, reference geometry, zonings and stackers, heat-transfer options, fixed factors and pairing, deduplication, metrics and
+  threshold, cost protocol, limits, reproducibility; every number with its source.
+- **Consolidated results** (`research/lod-study/results/`): `lod-recommendations.json` (R3's 264 entries,
+  218 with a recommendation, with R5's serial cost on the 12 timed references and 206 timed test sites and a `timing` block; schema version
+  1.1.0), `lod-recommendations-ht.json` (R4, separate; the 24 failed sites now carry their zoning), and `provenance.json`.
 
 ## 5. Size and run time (estimate)
 
@@ -222,3 +340,10 @@ calibration limits), and |conditioned-area change| ≤ 1 %; a load whose referen
 (3C, where heating is 0.09 kWh/m²) the coarsest zonings meeting it are the four *Perimeter Core* zonings with *Stack* or *Stacked
 Floor Zone Multiplier*, 15 zones against the reference's 65. The site integration (how the atlas reads, aggregates over
 orientations, and shows the file) is later atlas work.
+
+**The consolidated drop (R6, D-203).** The atlas site's zoning section, https://energy-atlas.github.io/archetype-atlas/zoning/, carries the R3/R4
+first drop (both `lod-recommendations.json` files of version 1.0.0). It takes the consolidated drop next, from
+`research/lod-study/results/`: `lod-recommendations.json` of schema version 1.1.0 (R3's entries unchanged, plus
+the optional `cost` of each timed reference and zoning, and the `timing` block with the gate verdict of D-202, the repeat check, and the medians
+by zoning and prototype), `lod-recommendations-ht.json` (R4, separate), and `provenance.json`. A reader of version 1.0.0 that ignores unknown
+members reads 1.1.0 unchanged.

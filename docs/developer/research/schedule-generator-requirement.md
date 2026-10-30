@@ -2,7 +2,7 @@
 
 > **Status:** Designed and implemented (stage B2, D-194 to D-196, [ADR-033](../decisions/ADR-033-schedule-draw-external-generator.md)); the requirement below is the owner's of 2026-10-12 · **Decisions:** D-133, D-134 · **Applies to:** test suites ([design note](../plans/2026-10-12-test-suite-generator.md)), *Schedule Draw* ([architecture](../architecture/schedule-draw.md)) · **Related:** [experiment outputs](experiment-outputs.md), [program presets](program-presets.md)
 
-This page records what the owner asked of a schedule generator. The design is [ADR-033](../decisions/ADR-033-schedule-draw-external-generator.md): the atlas generator `atlas_schedules` 3.0.0 called as an external command, *Schedule Draw* in Grasshopper, and the test-suite spec's optional `schedules:` section. Without a draw, every program is used with the schedules its program JSON defines.
+This page records what the owner asked of a schedule generator. The design is [ADR-033](../decisions/ADR-033-schedule-draw-external-generator.md): the atlas generator `atlas_schedules` called as an external command (3.0.0 in 1.6.0; 4.0.0 with atlas release 2.2.0 since 1.7.0, [ADR-035](../decisions/ADR-035-schedule-draw-generator-4-0-0.md)), *Schedule Draw* in Grasshopper, and the test-suite spec's optional `schedules:` section. Without a draw, every program is used with the schedules its program JSON defines.
 
 ## What the owner asked (2026-10-12)
 

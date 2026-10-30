@@ -1,8 +1,8 @@
 {
-  "version": "1.6.0",
-  "commit": "4f1b806a2c15decde98b9944ac6c917aba067ff7",
+  "version": "1.7.0",
+  "commit": "d58ac7517822781c32e11a9dca1abcffcb146a0c",
   "dirty": false,
   "rhino": "8.25.25314.11001",
-  "date": "2026-10-29T11:52:26Z",
+  "date": "2026-10-30T07:24:13Z",
   "gaps": 0
 }

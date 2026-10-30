@@ -756,19 +756,25 @@ Program preset of a stair. Every input defaults to the illustrative example valu
 
 Component · nickname `DoeFSRP` · GUID `0efa0bdc-0cfb-4dbb-b735-7a9453fec942` · exposure secondary
 
-The program presets of DOE Full-Service Restaurant. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Full-Service Restaurant. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
 
 ## DOE Hospital Programs
 
@@ -776,19 +782,25 @@ None.
 
 Component · nickname `DoeHospP` · GUID `8d1911ba-c454-4c22-a36f-139bfb46a1e5` · exposure secondary
 
-The program presets of DOE Hospital. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Hospital. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
 
 ## DOE Large Hotel Programs
 
@@ -796,19 +808,25 @@ None.
 
 Component · nickname `DoeLHtlP` · GUID `68514a63-fb87-479a-99da-31daaa34f3c8` · exposure secondary
 
-The program presets of DOE Large Hotel. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Large Hotel. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
 
 ## DOE Large Office Programs
 
@@ -816,19 +834,25 @@ None.
 
 Component · nickname `DoeLOffP` · GUID `5c1b1c67-a1c3-48e2-a8f9-3a235949b7d3` · exposure secondary
 
-The program presets of DOE Large Office. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Large Office. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
 
 ## DOE Medium Office Programs
 
@@ -836,19 +860,27 @@ None.
 
 Component · nickname `DoeMOffP` · GUID `37d576b9-c1eb-496a-8fda-5f80ffb9dd41` · exposure secondary
 
-The program presets of DOE Medium Office. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Medium Office. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
+
+**Example definitions:** `doe-atlas-map.gh` ([canvas](../../assets/screenshots/canvas/doe-atlas-map.png)).
 
 ## DOE Outpatient Programs
 
@@ -856,19 +888,25 @@ None.
 
 Component · nickname `DoeOutPP` · GUID `97748b7e-1c74-4c39-8baa-0245333d1480` · exposure secondary
 
-The program presets of DOE Outpatient. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Outpatient. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
 
 ## DOE Primary School Programs
 
@@ -876,19 +914,25 @@ None.
 
 Component · nickname `DoePSchP` · GUID `5f8262ad-b46c-466f-abcb-d3493099c93a` · exposure secondary
 
-The program presets of DOE Primary School. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Primary School. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
 
 ## DOE Quick-Service Restaurant Programs
 
@@ -896,19 +940,25 @@ None.
 
 Component · nickname `DoeQSRP` · GUID `93d7a80c-5cca-4e59-9a0f-0246caf79f9f` · exposure secondary
 
-The program presets of DOE Quick-Service Restaurant. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Quick-Service Restaurant. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
 
 ## DOE Secondary School Programs
 
@@ -916,19 +966,25 @@ None.
 
 Component · nickname `DoeSSchP` · GUID `cdacf7bc-11c9-4d8a-8213-ac9b6edceb0d` · exposure secondary
 
-The program presets of DOE Secondary School. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Secondary School. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
 
 ## DOE Small Hotel Programs
 
@@ -936,19 +992,25 @@ None.
 
 Component · nickname `DoeSHotP` · GUID `6606b09c-74fd-4f5e-8419-29bdd3ff484e` · exposure secondary
 
-The program presets of DOE Small Hotel. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Small Hotel. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
 
 ## DOE Small Office Programs
 
@@ -956,19 +1018,25 @@ None.
 
 Component · nickname `DoeSOffP` · GUID `cc7deb8a-becc-451c-8733-c47fb5132ccc` · exposure secondary
 
-The program presets of DOE Small Office. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Small Office. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
 
 ## DOE Stand-alone Retail Programs
 
@@ -976,19 +1044,25 @@ None.
 
 Component · nickname `DoeRetP` · GUID `538a2a8a-2a3b-414e-a1bc-c1d3c5109a18` · exposure secondary
 
-The program presets of DOE Stand-alone Retail. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Stand-alone Retail. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
 
 ## DOE Strip Mall Programs
 
@@ -996,19 +1070,25 @@ None.
 
 Component · nickname `DoeSMallP` · GUID `d488e69d-540b-419c-b8f0-fa0244661e09` · exposure secondary
 
-The program presets of DOE Strip Mall. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Strip Mall. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
 
 ## DOE Supermarket Programs
 
@@ -1016,19 +1096,25 @@ None.
 
 Component · nickname `DoeSMktP` · GUID `c4ced2e2-e69c-47ac-8a7a-d7fa01453b51` · exposure secondary
 
-The program presets of DOE Supermarket. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Supermarket. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |
 
 ## DOE Warehouse Programs
 
@@ -1036,16 +1122,22 @@ None.
 
 Component · nickname `DoeWareP` · GUID `fae396e6-ec9e-46e2-b9bd-660bd6579d23` · exposure secondary
 
-The program presets of DOE Warehouse. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map.
+The program presets of DOE Warehouse. One preset per program key of the generator, named by its key: the loads and setpoints of the illustrative example preset of the key's space type, the window-to-wall ratio per orientation and the skylight ratio the DOE reference building has for that key's zones (0 where the key has no wall of an orientation or no roof). A key whose every zone the generator draws differently from the source (a gap, such as a zone taller than its storey drawn to the storey height) keeps the source's own ratios, so its window area differs from the source's by what the gap changes. A key whose space type has no example preset takes the example Service preset as an any-program preset, named '&lt;key&gt; (Example Service)', which the plan records in its provenance. Wire Program Map into the generator's Program Map; to change a preset, wire Keys and the edited Presets into DOE Program Map. Get from Atlas at the bottom of the component takes every key's program from a family of the atlas site (https://energy-atlas.github.io/archetype-atlas/) in place of the illustrative presets, using the network only when clicked: the program of the key's space type in the prototype's folder, filled by default, with the DOE reference building's window ratios kept, stored in the definition, so the solve reads no file or network. A key the family has no program for is refused by name: the map is not output and Presets has that position empty.
 
 **Inputs**
 
-None.
+| Name | Nickname | Type | Access | Optional | Default | Description |
+| --- | --- | --- | --- | --- | --- | --- |
+| Climate Zone | `CZ` | Text | item | yes | – | Used with an atlas map only (Get from Atlas): the model's ASHRAE climate zone, such as 5B, for the programs' values that differ by climate. Unset: their general values, with a warning when a program has values by climate. |
+| Year | `Y` | Integer | item | no | `2007` | Used with an atlas map only: the calendar year the programs' schedules are expanded on, a non-leap year. The default 2007 starts on a Monday, as BEMGen's own presets assume. |
+| Holidays | `Hol` | Text | list | yes | – | Used with an atlas map only: holidays of that year as MM-DD text, such as 07-04. Unset: no holidays. |
+| Context | `Ctx` | Text | list | yes | – | Used with an atlas map only: the construction context as key=value items, such as foundation=slab, for loads a program applies only with that context. Unset: none. |
 
 **Outputs**
 
 | Name | Nickname | Type | Access | Description |
 | --- | --- | --- | --- | --- |
-| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. |
+| Program Map | `Map` | [Program Map](info.md#program-map) | item | The program map, one preset per program key; wire it into the DOE generator's Program Map. Not output for an atlas map with a key without a program. |
 | Keys | `K` | Text | list | The program keys of the generator (standards space types), in ordinal order: the keys of the map, and DOE Program Map's Keys. |
-| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. |
+| Presets | `P` | [Program Preset](info.md#program-preset) | list | The preset of each key, in the order of Keys; edit one and rebuild the map with DOE Program Map. With an atlas map, a key without a program has its position empty. |
+| JSON | `J` | Text | list | With an atlas map: each key's program JSON text, in the order of Keys (empty for a key without a program), for Program JSON or Schedule Draw. Without one: nothing. |

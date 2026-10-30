@@ -872,6 +872,8 @@ The DOE medium office: a ground, a middle, and a top storey of 23, 21, and 21 ro
 | Multipliers | `N` | Integer | list | How many storeys each plan stands for, bottom-up: the floor entries' multipliers. Wire it into the floor aggregator's Multipliers beside the floors made from Plan. |
 | Program Keys | `Keys` | Text | list | Every program key of the plans (standards space types), in ordinal order: the keys the Program Map needs. Given even without a Program Map. |
 
+**Example definitions:** `doe-atlas-map.gh` ([canvas](../../assets/screenshots/canvas/doe-atlas-map.png)).
+
 ## DOE Outpatient
 
 ![DOE Outpatient icon](../../assets/icons/OutpatientComponent.png)

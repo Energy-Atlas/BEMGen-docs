@@ -175,6 +175,7 @@ nav:
           - developer/decisions/ADR-033-schedule-draw-external-generator.md
           - developer/decisions/ADR-034-coplanar-surface-merge.md
           - developer/decisions/ADR-035-schedule-draw-generator-4-0-0.md
+          - developer/decisions/ADR-036-atlas-program-maps.md
       - Plans:
           - developer/plans/2026-09-30-implementation-roadmap.md
           - developer/plans/2026-10-01-s0-foundation.md
@@ -204,6 +205,7 @@ nav:
           - developer/plans/2026-10-06-conditioned-merge.md
           - developer/plans/2026-10-06-program-mix.md
           - developer/plans/2026-10-07-program-json.md
+          - developer/plans/2026-10-09-program-popup-window.md
           - developer/plans/2026-10-11-idf-out.md
           - developer/plans/2026-10-12-idf-batch-runner.md
           - developer/plans/2026-10-12-test-suite-generator.md
@@ -225,6 +227,7 @@ nav:
           - developer/plans/2026-10-28-spatial-program-research-contract.md
           - developer/plans/2026-10-29-lod-study-run-plan.md
           - developer/plans/2026-10-29-schedule-draw.md
+          - developer/plans/2026-10-30-atlas-program-picker.md
           - developer/plans/2026-10-30-generator-4-0-0.md
       - Research:
           - developer/research/envelope-presets.md

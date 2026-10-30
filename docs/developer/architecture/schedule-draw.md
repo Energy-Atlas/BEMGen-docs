@@ -20,6 +20,10 @@ A program JSON 5.4.0 defines deterministic ruleset schedules. *Schedule Draw* re
 
 Outputs: *Drawn JSON* (the drawn program JSON), *Provenance* (text), *Diagnostics* (every error, warning, and note, one per item).
 
+### Generator JSON from the atlas site (D-209)
+
+The strip *Get from Atlas…* at the bottom of the component ([ADR-036](../decisions/ADR-036-atlas-program-maps.md)) opens, on a double-click, a window that reads the `id` of the program in *Program JSON* (its wire's text of the last solution, else its stored text), finds the program's folder in the atlas site's index, and downloads and checks that folder's `generation.json` (`AtlasSite.DownloadGenerationAsync`). *Use this file* stores it as *Generator JSON*'s own value with one undo event (`SetGeneratorJsonText`); a wire into *Generator JSON* still takes precedence. The stored text is the site's store file, compact JSON equal in content to the release's file. Where the release has no generation file for the folder the window says so (`AtlasSiteGenerationNotPublished`) and stores nothing: in release 2.2.0 only 90 of 255 folders have one, and none of the `*-detailed` office folders, so the programs of the DOE small, medium, and large office's keys, which live in those folders, have no program setting on the site, as in the release. That is a limitation of the atlas data, which BEMGen does not work around. The network is used only while the window is open, never in a solve.
+
 ### The setting
 
 ```json

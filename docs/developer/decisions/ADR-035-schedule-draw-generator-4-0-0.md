@@ -4,6 +4,7 @@
 - **Date:** 2026-10-30
 - **Context:** [ADR-033](ADR-033-schedule-draw-external-generator.md) (Schedule Draw, generator 3.0.0, D-194 to D-196, D-198), [design note](../plans/2026-10-30-generator-4-0-0.md), the atlas's ADR 0051 (generation parameters in the release; data release 2.2.0 and generator 4.0.0, atlas `2b3a6870`), program JSON 5.4.0 ([ADR-027](ADR-027-atlas-release-2-0-0-contracts.md))
 - **Amends:** ADR-033 decisions 2 (pins), 4 (the wrong-recipe hint), 8 (supported recipes, by method), 9 (the setting format), and 10 (provenance). Decisions 1, 3, 5, 6, and 7 stand unchanged.
+- **Amended by:** [ADR-036](ADR-036-atlas-program-maps.md) (D-209): the program setting may also come from the atlas site, the store file of the program's folder's `generation.json` (compact JSON, equal in content to the release's file), through *Schedule Draw*'s strip *Get from Atlas…*; what the draw reads and checks is unchanged.
 
 ## Context
 

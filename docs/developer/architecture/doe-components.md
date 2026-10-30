@@ -136,7 +136,8 @@ owner's request and values) gives every DOE generator a ready program map, so th
 - **Keys.** One preset per program key of the generator (`DoeProgramPresets.ProgramKeys`, the generator's own `ProgramKeys`), in ordinal order.
 - **Loads and setpoints.** The illustrative example preset of the key's BEMGen space type (`DoeSpaceTypes.Of(key)`): a non-residential example
   (`ExampleNonResidentialPresets`), or for `Corridor` and `Stair` the residential examples (the stair unconditioned). Its program is taken
-  unchanged; the values are illustrative, not DOE or standard values, and are replaced when the atlas programs (A1, A2) land.
+  unchanged; the values are illustrative, not DOE or standard values. Since D-209 a component can take the atlas's programs in their place
+  ([below](#atlas-program-maps-d-209)).
 - **Name.** The key; descriptive only, never used for matching.
 - **Glazing.** The source's own for the key, shipped in the layout record (`programGlazing`, [doe-layouts.md](doe-layouts.md#layout-records)):
   the WWR per orientation and the skylight ratio of the key's zones on the true-outdoor-wall basis, as the answer keys' per-key inputs; for the
@@ -163,17 +164,26 @@ owner's request and values) gives every DOE generator a ready program map, so th
   with the gap's convention, or `none`); a plan records it among its inputs. `DoeProgramPresets.Create` builds a map without the shared
   instance (internal, for the determinism test).
 
-Fifteen output-only components, one per record and so one per DOE generator component, in their own group (secondary exposure) of panel
-*1 Program Presets* beside the built-in presets, each a thin adaptor over `DoeProgramPresets` (`DoeProgramPresetsComponents.cs`). Each shows a
-remark that the loads and setpoints are illustrative example values and the glazing is the DOE reference's for each key's zones (differing from
-the source's where a gap changes the zones), a second remark naming the keys that took the fallback, and a third naming the keys under a gap.
-Outputs:
+Fifteen components, one per record and so one per DOE generator component, in their own group (secondary exposure) of panel
+*1 Program Presets* beside the built-in presets, each a thin adaptor over `DoeProgramPresets` (`DoeProgramPresetsComponents.cs`). Without a
+stored atlas map each shows a remark that the loads and setpoints are illustrative example values and the glazing is the DOE reference's for each
+key's zones (differing from the source's where a gap changes the zones), a second remark naming the keys that took the fallback, and a third
+naming the keys under a gap. Until 1.7.0 they had no inputs; since D-209 they have four optional ones, used only with an atlas map, and a fourth
+output:
+
+| Input | Access | Meaning |
+| --- | --- | --- |
+| *Climate Zone* (CZ) | item, optional | the ASHRAE climate zone for an atlas map's values by climate, as on *Program JSON* |
+| *Year* (Y) | item, default 2007 | the calendar year an atlas map's schedules are expanded on, a non-leap year |
+| *Holidays* (Hol) | list, optional | holidays of that year as MM-DD |
+| *Context* (Ctx) | list, optional | the construction context as key=value items |
 
 | Output | Access | Meaning |
 | --- | --- | --- |
-| *Program Map* (Map) | item | the map; wire it into the generator's *Program Map* |
+| *Program Map* (Map) | item | the map; wire it into the generator's *Program Map*; not output for an atlas map with a key without a program |
 | *Keys* (K) | list of text | the program keys, in ordinal order |
-| *Presets* (P) | list of program presets | the preset of each key, in the order of *Keys*; to change one, wire *Keys* and the edited *Presets* into *DOE Program Map* |
+| *Presets* (P) | list of program presets | the preset of each key, in the order of *Keys*; to change one, wire *Keys* and the edited *Presets* into *DOE Program Map*; with an atlas map, a key without a program has its position empty |
+| *JSON* (J) | list of text | with an atlas map, each key's program JSON text in the order of *Keys* (empty for a key without a program), for *Program JSON* or *Schedule Draw*; without one, nothing |
 
 | Component (nickname) | Class | For | Keys | Keys with the Service fallback | Keys under a gap (the source's own glazing) | GUID |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -197,6 +207,38 @@ Tests: `tests/Lod.Generators.Tests/Doe/Presets/DoeProgramPresetsTests.cs` checks
 preset's space type and program (or the fallback), its glazing against the record and the answer key, that the generator at its defaults
 validates with the map and records the fallback, that every supported simplifier and aggregator validates, and determinism; every family's T4
 acceptance test runs a second time through the shipped map. The headless spec is `scripts/rhino-smoke/specs/doe-presets.py`.
+
+### Atlas program maps (D-209)
+
+The strip *Get from Atlas…* at the bottom of each *DOE … Programs* component ([ADR-036](../decisions/ADR-036-atlas-program-maps.md), the
+[atlas program picker note](../plans/2026-10-30-atlas-program-picker.md) §4.3) takes every key's program from the Energy Archetype Atlas site in
+place of the illustrative presets:
+
+- **The folder.** `DoeAtlasFolders` gives each prototype one fixed folder, `commercial/<template>/<folder>/`: the prototype's own name, except
+  `small-office-detailed`, `medium-office-detailed`, `large-office-detailed`, `retail-standalone`, `retail-stripmall`, and `super-market`. A key
+  matches the folder's one `source` program whose `space_type` is the key (department and general programs are never candidates); folders are
+  never searched.
+- **The window** (`DoeAtlasMapDialog`, a double-click on the strip) lists the five commercial families that hold the folder (DOE Ref pre-1980,
+  DOE Ref 1980–2004, 90.1-2007, 90.1-2013, 90.1-2019), each with its coverage, such as `90.1-2019: 3 of 4 keys; Retail has no program.`, and
+  the choice of the filled (default) or source version. *OK* runs `PickAtlasMapAsync`: every matched key's program downloaded in parallel and
+  checked as *Program JSON*'s download is, then given the program check on the component's *Year*, *Holidays*, *Climate Zone*, and *Context*;
+  when all succeed the window closes and `SetAtlasMap` stores the map as one text in the component with one undo event. *Clear* removes it, and
+  the component returns to its illustrative presets. The strip then reads, for example, `Get from Atlas… (90.1-2019, filled)`.
+- **The solve** reads the stored map offline (`AtlasProgramMapImporter`): each key's text through *Program JSON*'s import, named by the key,
+  of the key's space type (`DoeSpaceTypes.Of`), with the DOE reference building's window-to-wall ratio per orientation and skylight ratio of the
+  key (`DoeProgramPresets.KeyRatios`, the illustrative map's glazing, so the window areas are the same), and the four inputs. A remark names the
+  family, version, release, and folder; the gap remark stays. *JSON* gives each key's text.
+- **Keys without a program** (the 90.1 renames and splits: 90.1-2007 the secondary school's `Gym - audience` and the small hotel's `GuestRoom`;
+  90.1-2013 and 2019 also the hospital's `Office` and the stand-alone retail's `Retail`) are refused by name: *Program Map* is not output, an
+  error names the keys, and *Presets* and *JSON* have those positions empty, so *DOE Program Map* can complete the map with presets given by hand.
+- **Saved definitions.** The map is written by `Write` and read by `Read` (`AtlasProgramMap`, `bemgen-atlas-program-map` 1.0.0). A definition
+  saved before 1.8.0 reads without the IO dialog, with the inputs unset and no map, and solves as before
+  (`scripts/rhino-smoke/fixtures/doe-programs-1.7.0.gh`).
+
+Tests: `tests/Lod.Generators.Tests/Doe/Presets/DoeAtlasFoldersTests.cs` (the folders, the families, the glazing), `tests/Lod.ProgramJson.Tests/Site/`
+(`AtlasSiteFolderTests`, `AtlasProgramMapTests`, `AtlasGenerationPickerTests`), and `tests/Lod.Integration.Tests/DoeAtlasProgramMapTests.cs`,
+which pins every family's resolved keys and gaps on the recorded index of the 75 folders and runs an atlas map of the medium office through its
+generator; the headless spec is `scripts/rhino-smoke/specs/doe-atlas-maps.py`.
 
 ## Icons
 

@@ -1,6 +1,6 @@
 # ADR-033: Schedule Draw — the atlas generator as an external command, drawn per zone, aggregated by the existing rules
 
-- **Status:** Provisional (D-194 to D-196), pending the owner's reading; the released generator 3.0.0 pinned in 1.6.0 (D-198); decisions 2, 4, 8, 9, and 10 amended for generator 4.0.0 and atlas release 2.2.0 in 1.7.0 by [ADR-035](ADR-035-schedule-draw-generator-4-0-0.md) (D-205)
+- **Status:** Provisional (D-194 to D-196), pending the owner's reading; the released generator 3.0.0 pinned in 1.6.0 (D-198); decisions 2, 4, 8, 9, and 10 amended for generator 4.0.0 and atlas release 2.2.0 in 1.7.0 by [ADR-035](ADR-035-schedule-draw-generator-4-0-0.md) (D-205); decision 10 amended by D-128 and D-207: the source program's SHA-256 is that of its text with LF line endings, the setting's and the program settings' those of their bytes
 - **Date:** 2026-10-29
 - **Context:** the owner's [requirement](../research/schedule-generator-requirement.md) (D-133, D-134), [design note](../plans/2026-10-29-schedule-draw.md), program JSON 5.4.0 ([ADR-027](ADR-027-atlas-release-2-0-0-contracts.md), D-172), test suites ([ADR-020](ADR-020-test-suites.md)), the atlas's `atlas_schedules` 3.0.0 (its ADR 0035 and ADR 0047), atlas release 2.0.0's `generator.json` (its ADR 0046)
 

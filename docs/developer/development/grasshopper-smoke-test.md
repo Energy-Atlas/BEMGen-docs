@@ -1208,3 +1208,69 @@ For a person in Rhino 8, with the files of the GitHub release `v1.7.0` (the zip 
 - [ ] A `schedule-draw.gh` saved with 1.6.0 (its panels hold the 1.6.0 `generator.json` and setting 1.0.0) opens with its saved values; with *Run* true it stops with `ScheduleDrawSettingInvalid` saying what to change, and with the 1.7.0 panels (the release 2.2.0 `generation.json`, setting 2.0.0) it draws.
 - [ ] A *Program JSON* given an export of atlas release 2.2.0 (`python -m scripts.atlas_exports --program <ID> --version filled` in an atlas checkout at `v2.2.0`) solves as the release 2.1.0 export does, its *Source* naming `atlas-release-2.2.0`.
 - [ ] The viewport previews of a few examples (the end-to-end and the office plate) look as in 1.6.0.
+
+### Program JSON editor window checklist (D-128)
+
+The strip at the bottom of *Program JSON* and the window it opens (D-128, merged into `main` by D-207). The scripted run is `scripts/rhino-smoke/specs/program-json-editor.py`, which cannot show the window, so these items need a person in Rhino 8.
+
+#### The strip
+
+- [ ] A new *Program JSON* has a strip labelled *Edit JSON…* below its inputs and outputs, inside the component, in the light and the dark canvas themes; selected, locked (disabled), and zoomed out, it stays legible and inside the component.
+- [ ] Single clicks and drags on the strip select and move the component; a double-click elsewhere on the component does what Grasshopper does without BEMGen.
+- [ ] Wiring a panel into *JSON* changes the label to *Edit JSON… (wired)*; removing the wire changes it back.
+
+#### The window
+
+1. Double-click the strip of a new *Program JSON*.
+   - [ ] A window titled *Program JSON* opens over the Grasshopper editor, about 800 × 600 and resizable, with an empty monospaced text field, a short instruction naming program JSON 5.4.0, and *OK* and *Cancel*.
+2. Paste the whole Medium Office JSON (`tests/Lod.ProgramJson.Tests/Fixtures/atlas/medium-office-90-1-2019.filled.json`) and press *OK*.
+   - [ ] The window closes, the component solves with no warning or error, and *Source* shows `Json.Sha256=1331af85…`, the checksum of the text with LF line endings (the file itself has CR LF and the SHA-256 `f121f346…`).
+   - [ ] Double-clicking again shows the stored text; *Cancel* and Esc close without a change.
+   - [ ] *Undo* (Ctrl+Z) in the editor restores the previous value (empty), and *Redo* the JSON.
+3. Change `"schema_version": "5.4.0"` to `"2.0.0"` and press *OK*.
+   - [ ] The window stays open and lists the error below the text field (`Error ProgramJsonVersionNotSupported [/schema_version]: …`); the component keeps the previous text and preset. Pressing *Cancel* leaves it so.
+4. Empty the text field and press *OK*.
+   - [ ] The stored text is removed; the component reports its missing *JSON* input.
+5. Store the JSON again, save the definition, close it, and open it again.
+   - [ ] The component has the strip and the stored text, and *Source* shows the same `Json.Sha256=1331af85…`.
+6. Wire a panel into *JSON*, then double-click the strip.
+   - [ ] The window says that the wire is used while it is connected; the component solves with the panel's text.
+7. On a new *Program JSON* with *Climate Zone* `4A` and *Context* `foundation=slab`, paste `multifamily-iecc-2021.source.json` from the same folder and press *OK*.
+   - [ ] The text is stored and the component solves; with *Context* removed, OK instead lists `ProgramJsonContextRequired`.
+
+### Atlas window checklist (D-208)
+
+*Get from Atlas…* on *Program JSON*; the scripted run is `program-json-editor`'s `get from atlas` scenario on recorded site files, which cannot show the window, so these items need a person in Rhino 8 with network access (and one item without).
+
+- [ ] *Program JSON* shows *Get from Atlas…* above *Edit JSON…* in both canvas themes; a double-click opens the window on `https://energy-atlas.github.io/archetype-atlas/catalogue/`, and the status line names atlas release 2.2.0 (with the program count when the index arrives before the catalogue has loaded).
+- [ ] *Use this program* is disabled on the catalogue and enabled on a program's page, such as the 90.1-2007 medium office's open office (`…/catalogue/commercial/90-1-2007/medium-office-detailed/programs/source/medium-office-open-office/`); the status line names the program.
+- [ ] With *Filled* chosen, *Use this program* closes the window; the component solves with no error, and *Source* shows `Json.Version=program JSON 5.4.0, filled`, `atlas-release-2.2.0`, and `Json.Sha256=b4e9a14f…`. *Undo* restores the previous text.
+- [ ] With *Source* chosen on the same page, the source version is stored (`Json.Version=program JSON 5.4.0, source`).
+- [ ] On an IECC program's page (such as `…/catalogue/commercial/iecc-2006/full-service-restaurant/programs/source/dining/`) the window selects *Source* and the status line gives the site's reason; choosing *Filled* and clicking gives `AtlasSiteVersionNotPublished` and stores nothing.
+- [ ] A link that leaves the site (such as the site's GitHub link), a link that opens a new window (the footer's *Material for MkDocs*, `target="_blank"`), and an address typed in the box outside the root are not opened, in the window or in a new one, and the status line names them.
+- [ ] After an IECC page (Source selected), a 90.1 program's page selects *Filled* again.
+- [ ] Without network (the network adapter off), the window opens with a status line saying the index cannot be read, and *Cancel* closes it; no exception. A program stored before solves offline.
+- [ ] The definition saved and reopened keeps the stored text and gives the same `Json.Sha256`.
+
+### Atlas program map checklist (D-209)
+
+*Get from Atlas…* on the DOE *Programs* components and on *Schedule Draw* ([ADR-036](../decisions/ADR-036-atlas-program-maps.md)); the scripted run is the `doe-atlas-maps` spec on recorded site files, which cannot show the windows, so these items need a person in Rhino 8 with network access (and one item without).
+
+- [ ] Each *DOE … Programs* component shows the strip *Get from Atlas…* below its parameters in both canvas themes, and its four inputs (*Climate Zone*, *Year*, *Holidays*, *Context*) and the *JSON* output; *Schedule Draw* shows the strip too.
+- [ ] A double-click on *DOE Medium Office Programs*' strip opens its window: five families, each `11 of 11 keys.`; *Filled* chosen. *OK* closes it after the downloads; the component's remark names `90.1-2019` (or the family chosen), `filled version`, `atlas release 2.2.0`, and the folder; the strip reads `Get from Atlas… (90.1-2019, filled)`; the medium office's generator and *Validate* solve with no error. *Undo* returns to the illustrative presets, *Redo* brings the map back.
+- [ ] *DOE Stand-alone Retail Programs*' window shows `90.1-2019: 3 of 4 keys; Retail has no program.`; *OK* stores it, and the component gives an error naming `Retail`, no *Program Map*, and *Presets* with its fourth position empty; *Keys* and *Presets* with a preset given by hand at that position through *DOE Program Map* make a map that the generator takes.
+- [ ] *Clear* in the window returns the component to its illustrative presets (the *Illustrative* remark), with one undo event.
+- [ ] A definition with a stored map saved, Rhino closed, the network adapter off, and the definition reopened solves offline with the same presets; the window then opens with a status line saying the index cannot be read, and *Cancel* closes it; no exception.
+- [ ] A definition saved with 1.7.0 that holds DOE *Programs* components (`scripts/rhino-smoke/fixtures/doe-programs-1.7.0.gh`) opens without the *Grasshopper IO* dialog and solves as before.
+- [ ] *JSON* of a quick-service restaurant map wired into *Schedule Draw*'s *Program JSON* (one item, through *List Item*): the strip's window names the folder `commercial/<template>/quick-service-restaurant/` and the release; *Use this file* stores *Generator JSON*, and *Undo* removes it. With the medium office's program instead, the window says that the folder `commercial/<template>/medium-office-detailed/` has no `generation.json` (an atlas limitation) and *Use this file* stays disabled.
+
+### Release 1.8.0 checklist (D-210)
+
+For a person in Rhino 8 with network access, with the files of the GitHub release `v1.8.0` (the zip or the Yak package, installed one way only). The headless part is done (D-209, D-210): every spec of `scripts/rhino-smoke` on the release candidate, the 22 example definitions rebuilt, the 21 saved with 1.7.0 and `scripts/rhino-smoke/fixtures/doe-programs-1.7.0.gh` reopened; these items need a person.
+
+- [ ] Installing from the release: `bemgen-1.8.0-rh8_19-win.yak` dragged onto Rhino 8.19 or later, or the unblocked zip in `%APPDATA%\Grasshopper\Libraries\BEMGen\` replacing the 1.7.0 folder; Grasshopper shows the BEMGen tab and *About* or the component tooltip names 1.8.0; no duplicate-library dialog. WebView2 (installed with Windows 11 and recent Windows 10) shows the atlas pages.
+- [ ] The icons look as in 1.7.0 (none changed); *Program JSON* shows its two strips, each *DOE … Programs* component and *Schedule Draw* one strip, in both canvas themes.
+- [ ] The [program JSON editor window checklist](#program-json-editor-window-checklist-d-128), the [atlas window checklist](#atlas-window-checklist-d-208), and the [atlas program map checklist](#atlas-program-map-checklist-d-209), with the installed release.
+- [ ] `examples/doe-atlas-map.gh` opens and solves with *Validate* True and no network; *DOE Medium Office Programs*' remark names 90.1-2007, the filled version, and atlas release 2.2.0, and its strip reads `Get from Atlas… (90.1-2007, filled)`.
+- [ ] A definition saved with 1.7.0 that holds *Program JSON*, *Schedule Draw*, or DOE *Programs* components opens without the *Grasshopper IO* dialog and solves as before; a *Program JSON* text stored with CR LF line endings gets a new *Source* checksum once (D-207).
+- [ ] The viewport previews of a few examples (the end-to-end, the office plate, and the DOE atlas map) look as in 1.7.0.

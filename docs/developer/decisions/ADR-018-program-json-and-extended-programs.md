@@ -1,6 +1,6 @@
 # ADR-018: Program presets from program JSON 2.0.0, and the extended program model
 
-Status: Accepted (the owner's decisions of 2026-10-07; the realisation by the controller, provisional pending the owner's reading)
+Status: Accepted (the owner's decisions of 2026-10-07; the realisation by the controller, provisional pending the owner's reading). Amended by D-128: the SHA-256 is of the text with LF line endings. Amended by D-208: the solve still reads no file or network, and the component's atlas window may use the network after a click, from the atlas site only (see [The atlas window](#the-atlas-window-d-208)).
 
 Date: 2026-10-07
 
@@ -76,7 +76,7 @@ The people sensible rule counts only the sources with a positive weight. A weigh
 
 `ProgramJsonImporter.Import(json, options)` reads in `ProgramJsonReader`: strictly (duplicate keys rejected, 64 MiB and depth 64 at most, `ProgramJsonLimits`), then the mode (`raw` rejected before the schema), then the embedded schema, then the contract's checks (schedule keys and references, units by role, real dates, annual lengths and years, heat-fraction sums, repeated demands), then the expansion of every referenced schedule on the calendar and the hourly checks (heating ≤ cooling when both sides are on, water target ≥ inlet). Rule-based schedules use the holiday day type `Hol` on holidays; the last matching specific rule wins, else the last matching `Default`; rules are never sorted; a start after the end wraps New Year; a day no rule covers is an error. Design-day rules are checked for coverage (a warning) and not used. Hot-water flows convert from m³/s to m³/h. Loads of one type, end use, and basis with different demand IDs add, by the aggregator's own rule. Shared services are left out and listed once each. The preset's `Source` records the JSON's identity and SHA-256, its source record, the default policy and the number of its substitutions, the calendar, every override, and what was left out. Every diagnostic carries the JSON Pointer of its node.
 
-*Program JSON* (panel *1 Program*, `abb0aeb9-5a9f-40ff-b3a1-bb125cfb675c`) is a thin adaptor over the importer. It takes the JSON text only (no file, no network), a WWR (illustrative default 0.4), a year (default 2007, whose 1 January is a Monday, as BEMGen's presets assume) and holidays, and optional overrides: loads (each replaces the JSON loads of its type and end use, or is added, such as ventilation, which the contract does not carry), each thermostat side and its schedule, the activity schedule, and the two people fractions. The space type is unset by default, which gives an any-program preset.
+*Program JSON* (panel *1 Program*, `abb0aeb9-5a9f-40ff-b3a1-bb125cfb675c`) is a thin adaptor over the importer. It takes the JSON text only (no file, no network in the solve; since D-208 its atlas window downloads text after a click, below), a WWR (illustrative default 0.4), a year (default 2007, whose 1 January is a Monday, as BEMGen's presets assume) and holidays, and optional overrides: loads (each replaces the JSON loads of its type and end use, or is added, such as ventilation, which the contract does not carry), each thermostat side and its schedule, the activity schedule, and the two people fractions. The space type is unset by default, which gives an any-program preset.
 
 ### Export
 
@@ -97,3 +97,13 @@ The people sensible rule counts only the sources with a positive weight. A weigh
 - **Retired:** the S10 fetch components, their GUIDs (never to be reused, listed in D-126), and the two atlas examples, kept only in the tag `archive/archetype-data`.
 - **Contract gaps** found while building are reported to the atlas, not worked around: 29 February in a non-leap model year, holidays for schedules without a `Hol` rule, the vague "relevant active periods" wording of the setpoint rule, a copy-paste constraint on annual schedules, and design-day coverage that a consumer without sizing never uses (D-126).
 - **Provisional.** The owner's decisions are final; the realisation stands until the owner has read it.
+
+## The atlas window (D-208)
+
+The owner's answers of 2026-10-30 to the [atlas program picker note](../plans/2026-10-30-atlas-program-picker.md) (§6, questions 1 to 3) amend D-126's "no file or network" for the component as a whole, not for its solve:
+
+- **The solve reads no file or network**, as before. The text is the *JSON* input's value, so a definition reopens and re-solves offline and gives the same preset.
+- **The network after a click only, from the atlas site only.** The strip *Get from Atlas…* opens a window with a web view of `https://energy-atlas.github.io/archetype-atlas/` (fixed; a configurable root is left for later), which goes to no address outside that root. The window reads the site's index when it opens and a program's export when *Use this program* is clicked; nothing else on the network is read, and never the page or the clipboard.
+- **What is stored** is the site's store file, decompressed, byte for byte, after `AtlasSite` checked the SHA-256 of its gzip bytes against its path, its `id`, `version`, and `source.release` against the index, and the editor window's check accepted it. The filled version is the default, the source version a choice. The checksum in *Source* is therefore that of the site's canonical JSON, which differs from that of the pretty-printed file of `atlas-release-2.2.0.zip`.
+- **Trade-off.** The plugin depends on a web site again, which D-126 had removed with the atlas fetch components (D-122). It is kept narrow: one site, a user's click, files checked by their own names, and the result stored in the definition, so reproducibility does not depend on the site staying up or unchanged.
+- **Amended by [ADR-036](ADR-036-atlas-program-maps.md) (D-209):** the same rule holds for the strip *Get from Atlas…* on the DOE *Programs* components, whose window downloads a whole map of programs, and on *Schedule Draw*, whose window downloads a folder's `generation.json`; each solve still reads no file or network.

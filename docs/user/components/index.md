@@ -130,6 +130,7 @@ The definitions in the examples zip of each release, checked in Rhino before the
 - `cafeteria.gh` ([canvas](../../assets/screenshots/canvas/cafeteria.png))
 - `care-hub.gh` ([canvas](../../assets/screenshots/canvas/care-hub.png))
 - `court-cluster.gh` ([canvas](../../assets/screenshots/canvas/court-cluster.png))
+- `doe-atlas-map.gh` ([canvas](../../assets/screenshots/canvas/doe-atlas-map.png))
 - `enclosed-court.gh` ([canvas](../../assets/screenshots/canvas/enclosed-court.png))
 - `end-to-end.gh` ([canvas](../../assets/screenshots/canvas/end-to-end.png))
 - `foyer-halls.gh` ([canvas](../../assets/screenshots/canvas/foyer-halls.png))

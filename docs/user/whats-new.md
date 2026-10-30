@@ -1,6 +1,28 @@
 # What's new
 
-This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.6.0.
+This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.7.0.
+
+## 1.7.0
+
+Version 1.7.0 moves *Schedule Draw* to version 4.0.0 of the atlas's schedule generator and reads release 2.2.0 of the Energy Archetype Atlas.
+
+### Schedule Draw on generator 4.0.0
+
+*Schedule Draw* now runs `atlas-schedules` 4.0.0, which carries atlas release 2.2.0 with it. See the [component reference](components/program.md#schedule-draw).
+
+- **Install the new generator.** Download `atlas_schedules-4.0.0-py3-none-any.whl` and `SHA256SUMS.txt` from the atlas release [atlas-schedules-v4.0.0](https://github.com/Energy-Atlas/archetype-atlas/releases/tag/atlas-schedules-v4.0.0), check the file with `sha256sum -c SHA256SUMS.txt --ignore-missing`, and install it in a virtual environment (Python 3.11 or later): `python -m venv <folder>`, then `<folder>\Scripts\python -m pip install atlas_schedules-4.0.0-py3-none-any.whl`. An environment that has 3.0.0 is upgraded with `pip install --upgrade` and the same wheel. *Command* stays `<folder>\Scripts\atlas-schedules.exe`.
+- **Generator JSON takes `generation.json`.** Give the `generation.json` of the program's folder in atlas release 2.2.0: `v2.2.0/<family>/<template>/<type>/generation.json` in `atlas-release-2.2.0.zip` of the atlas release [v2.2.0](https://github.com/Energy-Atlas/archetype-atlas/releases/tag/v2.2.0). The `generator.json` of earlier releases is refused, with a message that names the file to give.
+- **Setting 2.0.0.** The setting's `schema_version` is `2.0.0`, its generator version `4.0.0` and bundle schema `4.0.0`, and it has no `view`: the program JSON's own version, filled or source, chooses the values drawn from. A 1.0.0 setting is refused with what to change.
+- **Provenance** names the atlas release the generator read and its manifest checksum.
+- **Drawn schedules.** A program JSON drawn with 1.6.0 still reads. Drawing it again gives the same schedules where the atlas found generator 4.0.0 equal to 3.0.0, as for the DOE Ref medium office of the example; the atlas's 90.1 apartment-building common-area programs now carry their heat fractions, so their draws can differ.
+
+### Atlas release 2.2.0
+
+*Program JSON* and *Construction JSON* read the exports of atlas release 2.2.0, the release to download now. Its contracts are those of 2.0.0 and 2.1.0, whose exports remain valid, and later releases of the same program JSON contract are read too.
+
+### Opening older definitions
+
+Definitions saved with 1.6.0 open with their saved values. To draw with a `schedule-draw.gh` saved with 1.6.0, replace its `generator.json` panel with the release 2.2.0 `generation.json` and its setting with a 2.0.0 setting. The example definitions in the examples zip have been rebuilt with 1.7.0.
 
 ## 1.6.0
 

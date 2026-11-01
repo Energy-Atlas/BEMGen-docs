@@ -1,10 +1,96 @@
 # What's new
 
-This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.8.0.
+This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.9.0.
+
+## 1.9.0
+
+Version 1.9.0 reads release 2.3.0 of the Energy Archetype Atlas and refuses the texts of earlier releases. It offers the IECC programs on the DOE *Programs* components, adds *Get from Atlas…* to *Mix Programs* and *Construction JSON*, moves *Schedule Draw* to generator 4.1.0, and carries the fixes made since 1.8.0: a rule for zones without HVAC under the heat-transfer options, the refusal of an unresolved climate, and code-rule daylighting on request. Every component keeps its GUID and icon; new inputs and outputs are added after the existing ones.
+
+### Atlas release 2.3.0
+
+BEMGen reads the exports of atlas release 2.3.0, and only those: program JSON 6.0.0, unified construction JSON 4.0.0 (the building-level equivalent), and detailed construction JSON 5.0.0. Release 2.3.0 is the release to download now, or to take with *Get from Atlas…*.
+
+- **Texts of releases 2.0.0 to 2.2.0 are refused**, whether they are wired in or stored in a definition. A program JSON 5.4.0 or a unified construction JSON 3.1.0 is refused with the ID the program or set has in release 2.3.0, or with the remark that its ID did not change. Take the program or set again from the atlas site with *Get from Atlas…*, or export it again from release 2.3.0.
+- **A DOE program map stored by 1.8.0** holds texts of release 2.2.0, so *DOE … Programs* refuses the whole map and names each moved program's new ID. *Get from Atlas…* stores it again.
+- **A stored *Generator JSON* of *Schedule Draw*** names no release. It fails with a message that a program of an earlier release has another ID when the program's ID moved; when the ID did not move, it is accepted and draws the same.
+- **A dwelling's window ratios follow its *Context*.** A program JSON of a dwelling can hold several window ratios, one for each construction context; *Context* (for example `foundation=slab`) chooses one, and *Source* names it. Without the keys it needs, *Program JSON* warns with `ProgramJsonFenestrationContextRequired` and does not use the JSON's window ratios.
+- ***Assumptions*** lists the filled version's absent demands, the demands it records as known zeros (`metadata.absent_demands`), after its resolutions.
+- **Checksums.** The SHA-256 that *Program JSON* and *Construction JSON* record is now that of the canonical form of the JSON, sorted by key and without extra whitespace, as the atlas site's `json_sha256` is. A pretty-printed file, a panel with CR LF line endings, and the site's text have one checksum. A definition's *Source* shows a new checksum once. A program or set taken from the site also records the atlas store file it came from (`Json.Store`, or `atlas store …` for a construction set), for as long as the text is not edited.
+- **Imported now.** The 152 DOE Ref unified construction documents (stand-alone retail, small hotel, supermarket, and warehouse) that 1.8.0 refused for their internal mass import, because the atlas corrected them in release 2.3.0.
+
+### IECC programs on the DOE Programs components
+
+The strip *Get from Atlas…* on each *DOE … Programs* component now offers eleven families, the five of 1.8.0 and the IECC editions 2006, 2009, 2012, 2015, 2018, and 2021, for the eleven prototypes that the atlas has IECC programs for. The IECC families are not offered for the DOE small, medium, and large office, whose IECC folders hold whole-building programs only, nor for the supermarket, which they lack. See the [component reference](components/program-presets.md).
+
+- **Source version only.** The atlas publishes the IECC programs in their source version. Choose *Source* in the window; *Filled* is refused key by key with the site's reason, and the window says `only the source version of …`.
+- **The split keys.** The 90.1 and IECC folders split or rename a few of the reference building's space types. A key without a program of its own can take the atlas's area-weighted mix of its split spaces: the small hotel's `GuestRoom` takes `GuestRooms_Mixed` (90.1-2007, 90.1-2013, 90.1-2019, and the IECC families), and the hospital's `Office` takes `Office_Mixed` (90.1-2013, 90.1-2019, and the IECC families). The window's coverage names the mix, for example `GuestRoom takes GuestRooms_Mixed`.
+- **Keys still without a program.** The secondary school's `Gym - audience` and the stand-alone retail's `Retail` stay without one, where a family splits them. The retail's mix would count its point-of-sale program twice, so it is not used. As before, such a key is named in an error, *Program Map* is not output, and *Presets* leaves its position empty, so you can complete the map with *DOE Program Map*.
+- **New output.** Each *DOE … Programs* component has a fifth output, *Left Out*, a tree with one branch for each key: what the key's program does not hold, as *Program JSON*'s *Left Out* lists it, empty for a key without a program and without an atlas map.
+- The ASHRAE *Climate Zone* of a stored map is needed to convert, as [below](#unresolved-climate-zones-are-refused).
+
+### Get from Atlas on Mix Programs
+
+*Mix Programs* has the strip *Get from Atlas…* at its bottom; double-click it to open its window. The network is used only after you click in the window; the programs and weights are stored in the definition, so every solve reads only the definition. See the [component reference](components/program.md#mix-programs).
+
+- **Choose the members.** Choose a template and a building type; the window lists the folders that have source programs. *Start from* offers each general mix and each department mix of the folder, with its members ticked and their weights, which are the members' floor-area shares in the prototype, or *Free selection*, every source program of the folder, unticked. In a free selection a program that is a member of a general mix has that mix's area share as its weight, and another program has none.
+- **Untick and reweight.** Untick members and edit the weights (each greater than 0); the window shows each member's space type, represented area, weight, and normalised share. A ticked member without a weight asks for one.
+- ***OK*** downloads the ticked members (at most four at a time, filled by default or as you choose), checks each one with the component's *Climate Zone*, *Year*, *Holidays*, and *Context*, tries the mix, and stores the programs and weights in the component with one undo step only if the mix is accepted. *Clear* removes the stored mix.
+- **BEMGen mixes the members itself**, by the rule of *Mix Programs* (floor-area weights), not by taking the atlas's own mix program, so that you can untick and reweight and so that the result's *Source* names every member with its program, weight, checksum, and store file. The atlas's own mix programs remain available through *Program JSON*; the two can differ where the atlas's mixing rule differs.
+- **Members are any-program presets** named by their space type, so with *Space Type* unset the mix is an any-program preset, which fits any preset input.
+- ***Presets* and *Weights* are optional now.** A wire into *Presets* takes precedence over the stored mix (and then needs *Weights*, as before); a wired but empty *Presets* takes precedence too, with a warning. With the stored mix and no wire, *Weights*, when given, replaces the stored weights, one for each member in the stored order.
+- **New inputs** *Climate Zone*, *Year* (2007), *Holidays*, and *Context* apply to a stored mix, as on *Program JSON*. **New outputs:** *JSON*, each member's program text in member order, for example for *Schedule Draw*, and *Left Out*, a branch for each member.
+
+### Get from Atlas on Construction JSON
+
+*Construction JSON* has the strip *Get from Atlas…* too. Its window lists the atlas's construction sets, grouped by the template and building type their IDs begin with, and a set's contexts, such as its climate zone. *Use this set* downloads the context's unified document, checks it, and stores it as the *JSON* input's value, with one undo step; a wire into *JSON* still takes precedence. See the [component reference](components/program.md#construction-json).
+
+- **Only whole-building sets can be used.** The window marks and refuses, before any download, the contexts whose one document serves both representations: the atlas's IECC residential and manufactured-housing sets, which describe a source dwelling's constructions by the source's own surfaces. A ResStock set is a single-dwelling set and is refused by the import (`ConstructionJsonScopeNotSupported`). A context with no unified document gives the atlas's reason.
+- An IECC commercial set is stored with the warning about its source design-flow infiltration, and *Convert2IDF* does not convert it, as before.
+- ***Source*** records the atlas store file the set came from and the checksum of its canonical JSON.
+- **Skylights.** A set's skylight glazing is read and used for a building's skylights (before, they took the window's glazing). A building with skylights and a set without skylight glazing gets the warning `SkylightGlazingFromWindow` and the window's glazing; a building without skylights lists the skylight glazing as unused, and says nothing else.
+
+### Schedule Draw on generator 4.1.0
+
+*Schedule Draw* now runs `atlas-schedules` 4.1.0, which carries atlas release 2.3.0 with it. See the [component reference](components/program.md#schedule-draw).
+
+- **Install the new generator.** Download `atlas_schedules-4.1.0-py3-none-any.whl` and `SHA256SUMS.txt` from the atlas release [atlas-schedules-v4.1.0](https://github.com/Energy-Atlas/archetype-atlas/releases/tag/atlas-schedules-v4.1.0), check the file with `sha256sum -c SHA256SUMS.txt --ignore-missing`, and install it in a virtual environment (Python 3.11 or later): `python -m venv <folder>`, then `<folder>\Scripts\python -m pip install atlas_schedules-4.1.0-py3-none-any.whl`. An environment that has 4.0.0 is upgraded with `pip install --upgrade` and the same wheel. *Command* stays `<folder>\Scripts\atlas-schedules.exe`.
+- **Generator JSON** takes the `generation.json` of the program's folder in atlas release 2.3.0: `v2.3.0/<family>/<template>/<type>/generation.json` in `atlas-release-2.3.0.zip` of the atlas release [v2.3.0](https://github.com/Energy-Atlas/archetype-atlas/releases/tag/v2.3.0). *Get from Atlas…* on the component stores it.
+- **Setting.** The setting is still `schema_version` 2.0.0, but its generator version is `4.1.0` (its bundle schema stays `4.0.0`); a setting that names another generator version is refused.
+- **More programs can be drawn.** Release 2.3.0 generates the DOE small, medium, and large office (their detailed office folders) and the IECC commercial programs, so *Get from Atlas…* now finds a `generation.json` for them, and they are drawn (an IECC program in its source version). The atlas still has none for some folders, such as the IECC apartments and the commercial folders without a sampling building type; the window says so.
+- A program JSON drawn with 1.8.0 holds program JSON 5.4.0 and is refused; draw again from a program of release 2.3.0.
+
+### Convert2IDF and Convert2BEM
+
+- **Daylighting on request.** *Convert2IDF* has a new last input, *Daylighting*, false by default. With it true, each zone whose program has daylighting controls (from *Program JSON*) gets them: the program's setpoint, control type, minimum fractions, steps, and method, at up to two reference points 0.8 m above the floor. The 90.1 code rule of the program's edition (2010, or 2013 to 2019) places the points and shares the controlled areas from the zone's own windows and skylights, as openstudio-standards computes them for the DOE prototypes, so a merged zone takes its own geometry. A zone without a window or skylight, or whose daylit areas the edition does not require to be controlled, gets none, and a program without a code rule (an IECC or DOE reference program) gets the warning `DaylightingNoCodeRule` and none. The IDF header lists each zone and why it has none. EnergyPlus warns once for each zone that the reference points control less than all of its lights. With the input false, the default, no daylighting object is written and the lighting load is held fixed, as the LOD study requires; *Program JSON*'s *Left Out* says when the controls are written. See the [component reference](components/convert.md#convert2idf).
+- **Heat-transfer options.** With *EnableInternalWallHeatTransfer* or *EnableFloorHeatTransfer* off, a wall, floor, or ceiling is written `Adiabatic` only when both zones it separates are conditioned. A surface of a zone without HVAC, such as an unconditioned stair or an elevator core, keeps its `Interzone:<zone ID>` link whatever the options say, so that such a zone is never left with only its exterior surfaces to lose heat through (EnergyPlus stopped on a small hotel's elevator core, a zone without HVAC with a large equipment load, when its walls were sealed). *Convert2BEM*'s *Boundaries* and the IDF follow the same rule. A building with a zone without HVAC therefore shows `Interzone` where 1.8.0 showed `Adiabatic` for that zone's surfaces.
+
+### Unresolved climate zones are refused
+
+Some programs have values that differ by ASHRAE climate zone (loads, schedules, window ratios, daylighting). *Program JSON*, the atlas maps and mixes, take the zone from their *Climate Zone* input, such as `5B`. Without one they take the general values, with a warning, and *Convert2IDF* refuses the building with the error `ClimateZoneUnresolved`, which names each program and what differs; *Override* does not apply. The zone must be given to the component that imports the program, because the window ratios by climate have already shaped the generated windows by then. If the `.stat` file next to the `.epw` weather file states an ASHRAE zone, the error names it, the IDF header records `Weather climate zone`, and programs resolved for another zone get the warning `ClimateZoneDiffersFromWeather`.
+
+### Program JSON reads more
+
+- **Hot water** is delivered at most at the source outlet when the atlas caps it (`cap_at_source_outlet`): the draw's target temperature is capped hour by hour at the outlet of the last heating stage, and *Overrides* records the requested target, its maximum, and the hours it is not met.
+- **Fuels and water heaters.** An equipment load whose fuel its object does not meter (for example propane gas equipment) is written as given, with the warning `ProgramJsonFuelNotApplied`, and listed in *Left Out*. *Left Out* names each water heating demand's heater, fuel, efficiency, and outlet, which are not applied: BEMGen reports the hot water's thermal demand.
+- **Calendar.** *Left Out* lists the source calendar's daylight saving when it is recorded (the IDF runs on standard time), and its holiday rules only when the source has them and no *Holidays* are given, with the warning `ProgramJsonBindingNotMet`.
+- **Messages.** The messages name the real inputs; a newer program JSON schema tells you to update BEMGen, and an older one to export again.
+
+### Downloads from the atlas site
+
+All the atlas windows share one limit: at most four files are downloaded at a time. A download answered with HTTP 429 or a server error is asked for once more after a short wait. If GitHub Pages is limiting your network, the window says to wait a few minutes. A window shows any other fault in its status line.
+
+### Opening older definitions
+
+Definitions saved with 1.8.0 open with their saved values and solve as before except where this page says otherwise:
+
+- *Mix Programs*, the *DOE … Programs* components, and *Convert2IDF* get their new inputs and outputs unset (*Daylighting* false), and *Mix Programs*' *Presets* and *Weights* become optional.
+- A *Program JSON* or *Construction JSON* that stores a text of release 2.2.0 or earlier, and a DOE map stored by 1.8.0, show the refusal described above until the program, set, or map is taken again from the atlas. A *Schedule Draw* saved with 1.8.0 needs its setting's generator version changed to `4.1.0` and a `generation.json` of release 2.3.0.
+- The checksums in *Source* change once, and a building with a zone without HVAC converts with the new boundaries.
+- The example definitions in the examples zip have been rebuilt with 1.9.0: `program-json-office.gh`, `schedule-draw.gh`, and `doe-atlas-map.gh` hold texts of atlas release 2.3.0.
 
 ## 1.8.0
 
-Version 1.8.0 takes programs from the [Energy Archetype Atlas site](https://energy-atlas.github.io/archetype-atlas/). The network is used only after you click in one of the windows below; every solve reads only the definition, so stored programs solve offline. The windows need Windows, where they use WebView2.
+Version 1.8.0 takes programs from the [Energy Archetype Atlas site](https://energy-atlas.github.io/archetype-atlas/). The network is used only after you click in one of the windows below; every solve reads only the definition, so stored programs solve offline. The windows need Windows, where they use WebView2. Version 1.9.0 changed some of what this section says: the atlas release, the families and keys of the DOE maps, the checksum, and which programs *Schedule Draw* can draw; the 1.9.0 section above gives the current rules.
 
 ### Get from Atlas on Program JSON
 

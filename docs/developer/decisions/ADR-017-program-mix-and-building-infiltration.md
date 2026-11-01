@@ -1,6 +1,6 @@
 # ADR-017: Program mix and building-level infiltration
 
-Status: Accepted (the owner's decisions of 2026-10-06; the realisation by the controller, provisional pending the owner's reading)
+Status: Accepted (the owner's decisions of 2026-10-06; the realisation by the controller, provisional pending the owner's reading). Amended by [D-228](decision-log.md#d-228--get-from-atlas-on-mix-programs-a-folders-general-and-department-mixes-or-a-free-selection-area-share-weights-stored-and-mixed-offline) (2026-11-01): *Mix Programs* can take its members and their floor-area weights from a folder of the atlas site, stored in the component; *Presets* and *Weights* become optional, a wire into *Presets* taking precedence; the mixing rules are unchanged
 
 Date: 2026-10-06
 

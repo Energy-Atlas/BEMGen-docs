@@ -1,6 +1,6 @@
 # ADR-021: Construction sets from the atlas, and a mass ledger against reference budgets
 
-Status: Accepted (the owner's decisions of 2026-10-15, D-137 and D-138); the realisation is the controller's and stays provisional until the owner has read it. Decision 2 (the ground) is superseded by D-145 (2026-10-18) for packet v7 sets, which take the ground method of their own `GroundFloor` ([ADR-023](ADR-023-native-ground-methods-and-packet-v7.md)); it still holds for a set without foundation data.
+Status: Accepted (the owner's decisions of 2026-10-15, D-137 and D-138); the realisation is the controller's and stays provisional until the owner has read it. Decision 2 (the ground) is superseded by D-145 (2026-10-18) for packet v7 sets, which take the ground method of their own `GroundFloor` ([ADR-023](ADR-023-native-ground-methods-and-packet-v7.md)); it still holds for a set without foundation data. Amended by [D-229](decision-log.md#d-229--get-from-atlas-on-construction-json-a-sets-unified-document-by-context-the-residential-source-model-documents-not-read) (2026-11-01): *Construction JSON* can take a set's unified document from the atlas site by context; the atlas's source-model construction documents are not read, and the checksum is of the canonical JSON (D-226).
 
 Date: 2026-10-15
 

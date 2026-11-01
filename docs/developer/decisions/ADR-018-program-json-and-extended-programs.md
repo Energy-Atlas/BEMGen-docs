@@ -1,6 +1,6 @@
 # ADR-018: Program presets from program JSON 2.0.0, and the extended program model
 
-Status: Accepted (the owner's decisions of 2026-10-07; the realisation by the controller, provisional pending the owner's reading). Amended by D-128: the SHA-256 is of the text with LF line endings. Amended by D-208: the solve still reads no file or network, and the component's atlas window may use the network after a click, from the atlas site only (see [The atlas window](#the-atlas-window-d-208)).
+Status: Accepted (the owner's decisions of 2026-10-07; the realisation by the controller, provisional pending the owner's reading). Amended by D-128: the SHA-256 is of the text with LF line endings; by D-226: it is of the atlas's canonical JSON, and a program taken from the atlas site records its store file (`Json.Store`). Amended by D-208: the solve still reads no file or network, and the component's atlas window may use the network after a click, from the atlas site only (see [The atlas window](#the-atlas-window-d-208)).
 
 Date: 2026-10-07
 

@@ -184,6 +184,7 @@ output:
 | *Keys* (K) | list of text | the program keys, in ordinal order |
 | *Presets* (P) | list of program presets | the preset of each key, in the order of *Keys*; to change one, wire *Keys* and the edited *Presets* into *DOE Program Map*; with an atlas map, a key without a program has its position empty |
 | *JSON* (J) | list of text | with an atlas map, each key's program JSON text in the order of *Keys* (empty for a key without a program), for *Program JSON* or *Schedule Draw*; without one, nothing |
+| *Left Out* (LO) | tree of text | with an atlas map, what each key's program does not hold or apply, as *Program JSON*'s *Left Out* lists it, one branch per key in the order of *Keys* (empty for a key without a program; D-216); without one, nothing |
 
 | Component (nickname) | Class | For | Keys | Keys with the Service fallback | Keys under a gap (the source's own glazing) | GUID |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -218,8 +219,10 @@ place of the illustrative presets:
   `small-office-detailed`, `medium-office-detailed`, `large-office-detailed`, `retail-standalone`, `retail-stripmall`, and `super-market`. A key
   matches the folder's one `source` program whose `space_type` is the key (department and general programs are never candidates); folders are
   never searched.
-- **The window** (`DoeAtlasMapDialog`, a double-click on the strip) lists the five commercial families that hold the folder (DOE Ref pre-1980,
-  DOE Ref 1980–2004, 90.1-2007, 90.1-2013, 90.1-2019), each with its coverage, such as `90.1-2019: 3 of 4 keys; Retail has no program.`, and
+- **The window** (`DoeAtlasMapDialog`, a double-click on the strip) lists the commercial families that hold the folder (DOE Ref pre-1980,
+  DOE Ref 1980–2004, 90.1-2007, 90.1-2013, 90.1-2019, and since 1.9.0 IECC 2006, 2009, 2012, 2015, 2018, and 2021 for the eleven prototypes the
+  IECC families hold: not the three offices, whose IECC folders have whole-building programs only, nor the supermarket, which they lack; D-241),
+  each with its coverage, such as `90.1-2019: 3 of 4 keys; Retail has no program.`, and
   the choice of the filled (default) or source version. *OK* runs `PickAtlasMapAsync`: every matched key's program downloaded in parallel and
   checked as *Program JSON*'s download is, then given the program check on the component's *Year*, *Holidays*, *Climate Zone*, and *Context*;
   when all succeed the window closes and `SetAtlasMap` stores the map as one text in the component with one undo event. *Clear* removes it, and
@@ -228,16 +231,21 @@ place of the illustrative presets:
   of the key's space type (`DoeSpaceTypes.Of`), with the DOE reference building's window-to-wall ratio per orientation and skylight ratio of the
   key (`DoeProgramPresets.KeyRatios`, the illustrative map's glazing, so the window areas are the same), and the four inputs. A remark names the
   family, version, release, and folder; the gap remark stays. *JSON* gives each key's text.
+- **The IECC families** (D-241) are exported in their source version only, so their maps are stored in the *Source* version; *Filled* is
+  refused key by key with the site's reason. Their folders split the same keys as 90.1-2013 and 2019 and take the same crosswalk.
 - **Keys without a program** (the 90.1 renames and splits: 90.1-2007 the secondary school's `Gym - audience` and the small hotel's `GuestRoom`;
-  90.1-2013 and 2019 also the hospital's `Office` and the stand-alone retail's `Retail`) are refused by name: *Program Map* is not output, an
+  90.1-2013, 2019, and the six IECC families also the hospital's `Office` and the stand-alone retail's `Retail`; the crosswalk of D-218 gives
+  `GuestRoom` and `Office` their department mixes) are refused by name: *Program Map* is not output, an
   error names the keys, and *Presets* and *JSON* have those positions empty, so *DOE Program Map* can complete the map with presets given by hand.
-- **Saved definitions.** The map is written by `Write` and read by `Read` (`AtlasProgramMap`, `bemgen-atlas-program-map` 1.0.0). A definition
-  saved before 1.8.0 reads without the IO dialog, with the inputs unset and no map, and solves as before
-  (`scripts/rhino-smoke/fixtures/doe-programs-1.7.0.gh`).
+- **Saved definitions.** The map is written by `Write` and read by `Read` (`AtlasProgramMap`, `bemgen-atlas-program-map` 1.1.0 since D-226;
+  1.0.0 still reads). A definition saved before 1.8.0 reads without the IO dialog, with the inputs unset and no map, and solves as before
+  (`scripts/rhino-smoke/fixtures/doe-programs-1.7.0.gh`). A map stored by 1.8.0 from site release 2.2.0 holds program JSON 5.4.0 and 2.2.0 IDs,
+  which 1.9.0 no longer reads: the solve refuses it with `AtlasSiteStoredBeforeRelease`, naming each moved program's 2.3.0 ID, until *Get from
+  Atlas…* stores it again (D-240).
 
 Tests: `tests/Lod.Generators.Tests/Doe/Presets/DoeAtlasFoldersTests.cs` (the folders, the families, the glazing), `tests/Lod.ProgramJson.Tests/Site/`
 (`AtlasSiteFolderTests`, `AtlasProgramMapTests`, `AtlasGenerationPickerTests`), and `tests/Lod.Integration.Tests/DoeAtlasProgramMapTests.cs`,
-which pins every family's resolved keys and gaps on the recorded index of the 75 folders and runs an atlas map of the medium office through its
+which pins every family's resolved keys and gaps on the recorded index of the 141 folders (75 before the IECC families, D-241) and runs an atlas map of the medium office through its
 generator; the headless spec is `scripts/rhino-smoke/specs/doe-atlas-maps.py`.
 
 ## Icons

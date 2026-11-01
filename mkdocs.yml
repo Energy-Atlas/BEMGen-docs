@@ -176,6 +176,8 @@ nav:
           - developer/decisions/ADR-034-coplanar-surface-merge.md
           - developer/decisions/ADR-035-schedule-draw-generator-4-0-0.md
           - developer/decisions/ADR-036-atlas-program-maps.md
+          - developer/decisions/ADR-037-code-rule-daylighting.md
+          - developer/decisions/ADR-038-atlas-release-2-3-0-contracts.md
       - Plans:
           - developer/plans/2026-09-30-implementation-roadmap.md
           - developer/plans/2026-10-01-s0-foundation.md
@@ -229,6 +231,11 @@ nav:
           - developer/plans/2026-10-29-schedule-draw.md
           - developer/plans/2026-10-30-atlas-program-picker.md
           - developer/plans/2026-10-30-generator-4-0-0.md
+          - developer/plans/2026-11-01-bg1-correctness.md
+          - developer/plans/2026-11-01-bg2-atlas-pickers.md
+          - developer/plans/2026-11-01-bg3-daylighting.md
+          - developer/plans/2026-11-01-lod-study-tooling-fixes.md
+          - developer/plans/2026-11-01-rel-b-atlas-2-3-0.md
       - Research:
           - developer/research/envelope-presets.md
           - developer/research/experiment-outputs.md

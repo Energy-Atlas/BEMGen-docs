@@ -294,9 +294,9 @@ Build the plugin with `dotnet build src/Lod.Grasshopper -c Release` (0 warnings)
 #### Heat-transfer options
 
 8. Connect the *Stack Floors* building of the canonical floor (Multipliers 1, 3, 1) to *Convert2BEM*; *Convert2BEM* has the inputs Building, Override, EnableInternalWallHeatTransfer (IWHT), and EnableFloorHeatTransfer (FHT), both options `False` by default.
-   - [ ] *Boundaries* contains no `Interzone:` text: the 90 walls between zones and the 48 floors and ceilings between storeys read `Adiabatic`. *Provenance* contains the line `OPTIONS: EnableInternalWallHeatTransfer=False EnableFloorHeatTransfer=False`.
+   - [ ] *Boundaries*: the walls, floors, and ceilings between two conditioned zones read `Adiabatic`; those of the unconditioned stair (`L*/ST`) toward another zone read `Interzone:<zone ID>` (D-211: a zone without HVAC is never sealed off). *Provenance* contains the line `OPTIONS: EnableInternalWallHeatTransfer=False EnableFloorHeatTransfer=False`.
    - [ ] IWHT = True: the 90 walls read `Interzone:<zone ID>` (for example `Interzone:L0/CO` on `L0/ST`), the floors and ceilings between storeys stay `Adiabatic`, and the *OPTIONS* line reads `EnableInternalWallHeatTransfer=True EnableFloorHeatTransfer=False`.
-   - [ ] FHT = True (IWHT False): the 48 floors and ceilings between storeys read `Interzone:<zone ID>` and the walls `Adiabatic`.
+   - [ ] FHT = True (IWHT False): the 48 floors and ceilings between storeys read `Interzone:<zone ID>`, and the walls `Adiabatic` except the stair's, which read `Interzone:<zone ID>`.
    - [ ] *Validate* on the building gives the same report with every combination; *Zones*, *Surfaces*, and *Windows* are the same Breps.
 9. Connect the *Stacked Floor Zone Multiplier* building of step 1 and set FHT = True.
    - [ ] Its floors and ceilings between storeys stay `Adiabatic` (D-075); with IWHT = True its walls between zones read `Interzone:<zone ID>`.
@@ -1224,7 +1224,7 @@ The strip at the bottom of *Program JSON* and the window it opens (D-128, merged
 1. Double-click the strip of a new *Program JSON*.
    - [ ] A window titled *Program JSON* opens over the Grasshopper editor, about 800 × 600 and resizable, with an empty monospaced text field, a short instruction naming program JSON 5.4.0, and *OK* and *Cancel*.
 2. Paste the whole Medium Office JSON (`tests/Lod.ProgramJson.Tests/Fixtures/atlas/medium-office-90-1-2019.filled.json`) and press *OK*.
-   - [ ] The window closes, the component solves with no warning or error, and *Source* shows `Json.Sha256=1331af85…`, the checksum of the text with LF line endings (the file itself has CR LF and the SHA-256 `f121f346…`).
+   - [ ] The window closes, the component solves with no warning or error, and *Source* shows `Json.Sha256=f792abc0…`, the checksum of its canonical JSON since D-226 (`1331af85…`, of the text with LF line endings, before; the file itself has CR LF and the SHA-256 `f121f346…`).
    - [ ] Double-clicking again shows the stored text; *Cancel* and Esc close without a change.
    - [ ] *Undo* (Ctrl+Z) in the editor restores the previous value (empty), and *Redo* the JSON.
 3. Change `"schema_version": "5.4.0"` to `"2.0.0"` and press *OK*.
@@ -1232,7 +1232,7 @@ The strip at the bottom of *Program JSON* and the window it opens (D-128, merged
 4. Empty the text field and press *OK*.
    - [ ] The stored text is removed; the component reports its missing *JSON* input.
 5. Store the JSON again, save the definition, close it, and open it again.
-   - [ ] The component has the strip and the stored text, and *Source* shows the same `Json.Sha256=1331af85…`.
+   - [ ] The component has the strip and the stored text, and *Source* shows the same `Json.Sha256=f792abc0…`.
 6. Wire a panel into *JSON*, then double-click the strip.
    - [ ] The window says that the wire is used while it is connected; the component solves with the panel's text.
 7. On a new *Program JSON* with *Climate Zone* `4A` and *Context* `foundation=slab`, paste `multifamily-iecc-2021.source.json` from the same folder and press *OK*.
@@ -1274,3 +1274,59 @@ For a person in Rhino 8 with network access, with the files of the GitHub releas
 - [ ] `examples/doe-atlas-map.gh` opens and solves with *Validate* True and no network; *DOE Medium Office Programs*' remark names 90.1-2007, the filled version, and atlas release 2.2.0, and its strip reads `Get from Atlas… (90.1-2007, filled)`.
 - [ ] A definition saved with 1.7.0 that holds *Program JSON*, *Schedule Draw*, or DOE *Programs* components opens without the *Grasshopper IO* dialog and solves as before; a *Program JSON* text stored with CR LF line endings gets a new *Source* checksum once (D-207).
 - [ ] The viewport previews of a few examples (the end-to-end, the office plate, and the DOE atlas map) look as in 1.7.0.
+
+## BG1 correctness checklist (D-211 to D-218)
+
+For a person in Rhino 8. The headless Rhino check (`scripts/rhino-smoke/`) was not run for this stage; its `doe-atlas-maps` spec now expects the fifth output *Left Out*.
+
+- [ ] Run `scripts/rhino-smoke/run.ps1`: every spec passes, `doe-atlas-maps` with five outputs on each DOE *Programs* component.
+- [ ] *Convert2BEM* and *Convert2IDF* on the canonical linear plan with IWHT and FHT off: the stair's surfaces toward other zones are paired (`Interzone:<zone>` / `Surface`); every other interzone surface is `Adiabatic` (D-211). The IWHT and FHT descriptions say so.
+- [ ] *Construction JSON* with the 90.1-2019 medium office 3B set: *Roles* ends with `Skylight: 90-1-2019.simple-glazing.e99390`; the *JSON* input's description names schema 3.1.0. *Convert2IDF* of a skylit building (a preset with *Skylight Ratio* 0.04) with that set: the IDF's skylights use `90-1-2019.simple-glazing.e99390`, and *Unused* in the header does not list `Skylight`. With the native C-factor hospital set: the warning `SkylightGlazingFromWindow` (D-212).
+- [ ] *Program JSON* with the 90.1-2019 retail core and *Climate Zone* unset, into *Convert2IDF*: the error `ClimateZoneUnresolved` names the program and no file is written; with *Climate Zone* 5B it converts. With a weather file whose `.stat` states a zone, the error names that zone (D-213).
+- [ ] A DOE *Programs* component with an atlas map (for example `examples/doe-atlas-map.gh`): the new *Left Out* output has one branch per key (D-216).
+- [ ] *DOE Small Hotel Programs*, *Get from Atlas…*: the 90.1-2007, 2013, and 2019 families cover `GuestRoom` and say it takes `GuestRooms_Mixed`, and *OK* downloads and stores it; *DOE Hospital Programs* 90.1-2013 and 2019 cover `Office` with `Office_Mixed`; *DOE Stand-Alone Retail Programs* still refuses `Retail` (D-218).
+- [ ] *Program JSON* of the 90.1-2007 small-hotel laundry (filled) with its delivery cap: *Source* lists the cap at the source outlet and the unmet hours; *Left Out* names the water heater's fuel and efficiency (D-214, D-215).
+
+## BG3 daylighting checklist (D-233 to D-235)
+
+For a person in Rhino 8. The headless Rhino check (`scripts/rhino-smoke/`) was not run for this stage; its `program-json` spec now expects the header line `Daylighting: not written (Convert2IDF's Daylighting option is off, the default; D-233)`.
+
+- [ ] Run `scripts/rhino-smoke/run.ps1`: every spec passes, `program-json` with the new daylighting header line.
+- [ ] *Convert2IDF* shows *Daylighting* (`Dayl`, Boolean, false) as its thirteenth input, after *Require Floor Research Eligibility*; its GUID and icon are unchanged, and a definition saved with 1.8.0 that holds *Convert2IDF* opens without the *Grasshopper IO* dialog with *Daylighting* false.
+- [ ] *Program JSON* with the 90.1-2019 medium office (filled) and *Climate Zone* 5A, as the office and core presets of *Office Plate*, through *No Simplification* and *Stack Floors* into *Convert2IDF* with a Chicago weather file: with *Daylighting* false the IDF has no `Daylighting:` object and its header reads `Daylighting: not written (…)`, with a remark `DaylightingNotWritten`; *Program JSON*'s *Source* has `DaylightingRule=code rule 90.1-2019 …; non-geometry fractions 0.68 / 0.32; climate zone 5A`, and its *Left Out* says the controls are written only when *Convert2IDF*'s Daylighting input is on.
+- [ ] The same with *Daylighting* true: one `Daylighting:Controls` per office zone (none for the windowless core, whose header line reads `none (no window or skylight)`), two `Daylighting:ReferencePoint`s each at 0.8 m above its storey's floor and inside the zone in the viewport (compare the header's coordinates with the plate), the remark `DaylightingWritten`, and *Provenance* with `DAYLIGHTING: written for 3 of 6 zone(s) …`.
+- [ ] *Program JSON* with the IECC 2021 small office (source, *Climate Zone* 5A) and *Daylighting* true: the warning `DaylightingNoCodeRule`, no daylighting object, and the header line `none (the program has no code rule: …)`.
+- [ ] Open the IDF written with *Daylighting* true in EnergyPlus 26.2 with the Chicago weather file: it runs to the end with no severe error and only the warning `GetDaylightingControls: Fraction of zone or space controlled by the Daylighting reference points is < 1.0.` (once per zone).
+
+## BG2 atlas pickers checklist (D-225 to D-229)
+
+For a person in Rhino 8. The headless Rhino check (`scripts/rhino-smoke/`) was not run for this stage (Rhino is the owner's): the new spec `mix-atlas`, the `construction-json` scenario `atlas`, and the `program-json-editor` checks of `Json.Store` and the canonical checksum `f792abc0…` were written and not run.
+
+- [ ] Run `scripts/rhino-smoke/run.ps1`: every spec passes, `mix-atlas` and `construction-json` (scenario `atlas`) included.
+- [ ] *Mix Programs* shows the strip *Get from Atlas…* in both canvas themes; its inputs are *Presets*, *Weights*, *Name*, *Space Type*, *WWR*, *Climate Zone*, *Year* (2007), *Holidays*, *Context*, all optional; its outputs *Preset*, *JSON*, *Left Out*. GUID and icon unchanged.
+- [ ] A definition saved with 1.8.0 that holds *Mix Programs* (for example a copy of `examples/` with one, or a new one saved with the 1.8.0 plugin) opens without the *Grasshopper IO* dialog, solves as before, and its *Presets* and *Weights* show as optional (hover) with the new descriptions (the component sets them after reading, D-228).
+- [ ] The *Mix Programs* window: choose `90-1-2007`, `medium-office-detailed`; *Start from* lists `General_Mixed (general mix, 11 members)` and *Free selection (12 source programs)*; the general mix's rows are ticked with their areas and weights, the shares sum to 1; untick two rows and edit a weight, the shares update; *OK* closes, the component solves with the remark `Atlas mix: …` and no error, and its *Preset*'s *Source* names eleven (or the ticked) members with `Json.Store` lines. *Undo* removes the mix, *Redo* restores it; reopening the window shows the stored ticks and weights; *Clear* removes it.
+- [ ] *Free selection* in the 90.1-2019 stand-alone retail: `Back_Space` has no weight (it is in no general mix); ticking it without a weight and clicking *OK* asks for a weight, and with one it stores.
+- [ ] With the mix stored, wire a *Program Preset* into *Presets*: a remark says the stored mix is not used; wire an empty list: a warning says *Presets* is wired but empty. Disconnect: the stored mix solves again. *Weights* with one value per member replaces the stored weights; another count is an error naming the members.
+- [ ] *Construction JSON* shows the strip *Get from Atlas…*; the window lists the templates and sets; `90-1-2019`, `90-1-2019.medium-office.construction-package.edb590`, context `5-a`, *Use this set*: the component solves, *Source* has the line `atlas store https://energy-atlas.github.io/archetype-atlas/store/… (atlas site release 2.2.0)` and the `SHA-256` of the canonical JSON; *Undo* restores the previous text.
+- [ ] In the construction window, `doe-final-rule` (or an `iecc-…` residential set): every context is marked `not read: one document for both representations, a source_model_construction…` and *Use this set* stays disabled; a `resstock-sdr` set's context is refused with `ConstructionJsonScopeNotSupported`; an IECC commercial set (`iecc-2021.medium-office…`, `5-b`) is stored and the component warns about its source design-flow infiltration.
+- [ ] A construction JSON pasted in a panel with CR LF line endings gives the same *Source* `SHA-256` as the file (D-226); a *Program JSON* taken with *Get from Atlas* shows `Json.Store=…` in *Source*, which disappears when the text is edited in *Edit JSON…*.
+- [ ] Offline (network disabled), each of the five atlas windows (*Program JSON*, the DOE *Programs*, *Schedule Draw*, *Mix Programs*, *Construction JSON*) shows the reason in its status line and no error dialog; when GitHub Pages rate-limits (HTTP 429, if it happens), the status line says to wait a few minutes (D-225).
+- [ ] The DOE map of `examples/doe-atlas-map.gh` (stored as map format 1.0.0 by 1.8.0) still solves with *Validate* True; *Source* of its presets has no `Json.Store` (its keys carry no checksum); *Get from Atlas* again stores format 1.1.0 and the keys' `Json.Store` lines appear.
+
+## Release 1.9.0 checklist (D-239 to D-245)
+
+For a person in Rhino 8. Rhino was not launched for this release (the owner may be using it), so the headless Rhino check, the examples' rebuild, and the docs export were not run. Specs changed and not run: `doe-atlas-maps` (the IECC families, the coverage with the crosswalk, the detailed office's generation file), `mix-atlas` (141 folders, release 2.3.0), `program-json-editor` and `program-json` (program JSON 6.0.0, the new checksum, release 2.3.0), `schedule-draw` (generator 4.1.0, release 2.3.0), `construction-json` (the fixtures of `atlas-2.3.0/`), and `examples` (its inputs are the release 2.3.0 fixtures).
+
+- [ ] With no Rhino running, rebuild the examples (`$env:BEMGEN_EXAMPLES_WRITE = '1'`, `scripts/rhino-smoke/run.ps1 -Spec examples`) so that `program-json-office.gh`, `schedule-draw.gh`, and `doe-atlas-map.gh` hold the release 2.3.0 texts; commit them (they hold program JSON 5.4.0 of release 2.2.0 until then, which 1.9.0 refuses, D-240).
+- [ ] Run `scripts/rhino-smoke/run.ps1` with `BEMGEN_SCHEDULE_COMMAND` set to the `atlas-schedules` 4.1.0 console script: every spec passes, the changed ones above included; nothing `SKIPPED`.
+- [ ] Install the wheel `atlas_schedules-4.1.0-py3-none-any.whl` of the atlas release `atlas-schedules-v4.1.0` in a virtual environment (after `sha256sum -c SHA256SUMS.txt`) and run `RealDrawTests` with `BEMGEN_ATLAS_GENERATOR` its folder and `BEMGEN_ATLAS_COMMAND` its `Scripts\atlas-schedules.exe`: the three tests pass, the bundles equal the recorded ones (recorded with `python -m atlas_schedules` in an atlas checkout at `75fec30d`, D-242).
+- [ ] Open a definition saved with 1.8.0 whose *Program JSON* stores a program of atlas release 2.2.0 (the 1.8.0 `examples/program-json-office.gh`): it opens without the *Grasshopper IO* dialog, and *Program JSON*'s error says it reads program JSON 6.0.0 (atlas release 2.3.0) and names the program's ID in release 2.3.0 (`90-1-2019.medium-office.source.whole-building-md-office.d597bd`, it was `…36f6a8`). *Get from Atlas…* on the 2.3.0 page stores the new text and the component solves.
+- [ ] The 1.8.0 `examples/doe-atlas-map.gh`: *DOE Medium Office Programs* gives the error `AtlasSiteStoredBeforeRelease`, naming the release 2.2.0 map and each moved program's 2.3.0 ID; *Get from Atlas…* (90.1-2007, filled) stores the map again and *Validate* is True.
+- [ ] *DOE Small Hotel Programs*, *Get from Atlas…*: the window lists eleven families, the five and IECC 2006 to 2021; each IECC line covers 14 of 14 keys, says `GuestRoom takes GuestRooms_Mixed`, and `only the source version of …`. With *Source* chosen, *OK* downloads and stores the IECC 2021 map; with *Filled* it refuses with the site's reason. *DOE Medium Office Programs* and *DOE Supermarket Programs* list the five families only (D-241).
+- [ ] *DOE Quick Service Restaurant Programs* with the IECC 2021 map (source) and *Climate Zone* 4A into the DOE quick-service restaurant, *No Simplification*, *Stack Floors*, *Validate*: True; *Convert2IDF* writes the IDF.
+- [ ] *Schedule Draw* with *Program JSON* the 90.1-2019 detailed medium office's open office (from *Get from Atlas…* on *Program JSON*): *Get from Atlas…* on *Schedule Draw* now finds the folder's `generation.json` (D-242) and stores it; with *Run* true and generator 4.1.0 the draw succeeds. The same with an IECC 2021 program (source version).
+- [ ] *Construction JSON*, *Get from Atlas…*: the DOE Ref 1980–2004 warehouse set, any context, *Use this set*: it imports with no error (D-243; 1.8.0 refused it for its internal mass); the *JSON* input's description names schema 4.0.0 and atlas release 2.3.0.
+- [ ] *Program JSON* with the IECC 2021 single-family dwelling (source), *Context* `climate=4A` and `foundation=slab`: *Source*'s `WindowToWallRatio` names `variant 1 of 4`; without `foundation` the warning `ProgramJsonFenestrationContextRequired` (and the loads' `ProgramJsonContextRequired` error) appears.
+- [ ] The component descriptions of *Program JSON*, *Construction JSON*, and *Schedule Draw* name program JSON 6.0.0, unified 4.0.0, and generator 4.1.0 on atlas release 2.3.0 in Grasshopper's tooltips.
+- [ ] Run the docs export at the tag (`scripts/docs-export/export.ps1`) and import it in the docs repository, as for 1.8.0 (D-210).

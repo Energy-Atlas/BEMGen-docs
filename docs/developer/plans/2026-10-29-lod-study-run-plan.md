@@ -184,6 +184,9 @@ run `run_20261029-071919`; D-193):
   program's load and the option are written as given (GLOBAL.md scientific rule 3). Whether the IWHT-off setting should exclude such zonings,
   or the study should use another treatment for an unconditioned zone with a large gain, is for the owner; nothing was relaxed or changed.
 - **Deduplication:** 213 groups, 1 433 of 1 714 succeeded test sites dropped (84 %); 281 in the metric table.
+- **Small-hotel cells run again, 2026-11-01 (D-224).** With D-211's heat-transfer rule (an option that is off seals only a surface between two
+  conditioned zones), the small hotel's 3C and 5A cells ran again at `d4eb868` (stage `ht-smallhotel`, suite `lod-ht-smallhotel-20261101-042906`,
+  run `run_20261101-043133`): 192 of 192 succeed, so R4 as published has no failed run; the other cells' IDFs are unchanged by the rule.
 - **Recommendations:** a zoning meets the default threshold in 18 of the 22 cells, the same cells as R2 (none in the full-service restaurant 3C,
   the supermarket 5A, and the warehouse 3C and 5A); in 15 of them a recommended zoning has IWHT or FHT off.
 - **EnergyPlus time per site** (test-site median, longest, reference mean, s; shared machine): full-service restaurant 4.3, 10.7, 4.1; hospital
@@ -347,3 +350,10 @@ first drop (both `lod-recommendations.json` files of version 1.0.0). It takes th
 the optional `cost` of each timed reference and zoning, and the `timing` block with the gate verdict of D-202, the repeat check, and the medians
 by zoning and prototype), `lod-recommendations-ht.json` (R4, separate), and `provenance.json`. A reader of version 1.0.0 that ignores unknown
 members reads 1.1.0 unchanged.
+
+**Version 1.2.0 (2026-11-01, D-219 to D-223, [tooling fixes](2026-11-01-lod-study-tooling-fixes.md)).** After the 2026-10-31 review both files
+are written again by `report.py` and `study_tables.py` with LF line endings. Added members only: `suites`, `runs`, `deduplication`,
+`judged_loads`, and `sensitivity` at the top level, `judged` and `finer_than_reference` on an entry, `status` and `reason` on a zoning. Two
+readings change: `zonings` lists every planned zoning (those the generator refused with `status: "Invalid"`), and the recommendation is bounded
+by the reference's zone count (R3: 214 of 264 cells, 4 `finer_than_reference`). Deduplication keeps the both-on twin (R4: 7 cells with an off
+setting), and the cost medians drop twins and weight prototypes equally. The atlas site takes this drop in its release work (ADR 0050 §4).

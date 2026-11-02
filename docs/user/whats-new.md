@@ -1,6 +1,38 @@
 # What's new
 
-This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.9.0.
+This page says what each version changed and what to do about definitions saved with an earlier one. The other pages of this guide describe version 1.10.0.
+
+## 1.10.0
+
+Version 1.10.0 reads release 2.4.0 of the Energy Archetype Atlas and refuses the program texts of earlier releases. *Convert2IDF* can write the atlas's unoccupied lighting cap, *Schedule Draw* moves to generator 4.1.1, and the DOE generators carry the fixes made since 1.9.0.
+
+### Atlas release 2.4.0
+
+BEMGen reads the exports of atlas release 2.4.0: program JSON 6.1.0, and the construction JSON of 1.9.0, unchanged (unified 4.0.0 and detailed 5.0.0; a construction text of release 2.3.0 still reads). Release 2.4.0 is the release to download now, or to take with *Get from Atlas…*.
+
+- **Program texts of releases 2.0.0 to 2.3.0 are refused**, wired in or stored in a definition, including the DOE program maps and atlas mixes stored by 1.9.0. The message names the ID the program has in release 2.4.0, through the atlas's ID maps, or says that its ID did not change. *Get from Atlas…* stores the text again.
+- **Office lighting.** The atlas's 90.1 whole-building office programs take PNNL's lighting power (the 90.1-2019 medium office 6.664 W/m², 6.889 before).
+- **Elevators and reach-ins.** The 90.1 programs list PNNL's elevators and kitchen reach-in refrigerators as building services. *Program JSON*'s *Left Out* names each of them; BEMGen does not add building services to a program.
+
+### The unoccupied lighting cap
+
+The atlas records PNNL's rule of the 90.1-2019 offices, restaurants, retail, and warehouse: while a zone has no occupants and its lighting is at least 0.02 W/ft², its lights are set to 0.02 W/ft² (0.215 W/m²). *Program JSON* carries the rule (*Source* names it as `LightingCap`, and *Left Out* says when it is written).
+
+- ***Lighting Cap*** is a new input of *Convert2IDF*, the fourteenth, off by default. When it is on, each zone whose program has the rule gets an EnergyPlus EMS program that applies it. The IDF header lists each zone.
+- **Only zones with people.** A zone whose people are zero at all times is not capped, since it would be capped all the time. The warehouse storages read the office's occupants, as PNNL's do; BEMGen applies that only when the building has a zone with the name the rule gives (`Zone1 Office`), so in the DOE warehouse, whose office zone is `Office`, the storages are not capped, with a warning.
+- **Merged zones** keep the rule only when all the zones they merge have the same one.
+- In a year's run of the 90.1-2019 medium office the cap uses 2.5 % less lighting energy.
+
+### Schedule Draw on generator 4.1.1
+
+*Schedule Draw* uses `atlas-schedules` 4.1.1, the code of 4.1.0 with the generator view of release 2.4.0. Install the wheel `atlas_schedules-4.1.1-py3-none-any.whl` from the atlas release `atlas-schedules-v4.1.1`, and use the `generation.json` files of release 2.4.0.
+
+### DOE generators
+
+- **Stand-alone retail.** The core and the front retail are keyed apart, `Core_Retail` and `Front_Retail`, and take the programs of those names in 90.1-2013, 90.1-2019, and the IECC families; the DOE Ref and 90.1-2007 families give both their `Retail` program. A retail program map stored by 1.9.0 is refused for those keys until *Get from Atlas…* stores it again.
+- **IECC offices.** The DOE office *Programs* components offer the IECC families: every office key takes the folder's whole-building program, as PNNL's IECC model does, and the window says the rooms are not distinguished.
+- **IECC daylighting.** With *Convert2IDF*'s *Daylighting* on, IECC programs take the 90.1-2019 code rule.
+- **Skylights by family.** The retail, warehouse, supermarket, and schools get the skylights of the source geometry of the program map's family and climate zone, spread over the roof as the source places them.
 
 ## 1.9.0
 

@@ -88,6 +88,6 @@ Checked in the PNNL 90.1 medium office IDFs (Denver, 2004 to 2019) and the 90.1-
 
 ## 7. Open
 
-- The owner's choice for IECC programs: openstudio-standards has no IECC daylighting rule, so IECC controls are never placed (warning `DaylightingNoCodeRule`). An IECC edition could take the 90.1-2019 rule by decision.
+- The owner's choice for IECC programs: openstudio-standards has no IECC daylighting rule, so IECC controls are never placed (warning `DaylightingNoCodeRule`). An IECC edition could take the 90.1-2019 rule by decision. **Decided (D-248):** they take it.
 - The atlas: the occupancy-driven unoccupied lighting cap of the 90.1-2016 and 2019 prototypes (§6), and the LPD difference.
 - Rhino checks for the person: the smoke checklist's *Convert2IDF* daylighting items (`docs/development/grasshopper-smoke-test.md`).

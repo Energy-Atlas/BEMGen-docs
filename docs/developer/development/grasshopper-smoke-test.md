@@ -1295,7 +1295,7 @@ For a person in Rhino 8. The headless Rhino check (`scripts/rhino-smoke/`) was n
 - [ ] *Convert2IDF* shows *Daylighting* (`Dayl`, Boolean, false) as its thirteenth input, after *Require Floor Research Eligibility*; its GUID and icon are unchanged, and a definition saved with 1.8.0 that holds *Convert2IDF* opens without the *Grasshopper IO* dialog with *Daylighting* false.
 - [ ] *Program JSON* with the 90.1-2019 medium office (filled) and *Climate Zone* 5A, as the office and core presets of *Office Plate*, through *No Simplification* and *Stack Floors* into *Convert2IDF* with a Chicago weather file: with *Daylighting* false the IDF has no `Daylighting:` object and its header reads `Daylighting: not written (…)`, with a remark `DaylightingNotWritten`; *Program JSON*'s *Source* has `DaylightingRule=code rule 90.1-2019 …; non-geometry fractions 0.68 / 0.32; climate zone 5A`, and its *Left Out* says the controls are written only when *Convert2IDF*'s Daylighting input is on.
 - [ ] The same with *Daylighting* true: one `Daylighting:Controls` per office zone (none for the windowless core, whose header line reads `none (no window or skylight)`), two `Daylighting:ReferencePoint`s each at 0.8 m above its storey's floor and inside the zone in the viewport (compare the header's coordinates with the plate), the remark `DaylightingWritten`, and *Provenance* with `DAYLIGHTING: written for 3 of 6 zone(s) …`.
-- [ ] *Program JSON* with the IECC 2021 small office (source, *Climate Zone* 5A) and *Daylighting* true: the warning `DaylightingNoCodeRule`, no daylighting object, and the header line `none (the program has no code rule: …)`.
+- [ ] (Superseded by D-248, see the BG4 checklist.) *Program JSON* with the IECC 2021 small office (source, *Climate Zone* 5A) and *Daylighting* true: the warning `DaylightingNoCodeRule`, no daylighting object, and the header line `none (the program has no code rule: …)`.
 - [ ] Open the IDF written with *Daylighting* true in EnergyPlus 26.2 with the Chicago weather file: it runs to the end with no severe error and only the warning `GetDaylightingControls: Fraction of zone or space controlled by the Daylighting reference points is < 1.0.` (once per zone).
 
 ## BG2 atlas pickers checklist (D-225 to D-229)
@@ -1316,6 +1316,8 @@ For a person in Rhino 8. The headless Rhino check (`scripts/rhino-smoke/`) was n
 
 ## Release 1.9.0 checklist (D-239 to D-245)
 
+**Done headless on 2026-11-01** (D-245): the rebuild of the examples, the full smoke run with generator 4.1.0, `RealDrawTests` with the released wheel, and the docs export. The items about windows, opening the 1.8.0 definitions by hand, and tooltips remain for a person.
+
 For a person in Rhino 8. Rhino was not launched for this release (the owner may be using it), so the headless Rhino check, the examples' rebuild, and the docs export were not run. Specs changed and not run: `doe-atlas-maps` (the IECC families, the coverage with the crosswalk, the detailed office's generation file), `mix-atlas` (141 folders, release 2.3.0), `program-json-editor` and `program-json` (program JSON 6.0.0, the new checksum, release 2.3.0), `schedule-draw` (generator 4.1.0, release 2.3.0), `construction-json` (the fixtures of `atlas-2.3.0/`), and `examples` (its inputs are the release 2.3.0 fixtures).
 
 - [ ] With no Rhino running, rebuild the examples (`$env:BEMGEN_EXAMPLES_WRITE = '1'`, `scripts/rhino-smoke/run.ps1 -Spec examples`) so that `program-json-office.gh`, `schedule-draw.gh`, and `doe-atlas-map.gh` hold the release 2.3.0 texts; commit them (they hold program JSON 5.4.0 of release 2.2.0 until then, which 1.9.0 refuses, D-240).
@@ -1330,3 +1332,39 @@ For a person in Rhino 8. Rhino was not launched for this release (the owner may 
 - [ ] *Program JSON* with the IECC 2021 single-family dwelling (source), *Context* `climate=4A` and `foundation=slab`: *Source*'s `WindowToWallRatio` names `variant 1 of 4`; without `foundation` the warning `ProgramJsonFenestrationContextRequired` (and the loads' `ProgramJsonContextRequired` error) appears.
 - [ ] The component descriptions of *Program JSON*, *Construction JSON*, and *Schedule Draw* name program JSON 6.0.0, unified 4.0.0, and generator 4.1.0 on atlas release 2.3.0 in Grasshopper's tooltips.
 - [ ] Run the docs export at the tag (`scripts/docs-export/export.ps1`) and import it in the docs repository, as for 1.8.0 (D-210).
+
+## BG4 maps and geometry checklist (D-246 to D-251)
+
+For a person in Rhino 8; Rhino was not launched for this stage (the owner may be using it). The headless specs `doe-atlas-maps`, `doe-single-storey`, and `doe-presets` were updated to the new expectations and not run.
+
+- [ ] *DOE Stand-alone Retail Programs* lists five keys (`Back_Space`, `Core_Retail`, `Entry`, `Front_Retail`, `Point_of_Sale`); its *Get from Atlas…* window shows `90.1-2019: 5 of 5 keys.` and `DOE Ref 1980–2004: 5 of 5 keys; Core_Retail and Front_Retail take Retail, the family's one program of their space types.` (D-246).
+- [ ] *DOE Medium Office Programs*' window lists eleven families; `IECC 2021` reads `11 of 11 keys; the rooms are not distinguished in this family: …`; *OK* with *Source* stores it, and with *Climate Zone* `5A` the component outputs a map (D-247).
+- [ ] A definition holding a retail atlas map stored by 1.9.0 (keys with `Retail`) gives the map-mismatch error naming the keys; *Get from Atlas…* stores it again.
+- [ ] *Program JSON* with the IECC 2021 small office (source, *Climate Zone* 5A) into *Convert2IDF* with *Daylighting* true: no `DaylightingNoCodeRule` warning; the header's daylighting lines name `code rule IECC 2021 (openstudio-standards 90.1-2013 to 2019: IECC takes the 90.1-2019 rule, D-248)` and the zones with controls get `Daylighting:Controls` (D-248).
+- [ ] *DOE Stand-alone Retail Programs* with a *90.1-2019* atlas map and *Climate Zone* `5A` into *DOE Stand-alone Retail*: the core retail's roof carries one skylight of about 23.78 m² (none on the other zones); with `7A`, about 6.69 m²; with *Climate Zone* unset, the warning that the source's skylights differ by climate zone and the 23.78 m² skylight. The window areas equal the illustrative presets' (D-249).
+- [ ] *DOE Primary School Programs* with a *DOE Ref 1980–2004* atlas map: the gym has no skylight; with *90.1-2019*, its skylight as with the illustrative presets (D-249).
+
+## BG5 skylight layouts checklist (D-252)
+
+For a person in Rhino 8; Rhino was not launched for this stage. No headless spec's expectation moved (the skylight areas are unchanged); `doe-schools` gained one check, the secondary school's gyms with 54 and 36 skylights after *Stack Floors*, and was not run. The BG4 items above that say "one skylight" now read as below.
+
+- [ ] *DOE Stand-alone Retail Programs* with a *90.1-2019* atlas map and *Climate Zone* `5A` into *DOE Stand-alone Retail*, *No Simplification*, and *Stack Floors*: the viewport shows 16 small skylights in a 4 × 4 grid over the west half of the core retail's roof (about 23.78 m² in all); with `7A`, 8 smaller ones in two rows in its north-west corner (about 6.69 m²). *Validate* passes; the plan's provenance has `SkylightLayouts` (D-252).
+- [ ] *DOE Warehouse Programs* with a *90.1-2019* map and `5A`: 32 skylights over the southern part of the bulk storage and 14 in two rows over the north of the fine storage; with an *IECC 2012* map, 48 and 17.
+- [ ] *DOE Primary School* and *DOE Secondary School* with their illustrative presets: the gyms show 9, 54, and 36 skylights in regular grids over their roofs (one centred skylight each before D-252).
+- [ ] The same retail through *Perimeter Core* or *Single Zone per Floor*: each merged roof shows one centred skylight with the same area (ADR-012, unchanged).
+- [ ] *Convert2IDF* of the 5A retail with *Daylighting* true: 16 `…/Sky<k>` windows in the core's roof; the core's two reference points share about 0.515 of its lights; EnergyPlus runs it with no severe error.
+- [ ] *DOE Warehouse* with the *90.1-2019* `5A` map and *Fine Storage Depth* 12: the warning `SkylightLayoutNotFitted` on the fine storage's ceiling, which shows one centred skylight; the bulk storage keeps its 32.
+
+## Release 1.10.0 checklist (D-253 to D-260)
+
+For the Rhino run of 1.10.0 (D-260), with no other Rhino running. Specs changed and not run in the build: `program-json` and `program-json-editor` (program JSON 6.1.0, release 2.4.0, the new checksum and lighting power), `schedule-draw` (generator 4.1.1, release 2.4.0), `reference-programs` (*Convert2IDF*'s fourteenth input *Lighting Cap*), `doe-atlas-maps` and `mix-atlas` (release 2.4.0; the mix window's 159 recorded folders), `construction-json` (the fixtures of `atlas-2.4.0/`), and `examples` (its inputs are the release 2.4.0 fixtures and recorded site).
+
+- [ ] Rebuild the examples (`$env:BEMGEN_EXAMPLES_WRITE = '1'`, `scripts/rhino-smoke/run.ps1 -Spec examples`) so that `program-json-office.gh`, `schedule-draw.gh`, and `doe-atlas-map.gh` hold the release 2.4.0 texts; commit them (they hold release 2.3.0 texts until then, which 1.10.0 refuses, D-254).
+- [ ] Run `scripts/rhino-smoke/run.ps1` with `BEMGEN_SCHEDULE_COMMAND` set to the `atlas-schedules` 4.1.1 console script: every spec passes; nothing `SKIPPED`.
+- [ ] Install the wheel `atlas_schedules-4.1.1-py3-none-any.whl` of the atlas release `atlas-schedules-v4.1.1` in a virtual environment (after `sha256sum -c SHA256SUMS.txt`) and run `RealDrawTests` with `BEMGEN_ATLAS_GENERATOR` its folder and `BEMGEN_ATLAS_COMMAND` its `Scripts\atlas-schedules.exe`: the three tests pass, the bundles equal the recorded ones (recorded with `python -m atlas_schedules` in an atlas checkout at `7c543f5d`, D-255).
+- [ ] Open the 1.9.0 `examples/program-json-office.gh`: *Program JSON*'s error says it reads program JSON 6.1.0 (atlas release 2.4.0) and names the program's ID in release 2.4.0 (`90-1-2019.medium-office.source.whole-building-md-office.197348`, it was `…d597bd`, through `id-map-2.4.0.json`). *Get from Atlas…* stores the new text and the component solves.
+- [ ] The 1.9.0 `examples/doe-atlas-map.gh`: *DOE Medium Office Programs* gives `AtlasSiteStoredBeforeRelease`, naming the release 2.3.0 map and each moved program's 2.4.0 ID; *Get from Atlas…* stores the map again and *Validate* is True.
+- [ ] *Program JSON* with the 90.1-2019 medium office (*Get from Atlas…*): *Source* has `LightingCap=PNNL 90.1-2019 unoccupied lighting cap …`; *Left Out* says it is written only with *Lighting Cap* on and lists `Perimeter_mid_ZN_2`'s condition as not applied. Into *Office Plate*, *No Simplification*, *Stack Floors*, *Convert2IDF* with *Lighting Cap* true: the IDF has one `EnergyManagementSystem:Program` per zone and the header line `Unoccupied lighting cap: written as EMS programs (D-256); …`; with it false, none and `not written`.
+- [ ] *DOE Warehouse Programs* with the 90.1-2019 map into *DOE Warehouse*, *Convert2IDF* with *Lighting Cap* true: the office is capped, and the warning `LightingCapNotApplied` names the bulk and fine storages, whose condition zone `Zone1 Office` is not a zone of the building (D-256).
+- [ ] Grasshopper's tooltips of *Program JSON*, *Schedule Draw*, and *Convert2IDF*'s *Lighting Cap* name program JSON 6.1.0, generator 4.1.1 on atlas release 2.4.0, and the cap.
+- [ ] Run the docs export at the tag (`scripts/docs-export/export.ps1`) and import it in the docs repository, as for 1.9.0 (D-245).

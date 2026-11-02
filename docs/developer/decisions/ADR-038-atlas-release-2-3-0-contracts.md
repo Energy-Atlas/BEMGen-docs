@@ -1,6 +1,6 @@
 # ADR-038: Atlas release 2.3.0 contracts, and stored atlas IDs of earlier releases refused by name
 
-- **Status:** Accepted
+- **Status:** Accepted (decisions 1 and 3 superseded in part by [ADR-040](ADR-040-atlas-release-2-4-0-and-the-unoccupied-lighting-cap.md), D-253 and D-254: BEMGen reads release 2.4.0, and the refusals chain both ID maps)
 - **Date:** 2026-11-01
 - **Decision log:** [D-239](decision-log.md#d-239--atlas-release-230-contracts-program-json-600-unified-400-detailed-500-adr-038), [D-240](decision-log.md#d-240--stored-atlas-ids-and-texts-of-releases-200-to-220-refused-naming-their-230-ids-through-the-atlass-id-map-adr-038)
 - **Design note:** [REL-B, BEMGen 1.9.0 on atlas release 2.3.0](../plans/2026-11-01-rel-b-atlas-2-3-0.md)

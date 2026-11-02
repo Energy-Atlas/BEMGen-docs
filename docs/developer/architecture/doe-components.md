@@ -194,7 +194,7 @@ output:
 | *DOE Full-Service Restaurant Programs* (DoeFSRP) | `FullServiceRestaurantProgramsComponent` | *DOE Full-Service Restaurant* | 2 | 0 | none | `0efa0bdc-0cfb-4dbb-b735-7a9453fec942` |
 | *DOE Quick-Service Restaurant Programs* (DoeQSRP) | `QuickServiceRestaurantProgramsComponent` | *DOE Quick-Service Restaurant* | 2 | 0 | none | `93d7a80c-5cca-4e59-9a0f-0246caf79f9f` |
 | *DOE Strip Mall Programs* (DoeSMallP) | `StripMallProgramsComponent` | *DOE Strip Mall* | 3 | 0 | none | `d488e69d-540b-419c-b8f0-fa0244661e09` |
-| *DOE Stand-alone Retail Programs* (DoeRetP) | `StandAloneRetailProgramsComponent` | *DOE Stand-alone Retail* | 4 | 1: `Back_Space` | none | `538a2a8a-2a3b-414e-a1bc-c1d3c5109a18` |
+| *DOE Stand-alone Retail Programs* (DoeRetP) | `StandAloneRetailProgramsComponent` | *DOE Stand-alone Retail* | 5 | 1: `Back_Space` | none | `538a2a8a-2a3b-414e-a1bc-c1d3c5109a18` |
 | *DOE Supermarket Programs* (DoeSMktP) | `SupermarketProgramsComponent` | *DOE Supermarket* | 6 | 5: `Bakery`, `Deli`, `DryStorage`, `Produce`, `Sales` | none | `c4ced2e2-e69c-47ac-8a7a-d7fa01453b51` |
 | *DOE Warehouse Programs* (DoeWareP) | `WarehouseProgramsComponent` | *DOE Warehouse* | 3 | 2: `Bulk`, `Fine` | `Fine`, `Office` | `fae396e6-ec9e-46e2-b9bd-660bd6579d23` |
 | *DOE Primary School Programs* (DoePSchP) | `PrimarySchoolProgramsComponent` | *DOE Primary School* | 9 | 2: `Classroom`, `Mechanical` | none | `5f8262ad-b46c-466f-abcb-d3493099c93a` |
@@ -216,26 +216,38 @@ The strip *Get from Atlas…* at the bottom of each *DOE … Programs* component
 place of the illustrative presets:
 
 - **The folder.** `DoeAtlasFolders` gives each prototype one fixed folder, `commercial/<template>/<folder>/`: the prototype's own name, except
-  `small-office-detailed`, `medium-office-detailed`, `large-office-detailed`, `retail-standalone`, `retail-stripmall`, and `super-market`. A key
-  matches the folder's one `source` program whose `space_type` is the key (department and general programs are never candidates); folders are
-  never searched.
+  `small-office-detailed`, `medium-office-detailed`, `large-office-detailed`, `retail-standalone`, `retail-stripmall`, and `super-market`, and in
+  the IECC families the offices' `small-office`, `medium-office`, and `large-office` (D-247). A key matches the folder's one `source` program whose
+  `space_type` is the key (department and general programs are never candidates); folders are never searched. A family's crosswalk
+  (`DoeAtlasFolders.Crosswalk`) gives a key without such a program the folder's one `source` program of another space type (D-246, D-247) or else
+  its one department mix (D-218).
 - **The window** (`DoeAtlasMapDialog`, a double-click on the strip) lists the commercial families that hold the folder (DOE Ref pre-1980,
-  DOE Ref 1980–2004, 90.1-2007, 90.1-2013, 90.1-2019, and since 1.9.0 IECC 2006, 2009, 2012, 2015, 2018, and 2021 for the eleven prototypes the
-  IECC families hold: not the three offices, whose IECC folders have whole-building programs only, nor the supermarket, which they lack; D-241),
-  each with its coverage, such as `90.1-2019: 3 of 4 keys; Retail has no program.`, and
+  DOE Ref 1980–2004, 90.1-2007, 90.1-2013, 90.1-2019, and since 1.9.0 IECC 2006, 2009, 2012, 2015, 2018, and 2021, D-241; since D-247 for every
+  prototype but the supermarket, which the IECC families lack), each with its coverage, such as
+  `90.1-2019: 11 of 12 keys; Gym - audience has no program.` or `DOE Ref 1980–2004: 5 of 5 keys; Core_Retail and Front_Retail take Retail, the
+  family's one program of their space types.`, and
   the choice of the filled (default) or source version. *OK* runs `PickAtlasMapAsync`: every matched key's program downloaded in parallel and
   checked as *Program JSON*'s download is, then given the program check on the component's *Year*, *Holidays*, *Climate Zone*, and *Context*;
   when all succeed the window closes and `SetAtlasMap` stores the map as one text in the component with one undo event. *Clear* removes it, and
   the component returns to its illustrative presets. The strip then reads, for example, `Get from Atlas… (90.1-2019, filled)`.
 - **The solve** reads the stored map offline (`AtlasProgramMapImporter`): each key's text through *Program JSON*'s import, named by the key,
-  of the key's space type (`DoeSpaceTypes.Of`), with the DOE reference building's window-to-wall ratio per orientation and skylight ratio of the
-  key (`DoeProgramPresets.KeyRatios`, the illustrative map's glazing, so the window areas are the same), and the four inputs. A remark names the
+  of the key's space type (`DoeSpaceTypes.Of`), with the DOE reference building's window-to-wall ratio per orientation of the key
+  (`DoeProgramPresets.KeyRatios`, the illustrative map's, so the window areas are the same) and since D-249 the skylight ratio of the family's
+  source geometry in the *Climate Zone* (`KeyRatios(type, key, template, climateZone)`, [ADR-039](../decisions/ADR-039-doe-skylights-by-family.md):
+  none in the DOE Ref families; the PNNL models' in 90.1 and IECC, so the retail core and the warehouse storages are toplit; the supermarket's sales
+  in 90.1-2013 and 2019; a warning when the zone is not given and the family's skylights differ by zone; spread as the source spreads them, D-252), and the four inputs. A remark names the
   family, version, release, and folder; the gap remark stays. *JSON* gives each key's text.
 - **The IECC families** (D-241) are exported in their source version only, so their maps are stored in the *Source* version; *Filled* is
   refused key by key with the site's reason. Their folders split the same keys as 90.1-2013 and 2019 and take the same crosswalk.
+- **The stand-alone retail** (D-246) keys its core and front apart, `Core_Retail` and `Front_Retail`, the 90.1-2013 geometry's space types: in
+  90.1-2013, 2019, and the IECC families each takes its own program; in DOE Ref pre-1980, 1980–2004, and 90.1-2007, whose source has the one
+  space type `Retail`, the crosswalk gives both that program.
+- **The IECC offices** (D-247) hold only whole-building programs (`WholeBuilding - Sm Office`, `- Md Office`, `- Lg Office-others` for the
+  above-grade zones), as PNNL's IECC model gives every zone one program: the crosswalk gives every office key that program, except the large
+  office's `OfficeLarge Data Center`, which keeps its own. The coverage says `the rooms are not distinguished in this family: …`.
 - **Keys without a program** (the 90.1 renames and splits: 90.1-2007 the secondary school's `Gym - audience` and the small hotel's `GuestRoom`;
-  90.1-2013, 2019, and the six IECC families also the hospital's `Office` and the stand-alone retail's `Retail`; the crosswalk of D-218 gives
-  `GuestRoom` and `Office` their department mixes) are refused by name: *Program Map* is not output, an
+  90.1-2013, 2019, and the six IECC families also the hospital's `Office`; the crosswalk of D-218 gives `GuestRoom` and `Office` their department
+  mixes, so `Gym - audience` is the one gap left) are refused by name: *Program Map* is not output, an
   error names the keys, and *Presets* and *JSON* have those positions empty, so *DOE Program Map* can complete the map with presets given by hand.
 - **Saved definitions.** The map is written by `Write` and read by `Read` (`AtlasProgramMap`, `bemgen-atlas-program-map` 1.1.0 since D-226;
   1.0.0 still reads). A definition saved before 1.8.0 reads without the IO dialog, with the inputs unset and no map, and solves as before
@@ -245,7 +257,7 @@ place of the illustrative presets:
 
 Tests: `tests/Lod.Generators.Tests/Doe/Presets/DoeAtlasFoldersTests.cs` (the folders, the families, the glazing), `tests/Lod.ProgramJson.Tests/Site/`
 (`AtlasSiteFolderTests`, `AtlasProgramMapTests`, `AtlasGenerationPickerTests`), and `tests/Lod.Integration.Tests/DoeAtlasProgramMapTests.cs`,
-which pins every family's resolved keys and gaps on the recorded index of the 141 folders (75 before the IECC families, D-241) and runs an atlas map of the medium office through its
+which pins every family's resolved keys and gaps on the recorded index of the 159 folders (75 before the IECC families, D-241; 141 before the IECC offices, D-247) and runs an atlas map of the medium office through its
 generator; the headless spec is `scripts/rhino-smoke/specs/doe-atlas-maps.py`.
 
 ## Icons

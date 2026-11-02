@@ -84,8 +84,8 @@ Coordinates that come out within the distance tolerance of one another are one c
 
 `SchoolGenerator.ProgramKeys(type)` lists the keys a school's map needs: `Cafeteria`, `Classroom`, `Corridor`, `Gym`, `Kitchen`, `Lobby`,
 `Mechanical`, `Office`, `Restroom`, and for the secondary school also `Auditorium`, `Gym - audience`, and `Library`. A zone whose key has no preset
-is `MissingPreset`. Windows and skylights come from each key's preset (S5); the primary school's gym takes one centred skylight of the source's
-area, where the source has nine.
+is `MissingPreset`. Windows and skylights come from each key's preset (S5); since D-252 the gyms take the source's skylights, nine on the primary school's
+gym, 54 and 36 on the secondary school's gyms, at the source's places and with the source's area (one centred skylight before).
 
 ## Acceptance (design note §5)
 

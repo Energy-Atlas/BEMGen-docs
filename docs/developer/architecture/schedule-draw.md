@@ -1,17 +1,17 @@
 # Schedule Draw
 
-> **Status:** Provisional ([ADR-033](../decisions/ADR-033-schedule-draw-external-generator.md), D-194 to D-196); generator 4.0.0 and atlas release 2.2.0 since 1.7.0 ([ADR-035](../decisions/ADR-035-schedule-draw-generator-4-0-0.md), D-205); generator 4.1.0 and atlas release 2.3.0 since 1.9.0 (D-242, ADR-035 as amended) · **Component:** *Schedule Draw* (`SDraw`), panel *1 Program*, GUID `740cafea-7afe-47f4-8723-b24b6ec3c836` · **Code:** `Lod.ProgramJson.ScheduleDraw` (`src/Lod.ProgramJson/ScheduleDraw/`), `scripts/TestSuiteGenerator` (`schedules:`) · **Design note:** [2026-10-29-schedule-draw.md](../plans/2026-10-29-schedule-draw.md) · **Requirement:** [schedule-generator-requirement.md](../research/schedule-generator-requirement.md)
+> **Status:** Provisional ([ADR-033](../decisions/ADR-033-schedule-draw-external-generator.md), D-194 to D-196); generator 4.0.0 and atlas release 2.2.0 since 1.7.0 ([ADR-035](../decisions/ADR-035-schedule-draw-generator-4-0-0.md), D-205); generator 4.1.0 and atlas release 2.3.0 since 1.9.0 (D-242, ADR-035 as amended); generator 4.1.1 and atlas release 2.4.0 since 1.10.0 (D-255) · **Component:** *Schedule Draw* (`SDraw`), panel *1 Program*, GUID `740cafea-7afe-47f4-8723-b24b6ec3c836` · **Code:** `Lod.ProgramJson.ScheduleDraw` (`src/Lod.ProgramJson/ScheduleDraw/`), `scripts/TestSuiteGenerator` (`schedules:`) · **Design note:** [2026-10-29-schedule-draw.md](../plans/2026-10-29-schedule-draw.md) · **Requirement:** [schedule-generator-requirement.md](../research/schedule-generator-requirement.md)
 
 ## Purpose
 
-A program JSON 6.0.0 defines deterministic ruleset schedules. *Schedule Draw* replaces them, as an optional add-on, with stochastic 8,760-hour schedules drawn by the atlas's generator `atlas_schedules` 4.1.0, which assembles its recipes from atlas release 2.3.0 (ComStock's sampled hours of operation and base-to-peak ratios for commercial programs), called as an external command. The result is another program JSON 6.0.0, which *Program JSON* and the test-suite generator import like any other.
+A program JSON 6.1.0 defines deterministic ruleset schedules. *Schedule Draw* replaces them, as an optional add-on, with stochastic 8,760-hour schedules drawn by the atlas's generator `atlas_schedules` 4.1.1, which assembles its recipes from atlas release 2.4.0 (ComStock's sampled hours of operation and base-to-peak ratios for commercial programs), called as an external command. The result is another program JSON 6.1.0, which *Program JSON* and the test-suite generator import like any other.
 
 ## Inputs
 
 | Input | What it is |
 | --- | --- |
-| Program JSON | The program JSON 6.0.0 text (atlas release 2.3.0). Its `version` (`filled` or `source`) chooses the values the generator draws from. |
-| Generator JSON | The program setting: the `generation.json` of the program's folder in atlas release 2.3.0, `v2.3.0/<family>/<template>/<building>/generation.json` in `atlas-release-2.3.0.zip` of the release [`v2.3.0`](https://github.com/Energy-Atlas/archetype-atlas/releases/tag/v2.3.0) (a folder the delta does not change keeps release 2.2.0's file, `v2.2.0/…` in the same zip; *Get from Atlas…* takes the resolved one from the site): per release program its generation method and, per view (`source`, and `filled` for 90.1), its ComStock configuration; per release service the configurations it runs under. A `generator.json` of release 2.0.0 or 2.1.0 is refused. |
+| Program JSON | The program JSON 6.1.0 text (atlas release 2.4.0). Its `version` (`filled` or `source`) chooses the values the generator draws from. |
+| Generator JSON | The program setting: the `generation.json` of the program's folder in atlas release 2.4.0, `v2.4.0/<family>/<template>/<building>/generation.json` in `atlas-release-2.4.0.zip` of the release [`v2.4.0`](https://github.com/Energy-Atlas/archetype-atlas/releases/tag/v2.4.0) (a folder the delta does not change keeps an earlier release's file, `v2.3.0/…` or `v2.2.0/…` in the same zip; *Get from Atlas…* takes the resolved one from the site): per release program its generation method and, per view (`source`, and `filled` for 90.1), its ComStock configuration; per release service the configurations it runs under. A `generator.json` of release 2.0.0 or 2.1.0 is refused. |
 | Setting | The schedule-generator setting, `schedule_draw_setting` 2.0.0 (below). |
 | Seed | The master seed (0 or more; the component takes a Grasshopper integer, a suite up to 2^53 − 1). |
 | Floor Area | The floor area the program represents, m² (default 100), the extent of its shared services. |
@@ -30,7 +30,7 @@ The strip *Get from Atlas…* at the bottom of the component ([ADR-036](../decis
 {
   "schema_version": "2.0.0",
   "kind": "schedule_draw_setting",
-  "generator": {"name": "atlas_schedules", "version": "4.1.0", "bundle_schema": "4.0.0"},
+  "generator": {"name": "atlas_schedules", "version": "4.1.1", "bundle_schema": "4.0.0"},
   "draw": ["occupancy", "lighting", "electric_equipment", "gas_equipment", "hot_water", "activity", "heating_setpoint", "cooling_setpoint"],
   "operating_hours": "per_instance",
   "occupancy": {"mix": "state", "window": "2003-2019"},
@@ -42,16 +42,16 @@ Only `schema_version`, `kind`, and `generator` are required; the rest takes the 
 
 ### The generator
 
-The pinned generator is `atlas-schedules` 4.1.0, released as the wheel `atlas_schedules-4.1.0-py3-none-any.whl` (SHA-256 `9390facc…a687`) with `SHA256SUMS.txt` on the atlas release [`atlas-schedules-v4.1.0`](https://github.com/Energy-Atlas/archetype-atlas/releases/tag/atlas-schedules-v4.1.0) (D-242; 4.0.0 in 1.7.0 and 1.8.0, D-205). It needs Python 3.11 or later; pip brings numpy and jsonschema, and the wheel bundles the generator view of atlas release 2.3.0, so no atlas checkout or data download is needed to draw:
+The pinned generator is `atlas-schedules` 4.1.1, released as the wheel `atlas_schedules-4.1.1-py3-none-any.whl` (SHA-256 `21560a1f…`) with `SHA256SUMS.txt` on the atlas release [`atlas-schedules-v4.1.1`](https://github.com/Energy-Atlas/archetype-atlas/releases/tag/atlas-schedules-v4.1.1) (D-255: 4.1.0's code, whose wheel bundles the generator view of release 2.4.0, the atlas's ADR 0062 section 4; 4.1.0 in 1.9.0, D-242; 4.0.0 in 1.7.0 and 1.8.0, D-205). It needs Python 3.11 or later; pip brings numpy and jsonschema, and the wheel bundles the generator view of atlas release 2.4.0, so no atlas checkout or data download is needed to draw:
 
 ```powershell
 sha256sum -c SHA256SUMS.txt --ignore-missing
 python -m venv D:\bemgen-venv-schedules
-D:\bemgen-venv-schedules\Scripts\python -m pip install --upgrade atlas_schedules-4.1.0-py3-none-any.whl
+D:\bemgen-venv-schedules\Scripts\python -m pip install --upgrade atlas_schedules-4.1.1-py3-none-any.whl
 D:\bemgen-venv-schedules\Scripts\atlas-schedules --version
 ```
 
-`--version` prints `atlas-schedules 4.1.0 (request schema 4.0.0); reads atlas release 2.3.0 from ...`. A draw then gives no `ScheduleDrawPreRelease`, and the bundle's `release` is 2.3.0 with the pinned manifest SHA-256 `afe7e2ef…fb86c`; a generator pointed at another release (`ATLAS_RELEASES`, `--release-dir`) is refused with `ScheduleDrawVersionMismatch`. The `generation.json` files come from the same release (`atlas-release-2.3.0.zip`).
+`--version` prints `atlas-schedules 4.1.1 (request schema 4.0.0); reads atlas release 2.4.0 from ...`. A draw then gives no `ScheduleDrawPreRelease`, and the bundle's `release` is 2.4.0 with the pinned manifest SHA-256 `51ce9c9e…bd7f`; a generator pointed at another release (`ATLAS_RELEASES`, `--release-dir`) is refused with `ScheduleDrawVersionMismatch`. The `generation.json` files come from the same release (`atlas-release-2.4.0.zip`).
 
 ## How a draw works
 
@@ -87,7 +87,7 @@ A drawn load keeps the program's value, which must equal the generator's amplitu
 | `ScheduleDrawInstanceInvalid`, `ScheduleDrawCalendarYear` | Error | A bad key or floor area; a calendar year other than 2007 |
 | `ScheduleDrawCommandFailed`, `ScheduleDrawTimeout`, `ScheduleDrawGeneratorFailed` | Error | The command cannot start; it ran too long; it exited non-zero or wrote no bundle (with its standard error) |
 | `ScheduleDrawBundleInvalid`, `ScheduleDrawVersionMismatch` | Error | The bundle is malformed or answers another request (another seed, owner, or view); another schema or generator version, or another data release or manifest |
-| `ScheduleDrawPreRelease` | Warning | A pre-release of the pinned version, such as `4.1.0.dev0` |
+| `ScheduleDrawPreRelease` | Warning | A pre-release of the pinned version, such as `4.1.1.dev0` |
 | `ScheduleDrawValuesSource` | Info | The export's view is not one of the block's views, so the request asks for `source` |
 | `ScheduleDrawBindingMismatch`, `ScheduleDrawBindingNotKept`, `ScheduleDrawAmbiguous`, `ScheduleDrawUnitMismatch` | Error | Magnitude or annual binding disagree; a slot matches several loads; a unit does not fit |
 | `ScheduleDrawClimateScheduleReplaced` | Warning | A drawn load had schedules by climate zone |
@@ -104,4 +104,4 @@ The same instances, recipes, setting, and seed give byte-identical documents. Ea
 
 ## Tests
 
-`tests/Lod.ProgramJson.Tests/ScheduleDraw/` on the recorded draws `Fixtures/draw/` (the DOE Ref 1980–2004 medium office's filled export, instances `0.KS` 200 m² and `0.DI` 300 m², seed 42; the 90.1-2019 medium office's source export, `0.OF` 250 m²; since D-242 the 90.1-2019 detailed medium office's open office, filled, `0.OO` 250 m², and the IECC 2021 quick-service restaurant's dining, source, `0.DI` 300 m²; the requests BEMGen writes and the bundles `atlas_schedules` 4.1.0 answered with, run as `python -m atlas_schedules` in a clone of atlas `75fec30d`, D-242), and `tests/TestSuiteGenerator.Tests/ScheduleDrawSuiteTests.cs` (the cafeteria suite, the merged-zone aggregate). `RealDrawTests` runs the real generator when `BEMGEN_ATLAS_GENERATOR` names the folder to run in (an atlas checkout for the module form, any folder for the installed package) and `BEMGEN_ATLAS_COMMAND` the command, and checks that it reports 4.1.0 without `ScheduleDrawPreRelease`, reads release 2.3.0, and gives the recorded bundles byte for byte, twice. The Rhino smoke spec `schedule-draw` runs the component with `BEMGEN_SCHEDULE_COMMAND`.
+`tests/Lod.ProgramJson.Tests/ScheduleDraw/` on the recorded draws `Fixtures/draw/` (the DOE Ref 1980–2004 medium office's filled export, instances `0.KS` 200 m² and `0.DI` 300 m², seed 42; the 90.1-2019 medium office's source export, `0.OF` 250 m²; since D-242 the 90.1-2019 detailed medium office's open office, filled, `0.OO` 250 m², and the IECC 2021 quick-service restaurant's dining, source, `0.DI` 300 m²; the requests BEMGen writes and the bundles `atlas_schedules` 4.1.1 answered with, run as `python -m atlas_schedules` in a checkout of atlas `7c543f5d`, D-255), and `tests/TestSuiteGenerator.Tests/ScheduleDrawSuiteTests.cs` (the cafeteria suite, the merged-zone aggregate). `RealDrawTests` runs the real generator when `BEMGEN_ATLAS_GENERATOR` names the folder to run in (an atlas checkout for the module form, any folder for the installed package) and `BEMGEN_ATLAS_COMMAND` the command, and checks that it reports 4.1.0 without `ScheduleDrawPreRelease`, reads release 2.3.0, and gives the recorded bundles byte for byte, twice. The Rhino smoke spec `schedule-draw` runs the component with `BEMGEN_SCHEDULE_COMMAND`.
